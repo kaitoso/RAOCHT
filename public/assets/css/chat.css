@@ -1,0 +1,139 @@
+/* Body rules */
+body{
+    padding-left: 300px;
+}
+/* Navbar rules */
+.navmenu-default .navmenu-text,
+.navbar-default .navbar-offcanvas .navmenu-text {
+    color: #FFF;
+}
+
+.navmenu-default .navmenu-brand:hover,
+.navmenu-default .navbar-offcanvas .navmenu-brand:hover,
+.navmenu-default .navmenu-brand:focus,
+.navmenu-default .navbar-offcanvas .navmenu-brand:focus {
+    color: #fff;
+    background-color: transparent;
+}
+
+.navmenu-default .navmenu-brand,
+.navbar-default .navbar-offcanvas .navmenu-brand:hover {
+    color: #FFF;
+}
+.navmenu-default .navmenu-nav > .active > a,
+.navbar-default .navbar-offcanvas .navmenu-nav > .active > a,
+.navmenu-default .navmenu-nav > .active > a:hover,
+.navbar-default .navbar-offcanvas .navmenu-nav > .active > a:hover,
+.navmenu-default .navmenu-nav > .active > a:focus, .navbar-default .navbar-offcanvas .navmenu-nav > .active > a:focus{
+    background-color: rgba(255, 255, 255, 0.20);
+    color: #FFF;
+}
+.navmenu-default .navmenu-nav > li > a,
+.navbar-default .navbar-offcanvas .navmenu-nav > li > a {
+    color: #FFF;
+}
+.navmenu-default .navmenu-nav > li > a:hover,
+.navbar-default .navbar-offcanvas .navmenu-nav > li > a:hover,
+.navmenu-default .navmenu-nav > li > a:focus,
+.navbar-default .navbar-offcanvas .navmenu-nav > li > a:focus {
+    color: #FFF;
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.navmenu-default .navmenu-nav > .open > a,
+.navbar-default .navbar-offcanvas .navmenu-nav > .open > a,
+.navmenu-default .navmenu-nav > .open > a:hover,
+.navbar-default .navbar-offcanvas .navmenu-nav > .open > a:hover,
+.navmenu-default .navmenu-nav > .open > a:focus,
+.navbar-default .navbar-offcanvas .navmenu-nav > .open > a:focus {
+    color: #FFF;
+    background-color: rgba(33, 33, 33, 0.5);
+}
+
+.navmenu-default .navmenu-nav.dropdown-menu,
+.navbar-default .navbar-offcanvas .navmenu-nav.dropdown-menu {
+    background-color: rgba(33, 33, 33, 0.5);
+}
+
+.navmenu-default .navmenu-nav > .disabled > a,
+.navbar-default .navbar-offcanvas .navmenu-nav > .disabled > a,
+.navmenu-default .navmenu-nav > .disabled > a:hover,
+.navbar-default .navbar-offcanvas .navmenu-nav > .disabled > a:hover,
+.navmenu-default .navmenu-nav > .disabled > a:focus,
+.navbar-default .navbar-offcanvas .navmenu-nav > .disabled > a:focus {
+    color: #FFF;
+}
+
+.navmenu.navmenu-default.navmenu-fixed-left ul.nav.navmenu-nav li {
+
+}
+
+.navmenu.navmenu-default.navmenu-fixed-left ul.nav.navmenu-nav li:hover{
+    background-color: inherit;
+    opacity: 1;
+}
+
+.navmenu.navmenu-default.navmenu-fixed-left .dropdown-menu.navmenu-nav li:hover{
+    background-color: inherit;
+}
+
+.navmenu.navmenu-default.navmenu-fixed-left h3.navbar-text{
+    float: none;
+    color: #FFF;
+}
+/* Custom rules */
+.chatbox {
+    margin: 1em 0;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    word-wrap: break-word;
+}
+.comentario {
+    margin-bottom: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: solid 1px rgba(0,0,0,0.1);
+}
+.avatar img{
+    float: left;
+    height: 40px;
+    width: 40px;
+    margin-right: 5px;
+}
+.contenido{
+    position: relative;
+    margin-left: 45px;
+}
+.autor > .info,
+.autor > .text-muted{
+    color: rgba(0,0,0,.54);
+}
+
+#messageBox{
+    margin-bottom: 5px;
+    opacity: 0.9;
+}
+
+ul.nav.navmenu-nav{
+    font-size: 12pt;
+}
+
+.onlineUser img {
+    height: 20px;
+    width: 20px;
+}
+
+.fa-separator {
+    border-right: 1px solid #e3f2fd;
+    padding-right: 5px;
+}
+
+#userPreview img{
+    display: block;
+    margin: 10px auto;
+    width: 80px;
+    height: 80px;
+}

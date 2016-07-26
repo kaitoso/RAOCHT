@@ -1,0 +1,88 @@
+{% extends 'templates/admin.twig' %}
+{% block titulo %}Admisión de usuarios{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+{% endblock %}
+{% block contenido %}
+    <legend>Expulsiones</legend>
+    {% include 'templates/flash.twig' %}
+    <table id="tablaExpulsion"
+           data-toggle="table"
+           data-search="true"
+           data-show-refresh="true"
+           data-show-columns="true"
+           data-show-export="true"
+           data-show-pagination-switch="true"
+           data-pagination="true"
+           data-side-pagination="server"
+           data-url="{{ base_url() }}/admin/search/bans"
+           data-show-footer="false">
+        <thead>
+        <tr>
+            <th class="col-sm-1" data-field="id">#</th>
+            <th class="col-sm-2" data-field="user">Usuario</th>
+            <th class="col-sm-2" data-field="who">Expulsado por</th>
+            <th class="col-sm-2" data-formatter="localHour" data-field="created_at">Fecha de expulsión</th>
+            <th class="col-sm-2" data-formatter="localHour" data-field="date_ban">Fecha de terminación</th>
+            <th class="col-sm-2" data-field="reason">Razon</th>
+            <th class="col-sm-1 rowEliminar" data-formatter="formatoElimitar" data-events="eliminar">Acción</th>
+        </tr>
+        </thead>
+    </table>
+    {{ csrf.field | raw}}
+    <script id="button-template" type="text/x-handlebars-template">
+        {% verbatim %}
+            <div class="text-center">
+                <button type="button" data-id={{id}} class="btn btn-danger btnEliminar"><i class="fa fa-times"></i></button>
+            </div>
+        {% endverbatim %}
+    </script>
+{% endblock %}
+{% block js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+    <script type="text/javascript" src="/dist/js/moment.min.js"></script>
+    <script src="{{ base_url }}/dist/js/bootstrap-table.min.js"></script>
+    <script type="text/javascript">
+        moment.locale('es');
+        var button_template = Handlebars.compile($("#button-template").html());
+        function localHour(value, row, index){
+            return moment(value).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a')
+        }
+
+        function formatoElimitar(value, row, index) {
+            return button_template(row);
+        }
+
+        function eliminar(e, value, row, index) {
+            return {
+                'click .btnEliminar': function(e, value, row, index) {
+                    swal({
+                        title: "¿Está seguro de que quiere admitir a este usuario?",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Borrar",
+                        cancelButtonText: "Cancelar",
+                        closeOnConfirm: false,
+                        closeOnCancel: true
+                    },
+                    function(isConfirm) {
+                        if (!isConfirm)
+                            return;
+                        $.delete('{{ base_url() }}/admin/unban/' + row.id, {
+                                token: $('input[name="raoToken"]').val()
+                            }
+                        );
+                        $('#tablaExpulsion').bootstrapTable('remove', {
+                            field: 'id',
+                            values: [row.id]
+                        });
+                        swal("¡Borrado!", "Se ha eliminado la expulsión con éxito.", "success");
+                    }
+                    );
+                }
+            }
+        }
+    </script>
+{% endblock %}

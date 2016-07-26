@@ -1,0 +1,97 @@
+{% extends 'templates/admin.twig' %}
+{% block titulo %}Rangos{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
+{% endblock  %}
+{% block contenido %}
+    <div class="row">
+        <div class="col-xs-12 col-sm-9 col-md-10">
+            <legend>Rangos</legend>
+        </div>
+        <div class="col-xs-12 col-sm-3 col-md-2">
+            <a href="{{ base_url() }}/admin/rank/new" class="btn btn-success pull-right">Crear nuevo rango</a>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    {% include 'templates/flash.twig' %}
+<div class="table-responsive">
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>#</th>
+                <th>Nombre</th>
+                <th>Fecha de creación</th>
+                <th>Acción</th>
+			</tr>
+		</thead>
+		<tbody id="rankBody">
+		</tbody>
+	</table>
+</div>
+    {{ csrf.field | raw }}
+    {% verbatim %}
+<script id="rank-template" type="text/x-handlebars-template">
+    <tr id="rank-{{id}}">
+        <td>{{ id }}</td>
+        <td>{{ name }}</td>
+        <td>{{ created_at }}</td>
+        <td>
+            <a href="{% endverbatim %}{{ base_url() }}{% verbatim %}/admin/rank/{{ id }}" class="btn btn-warning"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+            <a href="#" class="btn btn-danger btnEliminar" data-id="{{id}}"><i class="fa fa-times" aria-hidden="true"></i></a>
+        </td>
+    </tr>
+</script>
+    {% endverbatim %}
+{% endblock %}
+{% block js %}
+    <script type="text/javascript" src="/dist/js/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+    <script>
+        moment.locale('es');
+        var $rankTemplate = Handlebars.compile($('#rank-template').html());
+        $.getJSON('{{ base_url() }}/admin/search/ranks', function (data) {
+            $.each(data.ranks, function(i, v){
+                v.created_at = moment(v.created_at).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a');
+                $('#rankBody').append($rankTemplate(v));
+            });
+        });
+
+        $('tbody').on('click', '.btnEliminar', function (event) {
+            event.preventDefault();
+            var $id = $(this).data('id');
+            console.log($id);
+            swal({
+                title: "¿Está seguro de eliminar éste rango?",
+                text: "Todos los usuarios de este rango se irán a",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Borrar",
+                cancelButtonText: "Cancelar",
+                closeOnConfirm: false,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (!isConfirm)
+                    return;
+                swal({
+                    title: "Eliminando rango...",
+                    text: "Espere un momento mientras se elimina este rango...",
+                    imageUrl: "{{ base_url() }}/assets/img/loading_spin.gif",
+                    showConfirmButton: false
+                });
+                $.delete('{{ base_url }}/admin/rank/' + $id,
+                        {token: $('input[name="raoToken"]').val()},
+                        function(data) {},
+                        'json'
+                ).done(function(){
+                    swal("¡Borrado!", "¡Se ha eliminado este rango con éxito!", "success");
+                    $('tbody tr#rank-'+$id).remove()
+                }).fail(function () {
+                    swal("¡Oops!", "¡Hubo un error al tratar de borrar el rango!", "error");
+                })
+
+            });
+        });
+    </script>
+{% endblock %}

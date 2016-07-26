@@ -1,0 +1,12 @@
+composer.phar
+composer.lock
+/vendor/*
+/logs/*
+!/logs/.gitkeep
+/cache/*
+!/cache/.gitkeep
+/public/avatar/b/*
+/public/avatar/s/*
+.idea
+/server/.idea
+/server/node_modules

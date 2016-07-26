@@ -1,0 +1,92 @@
+{% extends 'templates/admin.twig' %}
+{% block titulo %}Modificar rango: {{ rank.name }}{% endblock %}
+{% block css %}
+{% endblock  %}
+{% block contenido %}
+<form action="" method="post" class="form-horizontal" role="form">
+    <div class="form-group">
+        <legend>Modificar rango: {{ rank.name }}</legend>
+    </div>
+    {% include 'templates/flash.twig' %}
+    <div class="form-group {% if errors.inputName %}has-error{% endif %}">
+        <label for="rankName" class="col-sm-3 col-lg-2 col-lg-2 control-label">Nombre del rango:</label>
+        <div class="col-sm-9 col-lg-10">
+            <input type="text" name="inputName" class="form-control" id="rankName" placeholder="Ingrese el nombre del rango..." value="{{ rank.name }}">
+            <span class="help-block">
+                {% if errors.inputName %}
+                    {{ errors.inputName | first }}
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <div class="form-group {% if errors.inputImmunity %}has-error{% endif %}">
+        <label for="inputImmunity" class="col-sm-3 col-lg-2 control-label">Inmunidad:</label>
+        <div class="col-sm-9 col-lg-10">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="inputImmunity" id="inputImmunity" {% if rank.immunity %}checked{% endif %} >
+                    <small>(Imposible expulsar y patear del chat a los que pertenezcan a este rango)</small>
+                </label>
+                <span class="help-block">
+                {% if errors.inputImmunity %}
+                    {{ errors.inputImmunity | first }}
+                {% endif %}
+            </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-3 col-lg-2 control-label">Permisos de administración:</label>
+        <div class="col-sm-9 col-lg-10">
+            {% for key, perm in permisos %}
+                {% set checked = null %}
+                {% for rp in rankPerm %}
+                    {% if rp == key %}
+                        {% set checked = 'checked' %}
+                    {% endif %}
+                {% endfor %}
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="inputPermission[{{ key }}]" {{ checked }}>
+                    {{ perm.description }}
+                </label>
+            </div>
+            {% endfor %}
+            <input class="hidden" name="inputPermission[hidden]" value="false">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-3 col-lg-2 control-label">Permisos del chat:</label>
+        <div class="col-sm-9 col-lg-10">
+            {% for key, perm in chatPermisos %}
+                {% set checked = null %}
+                {% for rc in rankChat %}
+                    {% if key == rc %}
+                        {% set checked = 'checked' %}
+                    {% endif %}
+                {% endfor %}
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="inputChatPerm[{{ key }}]" {{ checked }}>
+                        {{ perm }}
+                    </label>
+                </div>
+            {% endfor %}
+            <input class="hidden" name="inputChatPerm[hidden]" value="false">
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-9 col-lg-10 col-sm-offset-3 col-lg-offset-2">
+            <input type="hidden" name="_METHOD" value="PUT">
+            {{ csrf.field | raw }}
+            <button type="submit" class="btn btn-primary">Modificar rango</button>
+            <a href="{{ path_for('admin.rank') }}" class="btn btn-default">Ir atrás</a>
+        </div>
+    </div>
+</form>
+{% endblock %}
+{% block js %}
+{% endblock %}

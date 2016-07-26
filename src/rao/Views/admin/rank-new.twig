@@ -1,0 +1,80 @@
+{% extends 'templates/admin.twig' %}
+{% block titulo %}Nuevo rango{% endblock %}
+{% block css %}
+{% endblock  %}
+{% block contenido %}
+<form action="" method="post" class="form-horizontal" role="form">
+    <div class="form-group">
+        <legend>Nuevo rango</legend>
+    </div>
+    {% include 'templates/flash.twig' %}
+    <div class="form-group {% if errors.inputName %}has-error{% endif %}">
+        <label for="rankName" class="col-sm-3 control-label">Nombre del rango:</label>
+        <div class="col-sm-9">
+            <input type="text" name="inputName" class="form-control" id="rankName" placeholder="Ingrese el nombre del rango..." {% if errors.inputName %}value="{{ old.inputName }}"{% endif %}>
+            <span class="help-block">
+                {% if errors.inputName %}
+                    {{ errors.inputName | first }}
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <div class="form-group {% if errors.inputImmunity %}has-error{% endif %}">
+        <label for="inputImmunity" class="col-sm-3 control-label">Inmunidad:</label>
+        <div class="col-sm-9">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="inputImmunity" id="inputImmunity">
+                    <small>(Imposible expulsar y patear del chat a los que pertenezcan a este rango)</small>
+                </label>
+                <span class="help-block">
+                {% if errors.inputImmunity %}
+                    {{ errors.inputImmunity | first }}
+                {% endif %}
+            </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-3 control-label">Permisos de administración:</label>
+        <div class="col-sm-9">
+            {% for key, perm in permisos %}
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="inputPermission[{{ key }}]">
+                    {{ perm.description }}
+                </label>
+            </div>
+            {% endfor %}
+            <input class="hidden" name="inputPermission[hidden]" value="false">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-3 control-label">Permisos del chat:</label>
+        <div class="col-sm-9">
+            {% for key, perm in chatPermisos %}
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="inputChatPerm[{{ key }}]">
+                        {{ perm }}
+                    </label>
+                </div>
+            {% endfor %}
+            <input class="hidden" name="inputChatPerm[hidden]" value="false">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-10 col-sm-offset-2">
+            {{ csrf.field | raw }}
+            <button type="submit" class="btn btn-primary">Crear rango</button>
+            <a href="{{ path_for('admin.rank') }}" class="btn btn-default">Ir atrás</a>
+        </div>
+    </div>
+</form>
+{% endblock %}
+{% block js %}
+{% endblock %}

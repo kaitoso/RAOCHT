@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chat - Administración - {% block titulo %}Inicio{% endblock %}</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/css/jasny-bootstrap.min.css">
+    <link rel="stylesheet" href="{{ base_url() }}/dist/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ base_url() }}/assets/css/chat.css">
+    <link rel="stylesheet" href="{{ base_url() }}/assets/css/admin.css">
+    <style>
+        .dropdown-backdrop{position: relative;}
+         #mainContainer{
+             height: 100%;
+             /*background: url("{{ base_url() }}/assets/img/logo3.png") left no-repeat;*/
+             background-size: cover;
+         }
+
+        .navmenu-default{
+            background-color: rgba(0,0,0,0.87);
+            /*background-image: url("http://i.imgur.com/XgigA1g.png");*/
+            background-size: cover;
+            border-color: #e7e7e7;
+        }
+        .container-fluid{
+            margin: 1em;
+        }
+    </style>
+    {% block css %}{% endblock  %}
+</head>
+<body>
+<nav id="myNavmenu" class="navmenu navmenu-default navmenu-fixed-left" role="navigation">
+    <a href="#" class="navmenu-brand">Panel de administración</a>
+    <ul class="nav navmenu-nav">
+        <li class="active"><a href="{{ base_url() }}/admin"><i class="fa fa-home"></i> Inicio</a></li>
+        {% for permiso in permisos %}
+            <li><a href="{{ base_url() }}/admin{{ permiso.url }}"><i class="fa {{ permiso.icon }}"></i> {{ permiso.description }}</a></li>
+        {% endfor %}
+    </ul>
+</nav>
+<div class="container-fluid">
+    {% block contenido %}
+    {% endblock %}
+</div>
+<script src="{{ base_url() }}/dist/js/jquery.min.js"></script>
+<!-- Latest compiled and minified JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="{{ base_url() }}/dist/js/jasny-bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+<script>
+    Array.prototype.diff = function(a) {
+        return this.filter(function(i) {return a.indexOf(i) < 0;});
+    };
+    var base_url = '{{ base_url() }}/admin';
+    var current_url = (document.location.href).split("/");
+    var diff = current_url.diff(base_url.split('/'));
+    if(current_url.join('/') != base_url){
+        $('.active').removeClass('active');
+    }
+    $('a[href="' + base_url + '/' + diff.join('/') + '"]').parent().addClass("active");
+    jQuery.each(["put", "delete"], function(i, method) {
+        jQuery[method] = function(url, data, callback, type) {
+            if (jQuery.isFunction(data)) {
+                type = type || callback;
+                callback = data;
+                data = undefined;
+            }
+            return jQuery.ajax({
+                url: url,
+                type: method,
+                dataType: type,
+                data: data,
+                success: callback
+            });
+        };
+    });
+</script>
+{% block js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,80 @@
+{% extends 'templates/admin.twig' %}
+{% block titulo %}Gestión de usuarios{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+    <style>
+        .imgTable{
+            margin: 0 auto;
+            width: 40px;
+        }
+    </style>
+{% endblock %}
+{% block contenido %}
+    <div class="row">
+        <div class="col-xs-12 col-sm-9 col-md-10">
+            <legend>Gestión de usuarios</legend>
+        </div>
+        <div class="col-xs-12 col-sm-3 col-md-2">
+            <a href="{{ base_url() }}/admin/user/new" class="btn btn-success pull-right"><i class="fa fa-user-plus"></i> Nuevo Usuario</a>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    {% include 'templates/flash.twig' %}
+    <table id="tablaExpulsion"
+           data-toggle="table"
+           data-search="true"
+           data-show-refresh="true"
+           data-show-columns="true"
+           data-show-export="true"
+           data-show-pagination-switch="true"
+           data-pagination="true"
+           data-side-pagination="server"
+           data-url="{{ base_url() }}/admin/search/users"
+           data-show-footer="false">
+        <thead>
+        <tr>
+            <th class="col-sm-1" data-field="id">#</th>
+            <th class="col-sm-2" data-field="user">Usuario</th>
+            <th class="col-sm-2" data-field="rank">Rango</th>
+            <th class="col-sm-2" data-formatter="imageFormater">Imagen</th>
+            <th class="col-sm-2" data-formatter="localHour" data-field="created_at">Fecha de creación</th>
+            <th class="col-sm-1 rowEditar" data-formatter="botonEditar">Editar</th>
+        </tr>
+        </thead>
+    </table>
+    {{ csrf.field | raw}}
+    <script id="button-template" type="text/x-handlebars-template">
+        {% verbatim %}
+            <div class="text-center">
+                <a href="{% endverbatim %}{{base_url()}}{% verbatim %}/admin/user/{{id}}" class="btn btn-warning"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+            </div>
+        {% endverbatim %}
+    </script>
+    <script id="image-template" type="text/x-handlebars-template">
+        {% verbatim %}
+            <img src="{% endverbatim %}{{base_url()}}{% verbatim %}/avatar/s/{{image}}" class="img-responsive imgTable" alt="Image">
+        {% endverbatim %}
+    </script>
+{% endblock %}
+{% block js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+    <script type="text/javascript" src="/dist/js/moment.min.js"></script>
+    <script src="{{ base_url }}/dist/js/bootstrap-table.min.js"></script>
+    <script type="text/javascript">
+        moment.locale('es');
+        var button_template = Handlebars.compile($("#button-template").html());
+        var image_template = Handlebars.compile($('#image-template').html());
+        function localHour(value, row, index){
+            return moment(value).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a')
+        }
+
+        function imageFormater(value, row, index) {
+            return image_template(row);
+        }
+
+        function botonEditar(value, row, index) {
+            return button_template(row);
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,91 @@
+body {
+    padding-top: 40px;
+    padding-bottom: 40px;
+    /*background: url('/assets/images/fondo.jpg') no-repeat fixed center top / cover transparent;*/
+    background: #fafafa;
+}
+#logo {
+    margin-bottom: 1.4rem;
+}
+.form-signin {
+    background: white;
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+    -webkit-border-radius: 5px;
+    -webkit-border-top-left-radius: 2px;
+    -moz-border-radius: 5px;
+    -moz-border-radius-topleft: 2px;
+    border-radius: 5px;
+    border-top-left-radius: 2px;
+    border: 2px solid #e0e0e0;
+}
+.form-signin .form-signin-heading, .form-signin .checkbox {
+    margin-bottom: 10px;
+}
+.form-signin .checkbox {
+    font-weight: normal;
+    margin-bottom: 10px;
+}
+.checkbox input[type=checkbox]{
+    position: static;
+    margin-left: 0;
+}
+.form-signin .form-control {
+    position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.form-signin .form-group{
+    margin-bottom: 0px;
+}
+
+.form-signin .bottom{
+    background-color:rgb(255,255,255);
+    border-top:1px solid #ddd;
+    clear:both;
+    padding:14px;
+}
+.inputControl {
+    background-color: #ecf2f4;
+    border: medium none;
+    border-radius: 0.2rem;
+    padding: 1rem;
+    width: 100%;
+}
+
+.center-img {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.social-buttons{
+    margin:12px 0    
+}
+
+.social-buttons a{
+    width: 32%;
+}
+
+@media (max-width: 700px) and (orientation: landscape) {
+    body{
+        padding-top: 0;
+    }
+    #logo {
+        height: 80px;
+    }
+    .form-signin {
+        position: static;
+    }
+}
+
+@media (max-height: 700px) and (orientation: portrait) {
+    .form-signin {
+        position: static;
+    }
+}

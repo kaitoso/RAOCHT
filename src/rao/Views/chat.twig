@@ -1,0 +1,116 @@
+{% extends 'templates/base.twig' %}
+{% block titulo %}Chat - Inicio{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{{ base_url }}/assets/css/chat.css">
+    <style>
+        #mainContainer{
+            height: 100%;
+            /*background: url("{{ base_url() }}/assets/img/logo3.png") left no-repeat;*/
+            background-size: cover;
+        }
+
+        .navmenu-default{
+            background-color: rgba(0,0,0,0.87);
+            /*background-image: url("http://i.imgur.com/XgigA1g.png");*/
+            background-size: cover;
+            border-color: #e7e7e7;
+        }
+    </style>
+{% endblock %}
+{% block contenido %}
+    <nav id="myNavmenu" class="navmenu navmenu-default navmenu-fixed-left" role="navigation">
+        <div class="navmenu-brand" id="userPreview">
+            <img src="{{ base_url() }}/avatar/b/{{ user.image }}">
+            <div class="userControl">
+                <h3>{{ user.user }}</h3>
+                <h4>{{ user.getRank.name }}</h4>
+            </div>
+            <div id="userData"></div>
+        </div>
+        <h3 class="navbar-text">Opciones</h3>
+        <ul class="nav navmenu-nav">
+            {% if user.getRank.permissions|length > 0 %}
+            <li><a href="/admin" target="_blank"> Administración</a></li>
+            {% endif %}
+            <li><a href="/cuenta" target="_blank"><i class="fa fa-cog"></i> Configuración</a></li>
+            <li><a href="/privados" target="_blank"><i class="fa fa-envelope" aria-hidden="true"></i> Mensajes privados <span class="label label-default pull-right">0</span></a></li>
+            <li><a href="#"><i class="fa fa-smile-o"></i> Smilies</a></li>
+            <li><a href="/logout"><i class="fa fa-sign-out"></i> Salir</a></li>
+            <li class="dropdown open">
+                <a href="#"><i class="fa fa-users"></i> Usuarios <span class="label label-default pull-right">10</span></a>
+                <ul class="dropdown-menu navmenu-nav" role="menu" id="chatUsuarios">
+                    <li>
+                        <a class="onlineUser" href="#">
+                            <img src="{{ base_url() }}/avatar/s/{{ user.image }}" alt="user name" class="img-circle"> Asner
+                        </a>
+                    </li>
+                    <li>
+                        <a class="onlineUser" href="#">
+                            <img src="{{ base_url() }}/avatar/s/{{ user.image }}" alt="user name" class="img-circle"> Asner
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container-fluid" id="mainContainer">
+        <div class="chatbox">
+            <div class="comentario clearfix">
+                <div class="avatar">
+                    <img src="{{ base_url() }}/avatar/s/{{ user.image }}" alt="user name" class="img-circle">
+                </div>
+                <div class="contenido">
+                    <div class="autor">
+                        <a href="#"><strong>Asner</strong></a>
+                        <span class="info">@Asner - Administrador</span>
+                        <small class="pull-right text-muted"><i class="fa fa-clock-o"></i> 21 01 2016 05 54 43</small>
+                    </div>
+                    <div class="mensaje">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tristique in magna sed ullamcorper. Pellentesque nec posuere arcu. Sed ipsum libero, dignissim ornare molestie eu, congue vitae odio. Suspendisse condimentum molestie mauris nec rutrum metus. </div>
+                    <div class="mensaje">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tristique in magna sed ullamcorper. Pellentesque nec posuere arcu. Sed ipsum libero, dignissim ornare molestie eu, congue vitae odio. Suspendisse condimentum molestie mauris nec rutrum metus. </div>
+                    <div class="mensaje">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tristique in magna sed ullamcorper. Pellentesque nec posuere arcu. Sed ipsum libero, dignissim ornare molestie eu, congue vitae odio. Suspendisse condimentum molestie mauris nec rutrum metus. </div>
+                    <div class="mensaje">HAY</div>
+                </div>
+            </div>
+        </div>
+        <form class="input-group" id="messageBox">
+            <input class="form-control border no-shadow no-rounded" placeholder="Ingresa tu mensaje aquí..." maxlength="255">
+            <span class="input-group-btn">
+                <button class="btn btn-success no-rounded" type="submit">Enviar</button>
+            </span>
+        </form><!-- /input-group -->
+    </div>
+    {% verbatim %}
+<script id="messageTemplate" type="text/x-handlebars-template">
+    <div class="comentario clearfix">
+        <div class="avatar">
+            <img src="{{image}}" alt="{{user}}" class="img-circle">
+        </div>
+        <div class="contenido">
+            <div class="autor">
+                <a href="#" style="color: #{{ chatColor }}"><strong>{{chatName}}</strong></a>
+                <span class="info">@{{user}} - {{rank}}</span>
+                <small class="pull-right text-muted"><i class="fa fa-clock-o"></i> {{ time }}</small>
+            </div>
+            <div class="mensaje" style="color: #{{chatText}}">{{message}}</div>
+        </div>
+    </div>
+</script>
+<script id="messageChildTemplate" type="text/x-handlebars-template">
+    <div class="mensaje" style="color: #{{chatText}}">{{message}}</div>
+</script>
+<script id="usersTemplate" type="text/x-handlebars-template">
+    <li>
+        <a class="onlineUser" href="#">
+            <img src="{{ image }}" alt="{{ name }}" class="img-circle"> {{ name }}
+        </a>
+    </li>
+</script>
+    {% endverbatim %}
+{% endblock %}
+{% block js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+    <script>var $baseUrl = '{{ base_url() }}';</script>
+    <script src="{{ base_url() }}/assets/js/app.js"></script>
+{% endblock %}
