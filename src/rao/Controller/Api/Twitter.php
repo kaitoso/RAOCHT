@@ -83,7 +83,7 @@ class Twitter extends BaseController
             $this->session->get('twitter_oauth_secret')
         );
         $access_token = $twitter->oauth("oauth/access_token", ["oauth_verifier" => $_REQUEST['oauth_verifier']]);
-        $user = User::find($this->session->get('user_id'));
+        $user = User::find($this->session->get('user_id"'));
         if(!$user){
             $this->flash->addMessage('error', '¡No has iniciado sesión!');
             return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
@@ -93,7 +93,7 @@ class Twitter extends BaseController
             'oauth_token' => $access_token['oauth_token'],
             'oauth_token_secret' => $access_token['oauth_token_secret']
         ];
-        $user->twitterId = $access_token['oauth_token'];
+        $user->twitterId = $access_token['user_id"'];
         $user->twitterToken = json_encode($auth);
         $user->ip = $request->getAttribute('ip_address');
         $user->save();
