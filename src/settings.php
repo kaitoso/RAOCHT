@@ -25,6 +25,7 @@ return [
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
+            'strict'    => true
         ],
         'smtp' => [
             'smtp_user' => 'azure_2d727fa0aef6d9383c5b41da9e552494@azure.com',
