@@ -34,7 +34,7 @@ class AppSchemas
             $table->bigInteger('twitterId')->unsigned()->nullable();
             $table->string('twitterToken', 510)->nullable();
             $table->string('googleId', 32)->nullable();
-            $table->timestamp('lastLogin');
+            $table->timestamp('lastLogin')->useCurrent();
             $table->timestamps();
             $table->foreign('rank')
                 ->references('id')
@@ -47,8 +47,8 @@ class AppSchemas
             $table->string('selector', 12)->unique();
             $table->string('token', 64);
             $table->integer('user_id')->unsigned();
-            $table->timestamp('expires');
-            $table->timestamp('last_used');
+            $table->timestamp('expires')->useCurrent();
+            $table->timestamp('last_used')->useCurrent();
             $table->string('ip', 45);
             $table->foreign('user_id')
                 ->references('id')
@@ -60,7 +60,7 @@ class AppSchemas
             $table->increments('id');
             $table->integer('user')->unsigned()->unique();
             $table->integer('who')->unsigned();
-            $table->timestamp('date_ban');
+            $table->timestamp('date_ban')->useCurrent();
             $table->string('reason', 255);
             $table->string('ip', 15);
             $table->timestamps();
