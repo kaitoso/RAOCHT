@@ -15,7 +15,7 @@ $container['db'] = function($c) use ($capsule){
 // Redis
 $container['redis'] = function($c){
     $redis = new Redis();
-    $redis->pconnect('127.0.0.1', 6379);
+    $redis->connect('127.0.0.1', 6379);
     return $redis;
 };
 
@@ -54,6 +54,18 @@ $container['logger'] = function ($c) {
     return $logger;
 };
 
+$container['errorHandler'] = function ($c) {
+    return new App\Handler\Error\ErrorHandler($c['logger']);
+};
+
+$container['email'] = function($c){
+    $config = $c->get('settings')['smtp'];
+    $transport = Swift_SmtpTransport::newInstance($config['smtp_server'], $config['smtp_port']);
+    $transport->setUsername($config['smtp_user']);
+    $transport->setPassword($config['smtp_password']);
+    return $transport;
+};
+
 $container['cookie'] = function($c){
     $request = $c->get('request');
     return new \Slim\Http\Cookies($request->getCookieParams());
@@ -72,8 +84,29 @@ $container['fb'] = function ($c){
     return new Facebook\Facebook($fbSettings);
 };
 
+$container['twitter'] = function($c){
+    $twitterSettings = $c->get('settings')['twitter'];
+    return new Abraham\TwitterOAuth\TwitterOAuth(
+        $twitterSettings['consumer_key'],
+        $twitterSettings['consumer_secret']
+    );
+};
+
+$container['google'] = function($c) {
+    $settings = $c->get('settings')['google'];
+    $client = new Google_Client();
+    $client->setClientId($settings['client_id']);
+    $client->setClientSecret($settings['client_secret']);
+    $client->setScopes('email');
+    return $client;
+};
+
 $container['App\MainController'] = function($c){
     return new App\Controller\MainController($c);
+};
+
+$container['App\SubscriptionController'] = function($c){
+    return new App\Controller\SubscriptionController($c);
 };
 
 $container['App\CuentaController'] = function($c){
@@ -104,6 +137,26 @@ $container['App\Admin\UserController'] = function ($c){
     return new App\Controller\Admin\UserController($c);
 };
 
+$container['App\Admin\SmilieController'] = function ($c){
+    return new App\Controller\Admin\SmilieController($c);
+};
+
+$container['App\Admin\LogroController'] = function ($c){
+    return new App\Controller\Admin\LogroController($c);
+};
+
+$container['App\Admin\ChatController'] = function ($c){
+    return new App\Controller\Admin\ChatController($c);
+};
+
 $container['App\Api\Facebook'] = function($c){
     return new App\Controller\Api\Facebook($c);
+};
+
+$container['App\Api\Twitter'] = function($c){
+    return new App\Controller\Api\Twitter($c);
+};
+
+$container['App\Api\Google'] = function($c){
+    return new App\Controller\Api\Google($c);
 };

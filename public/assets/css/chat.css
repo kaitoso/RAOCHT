@@ -82,11 +82,15 @@ body{
     color: #FFF;
 }
 /* Custom rules */
+#mainContainer{
+    padding-right: 0;
+}
 .chatbox {
     margin: 1em 0;
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
     word-wrap: break-word;
+    padding-right: 15px;
 }
 .comentario {
     margin-bottom: 10px;
@@ -114,6 +118,7 @@ body{
 
 #messageBox{
     margin-bottom: 5px;
+    margin-right: 15px;
     opacity: 0.9;
 }
 

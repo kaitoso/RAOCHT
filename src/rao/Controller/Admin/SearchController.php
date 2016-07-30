@@ -3,9 +3,13 @@ namespace App\Controller\Admin;
 
 
 use App\Controller\BaseController;
+use App\Model\Achievement;
 use App\Model\Ban;
 use App\Model\Rank;
+use App\Model\Smilie;
 use App\Model\User;
+use App\Model\UserAchievements;
+use Respect\Validation\Validator as v;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
@@ -14,7 +18,7 @@ class SearchController extends BaseController
     public function getUser(Request $request, Response $response, $args)
     {
         $inputUser = $args['user'];
-        $userLike = User::select('users.user', 'users.image', 'ranks.name')
+        $userLike = User::select('users.id', 'users.user', 'users.image', 'ranks.name')
             ->leftJoin('ranks', 'ranks.id', '=', 'users.rank')
             ->where('user', 'LIKE', "%{$inputUser}%")
             ->take(4)
@@ -31,7 +35,10 @@ class SearchController extends BaseController
         $order  = !empty($query['order']) ? $query['order'] : 'asc';
         $users = User::select('users.id', 'users.user', 'ranks.name as rank', 'users.image', 'users.created_at')
             ->join('ranks', 'users.rank', '=', 'ranks.id')
-            ->where('users.user', 'like', "{$search}%")
+            ->where([
+                ['users.id', '>', '2'],
+                ['users.user', 'like', "{$search}%"]
+            ])
             ->skip($offset)
             ->take($limit)
             ->orderBy('users.id', $order)
@@ -72,5 +79,75 @@ class SearchController extends BaseController
             'ranks' => $rangos->toArray(),
             'count' => $count
         ]);
+    }
+
+    public function getSmilies(Request $request, Response $response, $args)
+    {
+        $query = $request->getQueryParams();
+        $search = !empty($query['search']) ? $query['search'] : '';
+        $offset = !empty($query['offset']) ? $query['offset'] : 0;
+        $limit  = !empty($query['limit']) ? $query['limit'] : 10;
+        $order  = !empty($query['order']) ? $query['order'] : 'asc';
+        $smilies = Smilie::where('code', 'like', "%{$search}%")
+            ->skip($offset)
+            ->take($limit)
+            ->orderBy('id', $order)
+            ->get();
+        $return = array(
+            'rows' => $smilies->toArray(),
+            'total' => Smilie::count()
+        );
+        return $this->showJSONResponse($response, $return);
+    }
+
+    public function getAchievements(Request $request, Response $response, $args)
+    {
+        $query = $request->getQueryParams();
+        $search = !empty($query['search']) ? $query['search'] : '';
+        $offset = !empty($query['offset']) ? $query['offset'] : 0;
+        $limit  = !empty($query['limit']) ? $query['limit'] : 10;
+        $order  = !empty($query['order']) ? $query['order'] : 'asc';
+        $logros = Achievement::where('name', 'like', "%{$search}%")
+            ->skip($offset)
+            ->take($limit)
+            ->orderBy('id', $order)
+            ->get();
+        $return = array(
+            'rows' => $logros->toArray(),
+            'total' => Achievement::count()
+        );
+        return $this->showJSONResponse($response, $return);
+    }
+
+    public function getAchievementUsers(Request $request, Response $response, $args)
+    {
+        $validation = $this->validator->validateArgs($args, [
+            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+        ]);
+        if($validation->failed()){
+            $return = array(
+                'rows' => [],
+                'total' => 0
+            );
+            return $this->showJSONResponse($response, $return);
+        }
+        $query = $request->getQueryParams();
+        $search = !empty($query['search']) ? $query['search'] : '';
+        $offset = !empty($query['offset']) ? $query['offset'] : 0;
+        $limit  = !empty($query['limit']) ? $query['limit'] : 10;
+        $order  = !empty($query['order']) ? $query['order'] : 'asc';
+        $users = UserAchievements::select('users.id', 'users.user', 'user_achievements.created_at')
+            ->join('users', 'user_achievements.user_id', '=', 'users.id')
+            ->join('achievements', 'user_achievements.achievement_id', '=', 'achievements.id')
+            ->where('users.user', 'like', "{$search}%")
+            ->skip($offset)
+            ->take($limit)
+            ->orderBy('users.id', $order)
+            ->get();
+        $return = array(
+            'rows' => $users->toArray(),
+            'total' => UserAchievements::where('achievement_id', $args['id'])->count()
+        );
+        return $this->showJSONResponse($response, $return);
     }
 }

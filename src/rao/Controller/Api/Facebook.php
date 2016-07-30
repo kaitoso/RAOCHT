@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: joseg
- * Date: 21/07/2016
- * Time: 05:16 PM
- */
-
 namespace App\Controller\Api;
 
 use App\Controller\BaseController;
@@ -17,6 +10,29 @@ use Facebook\Exceptions\FacebookSDKException;
 
 class Facebook extends BaseController
 {
+
+    public function getIndex(Request $request, Response $response, $args)
+    {
+        if ($this->session->get('user_id') !== null) {
+            return $this->withRedirect($response, $this->router->pathFor('main.page'));
+        }
+        $fbHelper = $this->fb->getRedirectLoginHelper();
+        $url = $fbHelper->getLoginUrl(
+            $request->getUri()->getBaseUrl().$this->router->pathFor('auth.facebook.callback'),
+            ['email']
+        );
+        return $this->withRedirect($response, $url);
+    }
+
+    public function getCuentaLogin(Request $request, Response $response, $args)
+    {
+        $fbHelper = $this->fb->getRedirectLoginHelper();
+        $url = $fbHelper->getLoginUrl(
+            $request->getUri()->getBaseUrl().$this->router->pathFor('cuenta.facebook.callback'),
+            ['email']
+        );
+        return $this->withRedirect($response, $url);
+    }
 
     public function getFacebookCallback(Request $request, Response $response, $args)
     {
@@ -59,7 +75,11 @@ class Facebook extends BaseController
         $this->session->set('fb_id', $userNode->getId());
         $user = User::where('facebookId', '=', $userNode->getId())->first();
         if(empty($user)){
-            $this->container->flash->addMessage('error', '¡Error! Al parecer no has ligado tu cuenta del chat con Facebook. Intenta iniciar sesión con tus datos.');
+            $this->container->flash->addMessage(
+                'error',
+                '¡Error! Al parecer no has ligado tu cuenta del chat con Facebook. 
+                Intenta iniciar sesión con tus datos.'
+            );
             return $this->withRedirectWithout($response, $this->container->router->pathFor('auth.login'));
         }
         // Guardar sesión
@@ -69,6 +89,7 @@ class Facebook extends BaseController
         // Guardar usuario
         $user->ip = $request->getAttribute('ip_address');
         $user->lastLogin = date('Y-m-d H:i:s');
+        $user->facebookId = $userNode->getId();
         $user->facebookToken = $accessToken->getValue();
         $user->save();
         return $this->withRedirect($response, $this->router->pathFor('main.page'));
@@ -131,7 +152,7 @@ class Facebook extends BaseController
         $user = User::find($this->session->get('user_id'));
         if(empty($user->facebookId)){
             $this->flash->addMessage('social-error', '¡Esta cuenta no está ligada a ninguna cuenta de Facebook!');
-            return $this->withRedirect($response, $this->router->pathFor('main.error'));
+            return $this->withRedirectWithout($response, $this->router->pathFor('cuenta.main').'#formSocial');
         }
         // Guardamos token
         $user->facebookId = null;

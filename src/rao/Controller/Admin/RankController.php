@@ -2,6 +2,7 @@
 namespace App\Controller\Admin;
 
 use App\Controller\BaseController;
+use App\Handler\ClientCache;
 use App\Model\Rank;
 use App\Model\User;
 use Respect\Validation\Validator as v;
@@ -88,6 +89,8 @@ class RankController extends BaseController
         $newRank->permissions = json_encode(array_keys($chatInters));
         $newRank->chatPermissions = json_encode(array_keys($clientInter));
         $newRank->save();
+        /* Actualizar el caché */
+        ClientCache::createCache($this->redis);
         /* Publicar el nuevo rango */
 
         $this->flash->addMessage('success', '¡Se ha creado el nuevo rango con éxito!');
@@ -145,6 +148,8 @@ class RankController extends BaseController
         $rank->permissions = json_encode(array_keys($chatInters));
         $rank->chatPermissions = json_encode(array_keys($clientInter));
         $rank->save();
+        /* Actualizar el caché */
+        ClientCache::createCache($this->redis);
         /* Publicar la modificación del rango */
 
         $this->flash->addMessage('success', '¡Se ha modificado el rango con éxito!');
@@ -176,6 +181,10 @@ class RankController extends BaseController
             ->update(['rank' => 2]);
         /* Borrar rango */
         $rank->delete();
+        /* Actualizar el caché */
+        ClientCache::createCache($this->redis);
+        /* Publicar la modificación del rango */
+
         return $this->showJSONResponse($response, ['success' => 'Se ha eliminado el rango correctamente.']);
     }
 

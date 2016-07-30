@@ -15,15 +15,7 @@ class CuentaController extends BaseController
         }
         $id = $this->session->get('user_id');
         $user = User::find($id);
-        $social = [];
-        if(!$user->facebookId){
-            $fbHelper = $this->fb->getRedirectLoginHelper();
-            $social['facebook'] = $fbHelper->getLoginUrl(
-                $request->getUri()->getBaseUrl().$this->router->pathFor('cuenta.facebook'),
-                ['email']
-            );
-        }
-        return $this->view->render($response, 'cuenta.twig', ['user' => $user, 'social' => $social]);
+        return $this->view->render($response, 'cuenta.twig', ['user' => $user]);
     }
 
     public function postImagen(Request $request, Response $response, $args){
@@ -39,11 +31,25 @@ class CuentaController extends BaseController
             }
             return $this->withRedirect($response, $this->router->pathFor('cuenta.main'));
         }
+        $files = $request->getUploadedFiles();
+        if(empty($files['fileImage'])){
+            return $response->withJson([
+                'error' => true,
+                'message' => 'No has subido ninguna imagen.'
+            ]);
+        }
         $avatarPath = __DIR__.'/../../../public/avatar';
         $id = $this->session->get('user_id');
         $user = User::find($id);
-        $storage = new \Upload\Storage\FileSystem($avatarPath);
-        $file = new \Upload\File('fileImage', $storage);
+        try {
+            $storage = new \Upload\Storage\FileSystem($avatarPath);
+            $file = new \Upload\File('fileImage', $storage);
+        }catch(\InvalidArgumentException $ex){
+            return $response->withJson([
+                'error' => true,
+                'message' => 'No has subido ninguna imagen.'
+            ]);
+        }
         $file->setname($user->user . uniqid());
         $file->addValidations(array(
             new \Upload\Validation\Mimetype(array('image/png', 'image/gif', 'image/jpg', 'image/jpeg', 'image/gif')),
@@ -88,7 +94,7 @@ class CuentaController extends BaseController
 
     public function putChatInfo(Request $request, Response $response, $args){
         $validation = $this->validator->validate($request, [
-            'chatName' => v::noWhitespace()->notEmpty()->alnum()->length(4, 50),
+            'chatName' => v::stringType()->notEmpty()->length(4, 50),
             'chatColor' => v::noWhitespace()->notEmpty()->hexRgbColor(),
             'chatTexto' => v::noWhitespace()->notEmpty()->hexRgbColor(),
             'raoToken' => v::noWhitespace()->notEmpty()
@@ -106,7 +112,7 @@ class CuentaController extends BaseController
 
         if($this->session->get('token') !== $inputToken){
             $this->flash->addMessage('error', 'Éste token es inválido.');
-            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+            return $this->withRedirect($response, $this->router->pathFor('cuenta.main').'#chatForm');
         }
 
         $id = $this->session->get('user_id');

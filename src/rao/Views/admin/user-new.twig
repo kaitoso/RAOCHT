@@ -1,18 +1,73 @@
 {% extends 'templates/admin.twig' %}
-{% block titulo %}{% endblock %}
+{% block titulo %}Nuevo usuario{% endblock %}
 {% block css %}
 {% endblock  %}
 {% block contenido %}
     <form action="" method="post" class="form-horizontal" role="form">
         <div class="form-group">
-            <legend></legend>
+            <legend>Nuevo usuario</legend>
+        </div>
+        {% include 'templates/flash.twig' %}
+        <div class="form-group {% if errors.inputUser %}has-error{% endif %}">
+            <label for="inputUser" class="col-sm-2 control-label">Usuario: </label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="inputUser" id="inputUser" placeholder="Ingrese el usuario..." value="{{ old.inputUser }}" maxlength="50" required>
+                <span class="help-block">
+                    {{ errors.inputUser | first }}
+                </span>
+            </div>
         </div>
 
+        <div class="form-group {% if errors.inputPassword %}has-error{% endif %}">
+            <label for="inputPassword" class="col-sm-2 control-label">Contraseña:</label>
+            <div class="col-sm-10">
+                <input type="password" class="form-control" id="inputPassword" name="inputPassword" placeholder="Ingrese la contraseña..." value="{{ old.inputPassword }}" required>
+                <span class="help-block">
+                    {{ errors.inputPassword | first }}
+                </span>
+            </div>
+        </div>
 
+        <div class="form-group {% if errors.inputEmail %}has-error{% endif %}">
+            <label for="inputEmail" class="col-sm-2 control-label">Correo electrónico:</label>
+            <div class="col-sm-10">
+                <input type="email" class="form-control" name="inputEmail" id="inputEmail" placeholder="Ingrese el correo electrónico..." value="{{ old.inputEmail }}" required>
+                <span class="help-block">
+                    {{ errors.inputEmail | first }}
+                </span>
+            </div>
+        </div>
+        <div class="form-group {% if errors.inputEmail %}has-error{% endif %}">
+            <label for="inputRango" class="col-sm-2 control-label">Rango:</label>
+            <div class="col-sm-10">
+                <select name="inputRango" id="inputRango" class="form-control">
+                    {% for r in rank %}
+                    <option value="{{ r.id }}" {% if old.inputRango == r.id %}selected{% endif %}>{{ r.name }}</option>
+                    {% endfor %}
+                </select>
+                <span class="help-block">
+                    {{ errors.inputEmail | first }}
+                </span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputActivated" class="col-sm-2 control-label">Activado:</label>
+            <div class="col-sm-10">
+                <div class="checkbox">
+                	<label>
+                		<input type="checkbox" name="inputActivated" id="inputActivated" checked>
+                        <small>Si esta casilla está desmarcada, se le enviará un correo electrónico al usuario para que active su cuenta.</small>
+                	</label>
+                </div>
+            </div>
+        </div>
 
         <div class="form-group">
             <div class="col-sm-10 col-sm-offset-2">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                {{ csrf.field | raw }}
+                <button type="submit" class="btn btn-success"><i class="fa fa-user-plus"></i> Crear usuario</button>
+                <a href="{{ path_for('admin.user') }}" class="btn btn-default">Ir atrás</a>
             </div>
         </div>
     </form>

@@ -7,10 +7,12 @@ var server = require('http').createServer(httpHandler);
 var redis = require('redis');
 var io = require('socket.io')(server);
 var fs = require('fs');
+var _ = require('lodash');
 var cookie = require('cookie');
 var subscriber = redis.createClient();
 var redisClient = redis.createClient();
 var globalUsers = [];
+var userMetadata = [];
 server.listen(8080);
 
 
@@ -37,10 +39,10 @@ io.on('connection', (socket) => {
         let json = JSON.parse(data);
         json.session = sessid;
         globalUsers[socket.id] = json;
+        json.ready = false;
         console.log(globalUsers);
     });
     socket.on('message', (data) => {
-        console.log(data);
         if (typeof(data.message) !== 'string') return;
         if (data.message.length > 255) {
             io.to(socket.id).emit('error', {
@@ -49,10 +51,16 @@ io.on('connection', (socket) => {
             return;
         }
         let user = globalUsers[socket.id];
-        user.message = data.message;
-        delete user['session'];
-        delete user['user_id'];
-        io.emit('message', user);
+        let message = {
+            'user': user.user,
+            'chatName': user.chatName,
+            'chatColor': user.chatColor,
+            'chatText': user.chatText,
+            'image': user.image,
+            'rank': user.rank,
+            'message': data.message
+        }
+        io.emit('message', message);
     });
     socket.on('disconnect', () => {
        console.log('Handle disconect');
@@ -62,7 +70,53 @@ io.on('connection', (socket) => {
 });
 
 /* Redis */
-subscriber.on('message', (channel, message) => {
-   console.log(channel, message);
+subscriber.on('message', (channel, data) => {
+   console.log(channel, data);
+    let message = JSON.parse(data);
+
+    if(channel === 'update-image'){
+        let id = getUserBySession(message.id, globalUsers);
+        if(id === null){
+            return;
+        }
+        let user = globalUsers[id];
+        user.image = message.image;
+        globalUsers[id] = user;
+        // Emit user change
+    }
+    if(channel == 'update-chat'){
+        let id = getUserBySession(message.id, globalUsers);
+        console.log('id', id);
+        if(id === null){
+            return;
+        }
+        let user = globalUsers[id];
+        user.chatName = message.chatName;
+        user.chatColor = message.chatColor;
+        user.chatText = message.chatText;
+        globalUsers[id] = user;
+    }
 });
 subscriber.subscribe('update-image', 'update-chat', 'ban-chat');
+
+function getUserById(id, users){
+    let globalKey = null;
+    _.forOwn(users, (user, key) => {
+        if (user.user_id === id) {
+            globalKey = key;
+            return false;
+        }
+    });
+    return globalKey;
+};
+
+function getUserBySession(session, users){
+    let globalKey = null;
+     _.forOwn(users, (user, key) => {
+         if (user.session === session) {
+             globalKey = key;
+             return false;
+         }
+     });
+    return globalKey;
+};

@@ -5,13 +5,17 @@
     <style>
         #mainContainer{
             height: 100%;
-            /*background: url("{{ base_url() }}/assets/img/logo3.png") left no-repeat;*/
+        {% if config.background %}
+            background: url("{{ base_url() }}/assets/img/{{ config.background }}") left no-repeat;
+        {% endif %}
             background-size: cover;
         }
 
         .navmenu-default{
             background-color: rgba(0,0,0,0.87);
-            /*background-image: url("http://i.imgur.com/XgigA1g.png");*/
+        {% if config.side %}
+            background: url("{{ base_url() }}/assets/img/{{ config.side }}") left no-repeat;
+        {% endif %}
             background-size: cover;
             border-color: #e7e7e7;
         }
@@ -29,7 +33,7 @@
         </div>
         <h3 class="navbar-text">Opciones</h3>
         <ul class="nav navmenu-nav">
-            {% if user.getRank.permissions|length > 0 %}
+            {% if permissions|length > 0 %}
             <li><a href="/admin" target="_blank"> Administración</a></li>
             {% endif %}
             <li><a href="/cuenta" target="_blank"><i class="fa fa-cog"></i> Configuración</a></li>
@@ -109,6 +113,7 @@
     {% endverbatim %}
 {% endblock %}
 {% block js %}
+    <script src="{{ base_url() }}/dist/js/promise.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
     <script>var $baseUrl = '{{ base_url() }}';</script>

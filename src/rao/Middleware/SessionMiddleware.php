@@ -30,7 +30,7 @@ class SessionMiddleware extends Middleware{
                 $redis = $this->container->redis;
                 $this->container->session->set('user_id', $user->id);
                 $this->container->session->set('user', $user->user);
-                $this->container->session->set('rol', $user->rol);
+                $this->container->session->set('rank', $user->rank);
                 /* Actualizar el auth */
                 $auth->last_used = date('Y-m-d H:i:s');
                 $auth->save();
@@ -47,21 +47,22 @@ class SessionMiddleware extends Middleware{
                     'chatText' => $user->chatText,
                     'image' =>
                         $request->getUri()->getBaseUrl().'/avatar/s/'.$user->image,
-                    'rol' => $user->rol,
+                    'rank' => $user->rank,
                 )));
             }
         }else if(!empty($this->container->session->get('user_id'))){
-            if(!$this->container->redis->exists($this->container->session->getSessionId())){
-                $user =User::find($this->container->session->get('user_id'));
-                $this->container->redis->setex($this->container->session->getSessionId(), 3600, json_encode(array(
-                    'user_id' => $user->id,
-                    'user' => $user->user,
-                    'customName' => $user->chatName,
-                    'image' =>
-                        $request->getUri()->getBaseUrl().'/avatar/s/'.$user->image,
-                    'rol' => $user->rol,
-                )));
-            }
+            $this->container->redis->delete($this->container->session->getSessionId());
+            $user = User::find($this->container->session->get('user_id'));
+            $this->container->redis->setex($this->container->session->getSessionId(), 3600, json_encode(array(
+                'user_id' => $user->id,
+                'user' => $user->user,
+                'chatName' => $user->chatName,
+                'chatColor' => $user->chatColor,
+                'chatText' => $user->chatText,
+                'image' =>
+                    $request->getUri()->getBaseUrl().'/avatar/s/'.$user->image,
+                'rank' => $user->rank,
+            )));
         }
         if(empty($this->container->session->get('token'))){
             $this->container->session->set('token',

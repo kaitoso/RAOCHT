@@ -21,7 +21,7 @@ require __DIR__ . '/../src/dependencies.php';
 require __DIR__ . '/../src/middleware.php';
 
 // Register validations
-//v::with('App\\Validation\\Rules\\');
+v::with('App\\Validation\\Rules');
 
 // Register routes
 require __DIR__ . '/../src/routes.php';

@@ -1,0 +1,118 @@
+{% extends 'templates/admin.twig' %}
+{% block titulo %}Nuevo Smilie{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
+    <style>
+        small{
+            color: rgba(0,0,0, 0.54);
+        }
+        .current-img,
+        .preview-img img
+        {
+            max-height: 120px !important;
+            max-width: 320px;
+        }
+    </style>
+{% endblock  %}
+{% block contenido %}
+    <div class="row">
+        <div class="col-xs-12">
+            {% include 'templates/flash.twig' %}
+            <form id="formSmilie" method="post" action="{{ base_url() }}/admin/smilie/new" enctype="multipart/form-data" class="form-horizontal" role="form">
+                <div class="form-group">
+                    <legend>Agregar nuevo smilie</legend>
+                </div>
+
+                <div class="form-group {% if errors.inputCode %}has-error{% endif %}">
+                    <label for="inputCode" class="col-sm-2 control-label">Código</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="inputCode" id="inputCode" placeholder="Ingrese el código del smilie..." value="{{ old.inputEmail }}" maxlength="10" required>
+                        {% if errors.inputCode %}
+                        <span class="helper-block">
+                            {{ errors.inputCode | first }}
+                        </span>
+                        {% else %}
+                            <small>Los códigos de smilies se insertarán entre dos puntos en el chat. Ejemplo: :v:, :p: :super1:</small>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="fileImage" class="col-sm-2 control-label">Imagen</label>
+                    <div class="col-sm-10">
+                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                            <div class="fileinput-new thumbnail preview-img">
+                                <img data-src="holder.js/120x120" alt="...">
+                            </div>
+                            <div class="fileinput-preview fileinput-exists thumbnail preview-img"></div>
+                            <div>
+                            <span class="btn btn-primary btn-file">
+                                <span class="fileinput-new">Seleccionar Imagen</span>
+                                <span class="fileinput-exists">Cambiar</span>
+                                <input type="file" name="fileImage" id="fileImage">
+                            </span>
+                                <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Quitar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group {% if errors.inputUrl %}has-error{% endif %}">
+                    <label for="inputUrl" class="col-sm-2 control-label">URL o Link (Opcional)</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="inputUrl" id="inputUrl" placeholder="Ingrese la URL o el link de la imágen..." value="{{ old.inputUrl }}">
+                        <span class="helper-block">
+                            {{ errors.inputUrl | first }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-10 col-sm-offset-2">
+                        {{ csrf.field | raw }}
+                        <a href="{{ base_url() }}/admin/smilie" class="btn btn-default"><i class="fa fa-caret-left"></i> Ir atrás</a>
+                        <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i> Agregar smilie</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.3/holder.min.js"></script>
+    <script>
+        var validated = false;
+        var image_url = /\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/;
+        $('#fileImage').change(function(event) {
+            if(!this.files.length){
+                return;
+            }
+            var file = this.files[0];
+            var type = file.type;
+            if(!/^(image\/(gif|p?jpeg|(x-)?png))$/.test(type)){
+                $('.fileinput').fileinput('clear');
+                swal("Lo sentimos...", "Selecciona una imagen (gif, jpg o png)", "error");
+                return;
+            }
+            if(file.size > 2e6){
+                $('.fileinput').fileinput('clear');
+                swal("Lo sentimos...", "La imagen es mayor a 2MB. Por favor usa una imagen de menor tamaño.", "error");
+                return;
+            }
+        });
+
+        $('#formSmilie').submit(function (event) {
+           if(!validated){
+               var file = $('#fileImage').prop('files');
+               if(!file.length && !image_url.test($('#inputUrl').val())){
+                   swal("Lo sentimos...", "No has seleccionado ninguna imagen a subir.", "error");
+                   event.preventDefault();
+                   return;
+               }
+               validated = true;
+           }
+            $('#formSmilie').submit();
+        });
+    </script>
+{% endblock %}

@@ -1,30 +1,28 @@
 <?php
 namespace App\Handler\Error;
 
-use Exception;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use Whoops\Run as WhoopsRun;
+use Slim\Handlers\Error;
 
-class ErrorHandler{
-    private $whoops;
+final class ErrorHandler Extends Error{
+    protected $logger;
 
-    public function __construct(WhoopsRun $run)
+    /**
+     * ErrorHandler constructor.
+     * @param $logger
+     */
+    public function __construct($logger)
     {
-        $this->whoops = $run;
+        $this->logger = $logger;
     }
 
-    function __invoke(Request $request, Response $response, Exception $exception)
+    public function __invoke(Request $request, Response $response, \Exception $exception)
     {
-        $handler = WhoopsRun::EXCEPTION_HANDLER;
-        ob_start();
-        $this->whoops->$handler($exception);
-        $content = ob_get_clean();
-        $code = $exception instanceof \HttpException ? $exception->getCode() : 500;
-        return $response
-            ->withStatus($code)
-            ->withHeader('Content-type', 'text/html')
-            ->write($content);
+        $this->logger->critical($exception->getFile()."[{$exception->getLine()}]: {$exception->getMessage()}.\nFull-Stack: ".$exception->getTraceAsString());
+        return $response->withStatus(500)
+            ->withHeader('Content-Type', 'text/html')
+            ->write('¡NOOOOOOOOOOO! Algo falló en el chat. Nuestro robot ya lo estará arreglando enseguida.');
     }
 
 

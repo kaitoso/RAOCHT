@@ -1,0 +1,105 @@
+{% extends 'templates/admin.twig' %}
+{% block titulo %}{% endblock %}
+{% block css %}
+    <style>
+        small{
+            color: rgba(0,0,0, 0.54);
+        }
+        .current-img,
+        .preview-img img
+        {
+            max-height: 320px !important;
+            max-width: 320px;
+        }
+    </style>
+{% endblock %}
+{% block contenido %}
+    <form id="formLogro" action="{{ base_url() }}/admin/logro/new" method="post" enctype="multipart/form-data" class="form-horizontal" role="form">
+        <div class="form-group">
+            <legend>Añadir nuevo logro</legend>
+        </div>
+        {% include 'templates/flash.twig' %}
+        <div class="form-group {% if errors.inputName %}has-error{% endif %}">
+            <label for="inputName" class="col-sm-2 control-label">Nombre:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="inputName" id="inputName" placeholder="Ingrese el nombre del logro..." required
+                       maxlength="50" value="{{ old.inputName }}">
+                <span class="helper-block">{{ errors.inputName | first }}</span>
+            </div>
+        </div>
+
+        <div class="form-group {% if errors.inputDesc %}has-error{% endif %}">
+            <label for="inputDesc" class="col-sm-2 control-label">Descripción:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="inputDesc" id="inputDesc" placeholder="Ingrese la descripción del logro..." required
+                       maxlength="100" value="{{ old.inputDesc }}">
+                <span class="helper-block">{{ errors.inputDesc | first }}</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="fileImage" class="col-sm-2 control-label">Imagen</label>
+            <div class="col-sm-10">
+                <div class="fileinput fileinput-new" data-provides="fileinput">
+                    <div class="fileinput-new thumbnail preview-img">
+                        <img data-src="holder.js/320x320" alt="...">
+                    </div>
+                    <div class="fileinput-preview fileinput-exists thumbnail preview-img"></div>
+                    <div>
+                        <span class="btn btn-primary btn-file">
+                            <span class="fileinput-new">Seleccionar Imagen</span>
+                            <span class="fileinput-exists">Cambiar</span>
+                            <input type="file" name="fileImage" id="fileImage">
+                        </span>
+                        <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Quitar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-sm-10 col-sm-offset-2">
+                {{ csrf.field | raw }}
+                <a href="{{ base_url() }}/admin/logro" class="btn btn-default"><i class="fa fa-caret-left"></i> Ir atrás</a>
+                <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i> Agregar nuevo logro</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+{% block js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.3/holder.min.js"></script>
+    <script>
+        var validated = false;
+        $('#fileImage').change(function(event) {
+            if(!this.files.length){
+                return;
+            }
+            var file = this.files[0];
+            var type = file.type;
+            if(!/^(image\/(gif|p?jpeg|(x-)?png))$/.test(type)){
+                $('.fileinput').fileinput('clear');
+                swal("Lo sentimos...", "Selecciona una imagen (gif, jpg o png)", "error");
+                return;
+            }
+            if(file.size > 2e6){
+                $('.fileinput').fileinput('clear');
+                swal("Lo sentimos...", "La imagen es mayor a 2MB. Por favor usa una imagen de menor tamaño.", "error");
+                return;
+            }
+        });
+
+        $('#formLogro').submit(function (event) {
+            if(!validated){
+                var file = $('#fileImage').prop('files');
+                if(!file.length){
+                    swal("Lo sentimos...", "No has seleccionado ninguna imagen a subir.", "error");
+                    event.preventDefault();
+                    return;
+                }
+                validated = true;
+            }
+            $('#formSmilie').submit();
+        });
+    </script>
+{% endblock %}

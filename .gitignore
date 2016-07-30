@@ -7,6 +7,10 @@ composer.lock
 !/cache/.gitkeep
 /public/avatar/b/*
 /public/avatar/s/*
+/public/smilies/*
+/public/achievements/*
 .idea
 /server/.idea
 /server/node_modules
+/public/dist/js/core
+/public/dist/js/components

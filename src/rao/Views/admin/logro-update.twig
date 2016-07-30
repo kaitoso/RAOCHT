@@ -1,0 +1,274 @@
+{% extends 'templates/admin.twig' %}
+{% block titulo %}{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+    <style>
+        small{
+            color: rgba(0,0,0, 0.54);
+        }
+        .current-img,
+        .preview-img img
+        {
+            max-height: 320px !important;
+            max-width: 320px;
+        }
+    </style>
+{% endblock %}
+{% block contenido %}
+    <h3 class="page-header">Gestión del logro {{ logro.name }}</h3>
+    <form id="formLogro" action="{{ base_url() }}/admin/logro/{{ logro.id }}" method="post" enctype="multipart/form-data" class="form-horizontal" role="form">
+        <div class="form-group">
+            <legend>Modificar logro</legend>
+        </div>
+        {% include 'templates/flash.twig' %}
+        <div class="form-group {% if errors.inputName %}has-error{% endif %}">
+            <label for="inputName" class="col-sm-2 control-label">Nombre:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="inputName" id="inputName" placeholder="Ingrese el nombre del logro..." required
+                       maxlength="50" value="{% if old.inputName %}{{ old.inputName }}{% else %}{{ logro.name }}{% endif %}">
+                <span class="helper-block">{{ errors.inputName | first }}</span>
+            </div>
+        </div>
+
+        <div class="form-group {% if errors.inputDesc %}has-error{% endif %}">
+            <label for="inputDesc" class="col-sm-2 control-label">Descripción:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="inputDesc" id="inputDesc" placeholder="Ingrese la descripción del logro..." required
+                       maxlength="100" value="{% if old.inputDesc %}{{ old.inputDesc }}{% else %}{{ logro.description }}{% endif %}">
+                <span class="helper-block">{{ errors.inputDesc | first }}</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="fileImage" class="col-sm-2 control-label">Imagen</label>
+            <div class="col-sm-10">
+                <div class="fileinput fileinput-new" data-provides="fileinput">
+                    <div class="fileinput-new thumbnail preview-img">
+                        <img src="{{ base_url() }}/achievements/{{ logro.image }}" alt="{{ logro.name }}">
+                    </div>
+                    <div class="fileinput-preview fileinput-exists thumbnail preview-img"></div>
+                    <div>
+                        <span class="btn btn-primary btn-file">
+                            <span class="fileinput-new">Seleccionar Imagen</span>
+                            <span class="fileinput-exists">Cambiar</span>
+                            <input type="file" name="fileImage" id="fileImage">
+                        </span>
+                        <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Quitar</a>
+                    </div>
+                </div>
+                <p class="text-info">Se recomienda el uso de imagenes con un tamaño de 320x320 pixeles y menor a 2MB en peso.</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-10 col-sm-offset-2">
+                {{ csrf.field | raw }}
+                <input type="hidden" name="_METHOD" value="PUT">
+                <a href="{{ base_url() }}/admin/logro" class="btn btn-default"><i class="fa fa-caret-left"></i> Ir atrás</a>
+                <button type="submit" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i> Modificar logro</button>
+            </div>
+        </div>
+    </form>
+    <form id="formUser" method="post" class="form-horizontal" role="form">
+        <div class="form-group">
+            <legend>Asignar logro</legend>
+        </div>
+        <div class="form-group">
+            <label for="inputUser" class="col-sm-2 control-label">Usuario: </label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control typeahead" id="inputUser" placeholder="Ingrese el nombre del usuario..." autocomplete="off">
+            </div>
+            <div class="col-sm-2">
+                <a href="" id="btnAsignar" class="btn btn-success"><i class="fa fa-plus"></i> Asignar</a>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputName" class="col-sm-2 control-label">Usuarios conectados:</label>
+            <div class="col-sm-10">
+                <a id="btnGlobal" class="btn btn-primary">Asignar a conectados</a>
+            </div>
+        </div>
+    </form>
+
+    <legend>Usuarios con este logro</legend>
+    <table id="tableLogro"
+           data-toggle="table"
+           data-search="true"
+           data-show-refresh="true"
+           data-show-columns="true"
+           data-show-export="true"
+           data-show-pagination-switch="true"
+           data-pagination="true"
+           data-side-pagination="server"
+           data-url="{{ base_url() }}/admin/search/achievements/{{ logro.id }}"
+           data-show-footer="false">
+        <thead>
+        <tr>
+            <th class="col-sm-1" data-field="id">#</th>
+            <th class="col-sm-2" data-field="user">Usuario</th>
+            <th class="col-sm-2" data-formatter="localHour" data-field="created_at">Fecha de asignación</th>
+            <th class="col-sm-1 rowEliminar" data-formatter="formatoElimitar" data-events="eliminar">Eliminar</th>
+        </tr>
+        </thead>
+    </table>
+    {% verbatim %}
+    <script id="userTemplate" type="text/x-handlebars-template">
+        <a href="#inputUser">
+            <small class="typeahead-image"><img src="{% endverbatim %}{{ base_url() }}/avatar/s/{% verbatim %}{{image}}"></small>
+            <strong>{{user}}</strong>
+            <small class="text-muted"> - {{name}}</small>
+        </a>
+    </script>
+    {% endverbatim %}
+    <script id="eliminar-template" type="text/x-handlebars-template">
+        <div class="text-center">
+            <button type="button" data-id={% verbatim %}{{id}}{% endverbatim %}" class="btn btn-danger btnEliminar"><i class="fa fa-times"></i></button>
+        </div>
+    </script>
+{% endblock %}
+{% block js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+    <script src="{{ base_url }}/dist/js/moment.min.js"></script>
+    <script src="{{ base_url }}/dist/js/bootstrap-table.min.js"></script>
+    <script>
+        var $userTemplate = Handlebars.compile($('#userTemplate').html());
+        var eliminar_template = Handlebars.compile($('#eliminar-template').html());
+        var validated = false;
+        var currentUser = null;
+        var $user = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            remote: {
+                wildcard: '%QUERY',
+                url: '{{ base_url() }}/admin/search/user/%QUERY'
+            }
+        });
+        $user.initialize();
+        function formatoElimitar(value, row, index) {
+            return eliminar_template(row);
+        }
+        function localHour(value, row, index){
+            return moment(value).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a')
+        }
+        $('#inputUser').typeahead({
+            minLength: 3
+        }, {
+            display: 'user',
+            items: 4,
+            source: $user.ttAdapter(),
+            templates: {
+                empty: [
+                    '<div class="empty-message">',
+                    'No se encontró a ningún grupo con este nombre o clave.',
+                    '</div>'
+                ].join('\n'),
+                suggestion: $userTemplate
+            }
+        });
+        $('.typeahead').bind('typeahead:select', function(ev, user) {
+            currentUser = user.id;
+        });
+        $('#fileImage').change(function(event) {
+            if(!this.files.length){
+                return;
+            }
+            var file = this.files[0];
+            var type = file.type;
+            if(!/^(image\/(gif|p?jpeg|(x-)?png))$/.test(type)){
+                $('.fileinput').fileinput('clear');
+                swal("Lo sentimos...", "Selecciona una imagen (gif, jpg o png)", "error");
+                return;
+            }
+            if(file.size > 2e6){
+                $('.fileinput').fileinput('clear');
+                swal("Lo sentimos...", "La imagen es mayor a 2MB. Por favor usa una imagen de menor tamaño.", "error");
+                return;
+            }
+        });
+        $('#btnAsignar').on('click', function(event){
+            event.preventDefault();
+            if(!currentUser){
+                swal("¡Hey!", "¡No has seleccionado ningún usuario.", "error");
+                return;
+            }
+            swal({
+                title: "Agregando logro...",
+                text: "Espere un momento mientras se agrega el logro al usuario...",
+                imageUrl: "{{ base_url() }}/assets/img/loading_spin.gif",
+                showConfirmButton: false
+            });
+            $.post('{{ base_url() }}/admin/logro/user',{
+                logro_id: {{ logro.id }},
+                user_id: currentUser,
+                raoToken: $('input[name="raoToken"]').val()
+            }, function(data){
+                if(data.error){
+                    swal("¡Hey!", data.error, "error");
+                    return;
+                }
+                swal("¡Hey!", data.success, "success");
+                $('#tableLogro').bootstrapTable('refresh');
+            }, 'json')
+            .fail(function () {
+                swal("¡Oops!", "¡Hubo un error al tratar de enviar el logro!", "error");
+            });
+        });
+        $('#btnGlobal').on('click', function(event){
+            event.preventDefault();
+            swal({
+                title: "Agregando logro a usuarios...",
+                text: "Espere un momento mientras se agrega el logro a los usuarios conectados...",
+                imageUrl: "{{ base_url() }}/assets/img/loading_spin.gif",
+                showConfirmButton: false
+            });
+            $.post('{{ base_url() }}/admin/logro/global',{
+                logro_id: {{ logro.id }},
+                raoToken: $('input[name="raoToken"]').val()
+            }, function(data){
+                if(data.error){
+                    swal("¡Hey!", data.error, "error");
+                    return;
+                }
+                swal("¡Hey!", data.success, "success");
+            }, 'json')
+            .fail(function () {
+                swal("¡Oops!", "¡Hubo un error al tratar de enviar el logro!", "error");
+            });
+        });
+        function eliminar(e, value, row, index) {
+            return {
+                'click .btnEliminar': function(e, value, row, index) {
+                    swal({
+                        title: "¿Está seguro de que quiere eliminar este logro al usuario?",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Borrar",
+                        cancelButtonText: "Cancelar",
+                        closeOnConfirm: false,
+                        closeOnCancel: true
+                    },
+                    function(isConfirm) {
+                        if (!isConfirm)
+                            return;
+                        $.delete('{{ base_url() }}/admin/logro/user', {
+                            logro_id: {{ logro.id }},
+                            user_id: row.id,
+                            raoToken: $('input[name="raoToken"]').val()
+                        }).done(function(){
+                            swal("¡Borrado!", "Se ha eliminado el logro del usuario con éxito.", "success");
+                            $('#tableLogro').bootstrapTable('remove', {
+                                field: 'id',
+                                values: [row.id]
+                            });
+                        }).fail(function(){
+                            swal("¡Oops!", "Hubo un error al tratar de eliminar este logro del usuario.", "error");
+                        })
+                    });
+                }
+            }
+        }
+    </script>
+{% endblock %}

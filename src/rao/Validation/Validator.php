@@ -56,8 +56,10 @@ class Validator
             return 'Este campo debe contener solo letras (a-z)';
         }else if($str == '{{name}} must contain only letters (a-z) and digits (0-9)'){
             return 'Este campo solo debe contener letras (a-z) y digitos (0-9)';
-        }else if($str == '{{name}} must contain only letters (a-z) and "{{additionalChars}}"'){
+        }else if($str == '{{name}} must contain only letters (a-z) and "{{additionalChars}}"') {
             return 'Este campo debe contener solo letras (a-z) y los caracteres "{{additionalChars}}"';
+        }else if($str == '{{name}}  must contain only letters (a-z), digits (0-9) and "{{additionalChars}}"'){
+            return 'Este campo debe contener sólo letras (a-z), digitos (0-9) y los caracteres {{additionalChars}}';
         }else if($str == '{{name}} must be a boolean value'){
             return 'Este campo debe ser un valor booleano';
         }else if($str == 'No items were found for key chain {{name}}'){

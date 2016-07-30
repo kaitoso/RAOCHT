@@ -55,8 +55,9 @@ class AppSchemas
             $table->string('ip', 15);
             $table->bigInteger('facebookId')->unsigned()->nullable();
             $table->string('facebookToken', 510)->nullable();
+            $table->bigInteger('twitterId')->unsigned()->nullable();
             $table->string('twitterToken', 510)->nullable();
-            $table->string('googleToken', 510)->nullable();
+            $table->string('googleId', 32)->nullable();
             $table->timestamp('lastLogin');
             $table->timestamps();
             $table->foreign('rank')
@@ -97,6 +98,14 @@ class AppSchemas
                 ->onDelete('restrict');
         });
 
+        Capsule::schema()->create('smilies', function($table){
+            $table->increments('id');
+            $table->string('code', 12)->unique();
+            $table->string('url', 255);
+            $table->boolean('local')->default(0);
+            $table->timestamps();
+        });
+
         Capsule::schema()->create('salas', function($table){
             $table->increments('id');
             $table->string('nombre', 50);
@@ -106,7 +115,29 @@ class AppSchemas
             $table->timestamps();
         });
 
-        /* Create bans */
+        Capsule::schema()->create('achievements', function($table){
+            $table->increments('id');
+            $table->string('name', 50);
+            $table->string('description', 100);
+            $table->string('image', 255);
+            $table->timestamps();
+        });
+
+        Capsule::schema()->create('user_achievements', function($table){
+            $table->increments('id');
+            $table->integer('user_id')->unsigned();
+            $table->integer('achievement_id')->unsigned();
+            $table->timestamps();
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+            $table->foreign('achievement_id')
+                ->references('id')
+                ->on('achievements')
+                ->onDelete('cascade');
+        });
+
     }
 
     function createRanks(){

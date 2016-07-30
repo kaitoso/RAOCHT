@@ -1,14 +1,13 @@
 <?php
 namespace App\Validation\Rules;
 
-use App\Model\User;
 use Respect\Validation\Rules\AbstractRule;
 
-class EmailAvailable extends AbstractRule
+class ImageUrl extends AbstractRule
 {
 
     public function validate($input)
     {
-        return User::where('email', $input)->count() === 0;
+        return preg_match('/^\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b$/', $input) === 1;
     }
 }

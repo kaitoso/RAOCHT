@@ -28,7 +28,7 @@ class BanController extends BaseController
         $validation = $this->validator->validate($request, [
             'inputName' => v::noWhitespace()->notEmpty()->alnum('_')->length(4, 50),
             'banTime' => v::notEmpty()->intVal()->positive(),
-            'inputRazon' => v::notEmpty()->alnum('.-_$()[]')->length(4, 255),
+            'inputRazon' => v::notEmpty()->alnum(',;.:-_^*+-/¡!¿?()áéíóú')->length(4, 255),
             'raoToken' => v::noWhitespace()->notEmpty()
         ]);
 
@@ -57,7 +57,7 @@ class BanController extends BaseController
         /* Verificar si el usuario tiene inmunidad */
         $rank = $user->getRank;
         if($rank->immunity){
-            $this->flash->addMessage('error', 'Este usuario por su rol de ' . $rank->name .' tiene imunidad a la expulsión.');
+            $this->flash->addMessage('error', 'Este usuario por su rango de ' . $rank->name .' tiene imunidad a la expulsión.');
             return $this->withRedirect($response, $this->router->pathFor('admin.ban'));
         }
         /* Saber si existe la expulsión */

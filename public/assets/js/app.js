@@ -17,20 +17,28 @@ function cancelEvent(e) {
     e.preventDefault();
     e.stopPropagation();
 }
-function handleMessage(a) {
-    if (a.user != $config.lastUser) {
-        $config.lastUser = a.user;
-        $chatbox.append($messageTemplate(a));
+
+function getRank(rank){
+    return $.grep($config.rangos, function(b) {
+        return b.id == rank;
+    })[0];
+}
+
+function handleMessage(message) {
+    if(!$config.ready) return;
+    if (message.user != $config.lastUser) {
+        $config.lastUser = message.user;
+        message.rank = getRank(message.rank)['name'];
+        $chatbox.append($messageTemplate(message));
         $utils.messages++;
     } else {
-        $(".mensaje").last().append($messageChildTemplate(a));
+        $(".mensaje").last().append($messageChildTemplate(message));
     }
 }
 function getCurrentDate(){
     return new Date().toLocaleDateString(
         'es-419',
         {
-            weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -53,6 +61,7 @@ var $usersTemplate = Handlebars.compile($('#usersTemplate').html());
 var $chatbox = $('.chatbox');
 var sendReady = true;
 var $config = {
+    ready: false,
     user: null,
     lastUser: null,
     smilies: null,
@@ -72,6 +81,19 @@ var $chat = {
     interval: null,
     seed: Math.floor(Math.random() * (20 - 30 + 1)) + 20
 };
+/* Get client cache */
+$.getJSON('cache/client.json', function(data){
+    $config.rangos = [];
+    $.each(data.ranks, function(i, v){
+        console.log(v);
+        $config.rangos.push({
+            'id': v.id,
+            'name': v.name,
+            'permission': JSON.parse(v.chatPermissions)
+        });
+    });
+    $config.ready = true;
+});
 /* Chat Events */
 socket.on('message', function(user){
     console.log("Called", user);

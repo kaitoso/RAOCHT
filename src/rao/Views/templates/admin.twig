@@ -34,6 +34,7 @@
 <body>
 <nav id="myNavmenu" class="navmenu navmenu-default navmenu-fixed-left" role="navigation">
     <a href="#" class="navmenu-brand">Panel de administración</a>
+    <h4 class="navmenu-brand">{{ user.getRank.name }}</h4>
     <ul class="nav navmenu-nav">
         <li class="active"><a href="{{ base_url() }}/admin"><i class="fa fa-home"></i> Inicio</a></li>
         {% for permiso in permisos %}
@@ -45,6 +46,7 @@
     {% block contenido %}
     {% endblock %}
 </div>
+<script src="{{ base_url() }}/dist/js/promise.min.js"></script>
 <script src="{{ base_url() }}/dist/js/jquery.min.js"></script>
 <!-- Latest compiled and minified JS -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>

@@ -5,7 +5,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\JsonResponseHandler;
-use App\Handler\Error\ErrorHandler;
+use App\Handler\Error\WhoopsErrorHandler;
 
 class ErrorMiddleware{
     function __invoke(Request $request, Response $response, $next)
@@ -21,7 +21,7 @@ class ErrorMiddleware{
             $whoops->register();
 
             $container['errorHandler'] = function() use ($whoops) {
-                return new ErrorHandler($whoops);
+                return new WhoopsErrorHandler($whoops);
             };
             $container['whoops'] = $whoops;
         }

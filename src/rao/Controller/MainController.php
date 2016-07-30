@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Handler\Avatar;
+use App\Handler\Email;
 use App\Model\AuthToken;
 use App\Model\User;
 use Dflydev\FigCookies\FigRequestCookies;
@@ -24,7 +25,13 @@ class MainController extends BaseController
             return $this->withRedirect($response, $this->router->pathFor('auth.login'));
         }
         $user = User::find($this->session->get('user_id'));
-        return $this->view->render($response, 'chat.twig', ['user' => $user]);
+        $permissions = json_decode($user->getRank->permissions);
+        $chatConfig = require __DIR__.'/../Config/Chat.php';
+        return $this->view->render($response, 'chat.twig', [
+            'user' => $user,
+            'permissions' => $permissions,
+            'config' => $chatConfig
+        ]);
       }
 
     public function error(Request $request, Response $response, $args)
@@ -49,13 +56,8 @@ class MainController extends BaseController
             }
             $this->session->set('redirect', $redirect);
         }
-        $fbHelper = $this->fb->getRedirectLoginHelper();
-        $fbLogin = $fbHelper->getLoginUrl(
-            $request->getUri()->getBaseUrl().$this->router->pathFor('auth.facebook'),
-            ['email']
-        );
+
         return $this->view->render($response, 'login.twig', [
-            'fblogin' => $fbLogin,
             'redir' => $this->session->get('redirect')
         ]);
     }
@@ -75,9 +77,9 @@ class MainController extends BaseController
                 $response = RespCookies::expire($response, 'raoRemember');
             }
         }
-        $this->session->delete('user_id');
-        $this->session->delete('user');
-        $this->session->delete('rank');
+        /* Borramos la llave de redis */
+        $this->redis->delete($this->container->session->getSessionId());
+        /* Borramos datos del usuario */
         $this->session->destroySession();
         return $this->withRedirect($response, $this->router->pathFor('auth.login'));
     }
@@ -98,7 +100,7 @@ class MainController extends BaseController
             return $this->withRedirect($response, $redirect);
         }
         $validation = $this->validator->validate($request, [
-            'user' => v::noWhitespace()->notEmpty()->alnum('_')->length(4, 30),
+            'user' => v::noWhitespace()->notEmpty()->alnum('_-')->length(4, 30),
             'password' => v::noWhitespace()->notEmpty(),
             'rememberMe' => v::boolVal(),
             'raoToken' => v::noWhitespace()->notEmpty()
@@ -151,8 +153,9 @@ class MainController extends BaseController
                 'chatText' => $user->chatText,
                 'image' =>
                     $request->getUri()->getBaseUrl().'/avatar/s/'.$user->image,
-                'rol' => $user->rol,
+                'rank' => $user->rank,
             )));
+
             /* Guardar cookie */
             if ($remember === 'on') {
                 $selector = base64_encode(Token::generateRandom(9));
@@ -208,7 +211,7 @@ class MainController extends BaseController
             return $this->withRedirect($response, $redirect);
         }
         $validation = $this->validator->validate($request, [
-            'user' => v::noWhitespace()->notEmpty()->alnum('_')->length(4, 30),
+            'user' => v::noWhitespace()->notEmpty()->alnum('_-')->length(4, 30),
             'email' => v::noWhitespace()->notEmpty()->email(),
             'password' => v::noWhitespace()->notEmpty()->length(6),
             'rPassword' => v::noWhitespace()->notEmpty()->length(6),
@@ -257,12 +260,23 @@ class MainController extends BaseController
         ), PASSWORD_BCRYPT, ['cost' => 10]);
         $newUser->user = $inputUser;
         $newUser->rank = 2;
-        $newUser->chatName = 'Sistema';
+        $newUser->chatName = $inputUser;
         $newUser->image = $image.'.png';
         $newUser->ip = $request->getAttribute('ip_address');
         $newUser->lastLogin = date('Y-m-d H:i:s');
+        if(!empty($this->session->get('fb_id'))){
+            $newUser->facebookId = $this->session->get('fb_id');
+        }
+        if(!empty($this->session->get('twitter_id'))){
+            $newUser->twitterId = $this->session->get('twitter_id');
+        }
+        if(!empty($this->session->get('google_id'))){
+            $newUser->googleId = $this->session->get('google_id');
+        }
         $newUser->save();
-        $this->flash->addMessage('success', '¡Te has registrado correctamente en el chat! Por favor inicia sesión para comprobar los datos.');
+        $email = new Email($this->email);
+        $email->sendActivationEmail($this->view->getEnvironment(), $newUser);
+        $this->flash->addMessage('success', '¡Te has registrado correctamente en el chat! Te hemos enviado un correo electrónico con los datos de activación.');
         return $this->withRedirect($response,  $this->router->pathFor('auth.login'));
     }
 }

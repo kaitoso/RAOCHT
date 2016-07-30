@@ -1,0 +1,127 @@
+{% extends 'templates/admin.twig' %}
+{% block titulo %}Gestión de smilies{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+    <style>
+        .imgTable{
+            margin: 0 auto;
+            max-height: 120px;
+            max-width: 320px;
+        }
+    </style>
+{% endblock %}
+{% block contenido %}
+    <div class="row">
+        <div class="col-xs-12 col-sm-9 col-md-10">
+            <legend>Gestión de usuarios</legend>
+        </div>
+        <div class="col-xs-12 col-sm-3 col-md-2">
+            <a href="{{ base_url() }}/admin/smilie/new" class="btn btn-success pull-right"><i class="fa fa-plus"></i> Nuevo smilie</a>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    {% include 'templates/flash.twig' %}
+    <table id="tableSmilies"
+           data-toggle="table"
+           data-search="true"
+           data-show-refresh="true"
+           data-show-columns="true"
+           data-show-export="true"
+           data-show-pagination-switch="true"
+           data-pagination="true"
+           data-side-pagination="server"
+           data-url="{{ base_url() }}/admin/search/smilies"
+           data-show-footer="false">
+        <thead>
+        <tr>
+            <th class="col-sm-1" data-field="id">#</th>
+            <th class="col-sm-2" data-field="code">Código</th>
+            <th class="col-sm-2" data-formatter="imageFormater">Imagen</th>
+            <th class="col-sm-2" data-formatter="localHour" data-field="created_at">Fecha de creación</th>
+            <th class="col-sm-1 rowEditar" data-formatter="botonEditar">Editar</th>
+            <th class="col-sm-1 rowEliminar" data-formatter="formatoElimitar" data-events="eliminar">Eliminar</th>
+        </tr>
+        </thead>
+    </table>
+    {{ csrf.field | raw}}
+    <script id="button-template" type="text/x-handlebars-template">
+        {% verbatim %}
+            <div class="text-center">
+                <a href="{% endverbatim %}{{base_url()}}{% verbatim %}/admin/smilie/{{id}}" class="btn btn-warning"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+            </div>
+        {% endverbatim %}
+    </script>
+    <script id="eliminar-template" type="text/x-handlebars-template">
+        {% verbatim %}
+            <div class="text-center">
+                <button type="button" data-id={{id}} class="btn btn-danger btnEliminar"><i class="fa fa-times"></i></button>
+            </div>
+        {% endverbatim %}
+    </script>
+    <script id="image-template" type="text/x-handlebars-template">
+        {% verbatim %}
+        {{#if local}}
+            <img src="{% endverbatim %}{{base_url()}}{% verbatim %}/smilies/{{url}}" class="img-responsive imgTable" alt="Image">
+        {{else}}
+            <img src="{{url}}" class="img-responsive imgTable" alt="Image">
+        {{/if}}
+        {% endverbatim %}
+    </script>
+{% endblock %}
+{% block js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+    <script type="text/javascript" src="/dist/js/moment.min.js"></script>
+    <script src="{{ base_url }}/dist/js/bootstrap-table.min.js"></script>
+    <script type="text/javascript">
+        moment.locale('es');
+        var button_template = Handlebars.compile($("#button-template").html());
+        var image_template = Handlebars.compile($('#image-template').html());
+        var eliminar_template = Handlebars.compile($('#eliminar-template').html());
+
+        function localHour(value, row, index){
+            return moment(value).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a')
+        }
+
+        function imageFormater(value, row, index) {
+            return image_template(row);
+        }
+
+        function botonEditar(value, row, index) {
+            return button_template(row);
+        }
+        function formatoElimitar(value, row, index) {
+            return eliminar_template(row);
+        }
+
+        function eliminar(e, value, row, index) {
+            return {
+                'click .btnEliminar': function(e, value, row, index) {
+                    swal({
+                        title: "¿Está seguro de que quiere eliminar este smilie?",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Borrar",
+                        cancelButtonText: "Cancelar",
+                        closeOnConfirm: false,
+                        closeOnCancel: true
+                    },
+                    function(isConfirm) {
+                        if (!isConfirm)
+                            return;
+                        $.delete('{{ base_url() }}/admin/smilie/' + row.id, {
+                            raoToken: $('input[name="raoToken"]').val()
+                        });
+                        $('#tableSmilies').bootstrapTable('remove', {
+                            field: 'id',
+                            values: [row.id]
+                        });
+                        swal("¡Borrado!", "Se ha eliminado el smilie con éxito.", "success");
+                    }
+                    );
+                }
+            }
+        }
+    </script>
+{% endblock %}

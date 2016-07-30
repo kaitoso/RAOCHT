@@ -33,6 +33,8 @@ class SessionHandler
 
     public function destroySession()
     {
+        $_SESSION = array();
+        session_regenerate_id(true);
         session_destroy();
     }
 

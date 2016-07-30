@@ -15,7 +15,7 @@
     <div class="clearfix"></div>
     {% include 'templates/flash.twig' %}
 <div class="table-responsive">
-	<table class="table table-hover">
+	<table class="table table-hover table-bordered">
 		<thead>
 			<tr>
 				<th>#</th>
@@ -44,7 +44,7 @@
     {% endverbatim %}
 {% endblock %}
 {% block js %}
-    <script type="text/javascript" src="/dist/js/moment.min.js"></script>
+    <script src="{{ base_url }}/dist/js/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
     <script>
         moment.locale('es');
@@ -59,10 +59,9 @@
         $('tbody').on('click', '.btnEliminar', function (event) {
             event.preventDefault();
             var $id = $(this).data('id');
-            console.log($id);
             swal({
                 title: "¿Está seguro de eliminar éste rango?",
-                text: "Todos los usuarios de este rango se irán a",
+                text: "Todos los usuarios de este rango se irán al rango Nuevo",
                 type: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#DD6B55",

@@ -24,7 +24,7 @@
         'icon' => 'fa-heart',
         'url' => '/logro'
     ),
-    'smilies' => array(
+    'smilie' => array(
         'description' => 'Gestionar Smilies',
         'icon' => 'fa-smile-o',
         'url' => '/smilie'
