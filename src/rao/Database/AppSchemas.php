@@ -17,30 +17,6 @@ class AppSchemas
             $table->timestamps();
         });
 
-        Capsule::schema()->create('permissions', function($table){
-            $table->increments('id');
-            $table->string('name', 50);
-            $table->string('description', 100);
-            $table->string('icon', '50');
-            $table->string('url');
-            $table->timestamps();
-        });
-
-        Capsule::schema()->create('rank_permissions', function($table){
-            $table->increments('id');
-            $table->integer('rank_id')->unsigned();
-            $table->integer('permission_id')->unsigned();
-            $table->foreign('rank_id')
-                ->references('id')
-                ->on('ranks')
-                ->onDelete('cascade');
-            $table->foreign('permission_id')
-                ->references('id')
-                ->on('permissions')
-                ->onDelete('cascade');
-            $table->timestamps();
-        });
-
         Capsule::schema()->create('users', function($table){
             $table->increments('id');
             $table->string('email')->unique();
@@ -185,9 +161,11 @@ class AppSchemas
     }
 
     function down(){
+
+        Capsule::schema()->dropIfExists('user_achievements');
+        Capsule::schema()->dropIfExists('achievements');
         Capsule::schema()->dropIfExists('salas');
         Capsule::schema()->dropIfExists('bans');
-        Capsule::schema()->dropIfExists('rank_permissions');
         Capsule::schema()->dropIfExists('permissions');
         Capsule::schema()->dropIfExists('auth_token');
         Capsule::schema()->dropIfExists('users');
