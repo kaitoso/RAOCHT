@@ -12,7 +12,7 @@ class ChatController extends BaseController
 
     public function getIndex(Request $request, Response $response, $args)
     {
-        $chatConfig = require __DIR__.'/../../Config/Chat.php';
+        $chatConfig = json_decode(file_get_contents(__DIR__.'/../../Config/Chat.json'));
         return $this->view->render($response, 'admin/chat.twig', ['chat' => $chatConfig]);
     }
 
@@ -38,7 +38,7 @@ class ChatController extends BaseController
                 'message' => 'No has subido ninguna imagen.'
             ]);
         }
-        $chatConfig = require __DIR__.'/../../Config/Chat.php';
+        $chatConfig = json_decode(file_get_contents(__DIR__.'/../../Config/Chat.json'));
         $fondoPath = __DIR__.'/../../../../public/assets/img';
         $storage = new \Upload\Storage\FileSystem($fondoPath);
         $file = new \Upload\File('fileImage', $storage);
@@ -57,8 +57,8 @@ class ChatController extends BaseController
         $resp = array();
         try{
             $file->upload();
-            $oldfile = $chatConfig['background'];
-            $chatConfig['background'] = $file->getNameWithExtension();
+            $oldfile = $chatConfig->background;
+            $chatConfig->background = $file->getNameWithExtension();
             /* Pubsub nueva imagen */
             $this->redis->publish('admin-update-background', json_encode([
                 'background' => $request->getUri()->getBaseUrl().'/assets/img/'. $file->getNameWithExtension(),
@@ -67,7 +67,7 @@ class ChatController extends BaseController
             if(!empty($oldfile)  && file_exists($fondoPath.'/'.$oldfile)){
                 unlink($fondoPath.'/'.$oldfile);
             }
-            file_put_contents(__DIR__.'/../../Config/Chat.php', '<?php return ' . var_export($chatConfig, true). ";");
+            file_put_contents(__DIR__.'/../../Config/Chat.json', json_encode($chatConfig));
             $resp['error'] = false;
             $resp['image'] = $request->getUri()->getBaseUrl().'/assets/img/'. $file->getNameWithExtension();
         }catch(\Exception $e){
@@ -100,7 +100,7 @@ class ChatController extends BaseController
                 'message' => 'No has subido ninguna imagen.'
             ]);
         }
-        $chatConfig = require __DIR__.'/../../Config/Chat.php';
+        $chatConfig = json_decode(file_get_contents(__DIR__.'/../../Config/Chat.json'));
         $fondoPath = __DIR__.'/../../../../public/assets/img';
         $storage = new \Upload\Storage\FileSystem($fondoPath);
         $file = new \Upload\File('fileImage', $storage);
@@ -119,8 +119,9 @@ class ChatController extends BaseController
         $resp = array();
         try{
             $file->upload();
-            $oldfile = $chatConfig['side'];
-            $chatConfig['side'] = $file->getNameWithExtension();
+            $oldfile = $chatConfig->side;
+            $chatConfig->side = $file->getNameWithExtension();
+            file_put_contents(__DIR__.'/../../Config/Chat.json', json_encode($chatConfig));
             /* Pubsub nueva imagen */
             $this->redis->publish('admin-update-side', json_encode([
                 'background' => $request->getUri()->getBaseUrl().'/assets/img/'. $file->getNameWithExtension(),
@@ -129,7 +130,6 @@ class ChatController extends BaseController
             if(!empty($oldfile) && file_exists($fondoPath.'/'.$oldfile)){
                 unlink($fondoPath.'/'.$oldfile);
             }
-            file_put_contents(__DIR__.'/../../Config/Chat.php', '<?php return ' . var_export($chatConfig, true). ";");
             $resp['error'] = false;
             $resp['image'] = $request->getUri()->getBaseUrl().'/assets/img/'. $file->getNameWithExtension();
         }catch(\Exception $e){

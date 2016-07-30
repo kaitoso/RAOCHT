@@ -186,7 +186,8 @@ class UserController extends BaseController
         ]);
         $validation = $this->validator->validate($request, [
             'inputName' => v::noWhitespace()->notEmpty()->alnum('_')->length(4, 30),
-            'inputRango' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'inputRango' => v::intVal()->notEmpty()->positive(),
+            'inputActivated' => v::optional(v::boolVal()->notEmpty()),
             'raoToken' => v::noWhitespace()->notEmpty()
         ]);
         if($validation->failed() || $validationGet->failed()){
@@ -200,6 +201,7 @@ class UserController extends BaseController
         }
         $inputName = $request->getParam('inputName');
         $inputRank = $request->getParam('inputRango');
+        $inputActi = $request->getParam('inputActivated');
         $inputToken = $request->getParam('raoToken');
         if($this->session->get('token') !== $inputToken){
             $this->flash->addMessage('general-error', 'Éste token es inválido.');
@@ -240,6 +242,7 @@ class UserController extends BaseController
 
         $user->user = $inputName;
         $user->rank = $inputRank;
+        $user->activated = $inputActi === 'on';
         $user->save();
 
         /* Publicar cambio de usuario */

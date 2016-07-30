@@ -26,7 +26,7 @@ class MainController extends BaseController
         }
         $user = User::find($this->session->get('user_id'));
         $permissions = json_decode($user->getRank->permissions);
-        $chatConfig = require __DIR__.'/../Config/Chat.php';
+        $chatConfig = json_decode(file_get_contents(__DIR__.'/../Config/Chat.json'));
         return $this->view->render($response, 'chat.twig', [
             'user' => $user,
             'permissions' => $permissions,

@@ -45,13 +45,18 @@ class Twitter extends BaseController
             return $this->showJSONResponse($response, ['error' => 'Éste token es inválido.']);
         }
         $sett = $this->settings['twitter'];
-        $twitter = new TwitterOAuth(
-            $sett['consumer_key'],
-            $sett['consumer_secret'],
-            $this->session->get('twitter_oauth'),
-            $this->session->get('twitter_oauth_secret')
-        );
-        $access_token = $twitter->oauth("oauth/access_token", ["oauth_verifier" => $_REQUEST['oauth_verifier']]);
+        try {
+            $twitter = new TwitterOAuth(
+                $sett['consumer_key'],
+                $sett['consumer_secret'],
+                $this->session->get('twitter_oauth'),
+                $this->session->get('twitter_oauth_secret')
+            );
+            $access_token = $twitter->oauth("oauth/access_token", ["oauth_verifier" => $_REQUEST['oauth_verifier']]);
+        }catch (\Exception $ex){
+            $this->flash->addMessage('error', 'Hubo un problema al acceder a la API de Twitter. Intentalo más tarde.');
+            return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
+        }
         $user = User::where('twitterId', $access_token['user_id'])->first();
         if(!$user){
             $this->session->set('twitter_id', $access_token['user_id']);
@@ -76,14 +81,19 @@ class Twitter extends BaseController
             return $this->withRedirectWithout($response, $this->router->pathFor('cuenta.main').'#formSocial');
         }
         $sett = $this->settings['twitter'];
-        $twitter = new TwitterOAuth(
-            $sett['consumer_key'],
-            $sett['consumer_secret'],
-            $this->session->get('twitter_oauth'),
-            $this->session->get('twitter_oauth_secret')
-        );
-        $access_token = $twitter->oauth("oauth/access_token", ["oauth_verifier" => $_REQUEST['oauth_verifier']]);
-        $user = User::find($this->session->get('user_id"'));
+        try {
+            $twitter = new TwitterOAuth(
+                $sett['consumer_key'],
+                $sett['consumer_secret'],
+                $this->session->get('twitter_oauth'),
+                $this->session->get('twitter_oauth_secret')
+            );
+            $access_token = $twitter->oauth("oauth/access_token", ["oauth_verifier" => $_REQUEST['oauth_verifier']]);
+        }catch(\Exception $ex){
+            $this->flash->addMessage('social-error', 'Hubo un problema al acceder a la API de Twitter. Intentalo más tarde.');
+            return $this->withRedirectWithout($response, $this->router->pathFor('cuenta.main').'#formSocial');
+        }
+        $user = User::find($this->session->get('user_id'));
         if(!$user){
             $this->flash->addMessage('error', '¡No has iniciado sesión!');
             return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
@@ -93,7 +103,7 @@ class Twitter extends BaseController
             'oauth_token' => $access_token['oauth_token'],
             'oauth_token_secret' => $access_token['oauth_token_secret']
         ];
-        $user->twitterId = $access_token['user_id"'];
+        $user->twitterId = $access_token['user_id'];
         $user->twitterToken = json_encode($auth);
         $user->ip = $request->getAttribute('ip_address');
         $user->save();
