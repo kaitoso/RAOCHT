@@ -64,7 +64,7 @@ class ChatController extends BaseController
                 'background' => $request->getUri()->getBaseUrl().'/assets/img/'. $file->getNameWithExtension(),
             ]));
             /* Remover imagenes */
-            if(!empty($oldfile)  && file_exists($fondoPath.'/'.$oldfile)){
+            if(!empty($oldfile) && file_exists($fondoPath.'/'.$oldfile)){
                 unlink($fondoPath.'/'.$oldfile);
             }
             file_put_contents(__DIR__.'/../../Config/Chat.json', json_encode($chatConfig));
