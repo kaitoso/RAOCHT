@@ -34,4 +34,9 @@
         'icon' => 'fa-comments-o',
         'url' => '/chat'
     ),
+    'global' => array(
+        'description' => 'Mensaje Global',
+        'icon' => 'fa-comment-o',
+        'url' => '/global'
+    )
 );
