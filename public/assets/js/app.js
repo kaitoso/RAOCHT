@@ -267,6 +267,7 @@ socket.on('online', function(users){
         $config.autocomplete[1].push(val.user);
         $('#chatUsuarios').append($usersTemplate(val));
     });
+    $('#onlineCount').text(users.length);
 });
 
 socket.on('restart', function () {
