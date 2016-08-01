@@ -111,6 +111,9 @@ subscriber.on('message', (channel, data) => {
         }
         io.to(socket).emit('update', newUser);
     }
+    if(channel == 'update-client'){
+        io.emit('client-update', message);
+    }
     if(channel === 'update-chat'){
         let index = getUserIndexBySession(message.id, userData);
         if(index === -1) return;
@@ -232,10 +235,12 @@ subscriber.on('message', (channel, data) => {
             message: message.message
         });
     }
+
 });
 subscriber.subscribe(
     'admin-update-background', // Actualización del fondo
     'update-image',
+    'update-client',
     'update-chat',
     'user-achievement',
     'global-achievement',

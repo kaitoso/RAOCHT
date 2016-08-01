@@ -39,18 +39,20 @@ function smilies(str) {
     var limit = 0;
     $.each($config.smilies, function (i, val) {
         var d = new RegExp(':' + val.code + ':', "g");
+        var currentSmilie = val;
         if (limit > 3) {
             return false;
         }
-        str = str.replace(d, function (f) {
+        str = str.replace(d, function (match) {
             limit++;
-            if (val.local) {
-                val.url = $baseUrl + '/smilies/' + val.url;
-            }
             if (limit > 3) {
-                return f;
+                return match;
             }
-            return '<span class="smilie"><img src="' + val.url + '" title="' + val.code + '"/></span>';
+            if (currentSmilie.local) {
+                console.log(currentSmilie.url, $baseUrl);
+                currentSmilie.url = $baseUrl + '/smilies/' + currentSmilie.url;
+            }
+            return '<span class="smilie"><img src="' + currentSmilie.url + '" title="' + currentSmilie.code + '"/></span>';
         });
     });
     return str;
@@ -197,18 +199,20 @@ var $chat = {
     seed: Math.floor(Math.random() * (20 - 30 + 1)) + 20
 };
 /* Get client cache */
-$.getJSON('cache/client.json?time' +  new Date().getTime(), function (data) {
-    $config.rangos = [];
-    $config.smilies = data.smilies;
-    $.each(data.ranks, function (i, v) {
-        $config.rangos.push({
-            'id': v.id,
-            'name': v.name,
-            'permission': JSON.parse(v.chatPermissions)
+function getCache() {
+    $.getJSON('cache/client.json?time' +  new Date().getTime(), function (data) {
+        $config.rangos = [];
+        $config.smilies = data.smilies;
+        $.each(data.ranks, function (i, v) {
+            $config.rangos.push({
+                'id': v.id,
+                'name': v.name,
+                'permission': JSON.parse(v.chatPermissions)
+            });
         });
+        $config.ready = true;
     });
-    $config.ready = true;
-});
+}
 /* Chat Events */
 socket.on('message', function (user) {
     user.time = getCurrentDate();
@@ -244,6 +248,10 @@ socket.on('background', function (message) {
 
 socket.on('achievement', function (message) {
     getLogros(message.id);
+});
+
+socket.on('client-update', function (message) {
+    getCache();
 });
 
 socket.on('online', function(users){
@@ -349,6 +357,7 @@ $(window).blur(function () {
 });
 $(document).ready(function () {
     chatboxResponsive();
+    getCache();
     getLogros(0);
 });
 $('body').on('swipe', function() {
