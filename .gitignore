@@ -15,3 +15,4 @@ composer.lock
 /server/node_modules
 /public/dist/js/core
 /public/dist/js/components
+/public/cache/client.json

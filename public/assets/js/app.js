@@ -182,7 +182,8 @@ var $config = {
     user: null,
     lastUser: null,
     smilies: null,
-    rangos: null
+    rangos: null,
+    autocomplete: []
 };
 var $utils = {
     messages: 0,
@@ -203,12 +204,17 @@ function getCache() {
     $.getJSON('cache/client.json?time' +  new Date().getTime(), function (data) {
         $config.rangos = [];
         $config.smilies = data.smilies;
+        $config.autocomplete[0] = [];
         $.each(data.ranks, function (i, v) {
+            $config.autocomplete[0].push(v.name);
             $config.rangos.push({
                 'id': v.id,
                 'name': v.name,
                 'permission': JSON.parse(v.chatPermissions)
             });
+        });
+        $.each($config.smilies, function(i, v){
+            $config.autocomplete[0].push(':' + v.code + ':');
         });
         $config.ready = true;
     });
@@ -256,18 +262,40 @@ socket.on('client-update', function (message) {
 
 socket.on('online', function(users){
     $('#chatUsuarios').html('');
+    $config.autocomplete[1] = [];
     $.each(users, function(index, val){
-        console.log(val);
+        $config.autocomplete[1].push(val.user);
         $('#chatUsuarios').append($usersTemplate(val));
     });
 });
 
+socket.on('restart', function () {
+    console.log('Go restart');
+    setTimeout(function() { window.location.reload(); }, 1000);
+});
+
 socket.on('offline', function () {
-    location.href = 'logout';
+    window.location.href = 'logout';
+});
+
+socket.on('kick', function (message) {
+    window.location.href='logout';
+    swal({
+        title: '¡Te han pateado!',
+        text: "Por la razón de: " + message.reason,
+        type: 'warning',
+        showCancelButton: false,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: '¡Ya que!'
+    }).then(function() {
+        window.location.href='logout';
+    })
 });
 
 socket.on("disconnect", function () {
     console.log('Desconectado');
+    swal("Lo sentimos...", "Hubo un error con la conexión del chat. Quizá esté en mantenimiento. Intenta mas tarde o actualiza la ventana del chat.", "error");
 });
 
 /* Page events */
@@ -359,6 +387,7 @@ $(document).ready(function () {
     chatboxResponsive();
     getCache();
     getLogros(0);
+    $('#messageBox input').tabComplete($config.autocomplete);
 });
 $('body').on('swipe', function() {
     if($(document).width() < 958){

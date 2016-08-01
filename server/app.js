@@ -31,12 +31,14 @@ function httpHandler (req, res) {
 
 io.on('connection', (socket) => {
     let cookies = cookie.parse(socket.handshake.headers.cookie);
-    let sessid = cookies.rao_session;
-    let currentUser = null;
-    if(sessid == null){
+    if(cookies.rao_session === undefined){
+        console.error('Undefined session');
+        io.to(socket).emit('restart');
         socket.disconnect();
         return;
     }
+    let sessid = cookies.rao_session;
+    let currentUser = null;
     redisClient.get(sessid, (err, data) => {
         if(err){
             console.log(err);
@@ -46,7 +48,9 @@ io.on('connection', (socket) => {
         json.session = sessid;
         json.last = _.now();
         currentUser = json;
-        userData.push(json);
+        if(getUserIndexById(json.id, userData) === -1){
+            userData.push(json);
+        }
         globalUsers[socket.id] = json.id;
         generateOnlineUsers(userData);
     });
@@ -74,13 +78,16 @@ io.on('connection', (socket) => {
         currentUser.last = _.now();
     });
     socket.on('disconnect', () => {
-       console.log('Handle disconect');
         let userId = globalUsers[socket.id];
-        if(userId != null){
+        let sockets = getUserSockets(userId, globalUsers);
+        if(sockets.length > 1){
+            delete globalUsers[socket.id];
+        }else if(userId != null){
             let index = getUserIndexById(userId, userData);
             userData.splice(index, 1);
             delete globalUsers[socket.id];
         }
+        console.log('Global users: ', globalUsers, 'User data: ', userData);
         generateOnlineUsers(userData);
     });
 });
