@@ -44,16 +44,6 @@
             <li class="dropdown open">
                 <a href="#"><i class="fa fa-users"></i> Usuarios <span class="label label-default pull-right">10</span></a>
                 <ul class="dropdown-menu navmenu-nav" role="menu" id="chatUsuarios">
-                    <li>
-                        <a class="onlineUser" href="#">
-                            <img src="{{ base_url() }}/avatar/s/{{ user.image }}" alt="user name" class="img-circle"> Asner
-                        </a>
-                    </li>
-                    <li>
-                        <a class="onlineUser" href="#">
-                            <img src="{{ base_url() }}/avatar/s/{{ user.image }}" alt="user name" class="img-circle"> Asner
-                        </a>
-                    </li>
                 </ul>
             </li>
         </ul>
@@ -183,6 +173,7 @@
     <script src="{{ base_url() }}/dist/js/promise.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+    <script src="{{ base_url }}/dist/js/autocomplete.js"></script>
     <script>var $baseUrl = '{{ base_url() }}';</script>
     <script src="{{ base_url() }}/assets/js/app.js"></script>
 {% endblock %}
