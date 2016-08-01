@@ -104,6 +104,7 @@ function chatBottom() {
 function handleMessage(message) {
     if (!$config.ready) return;
     var rank = getRank(message.rank);
+    console.log(message.rank, rank, rank.permission);
     message.message = linkifyChat(message.message, rank.permission);
     message.message = smilies(message.message);
     if (message.user != $config.lastUser) {
@@ -237,6 +238,7 @@ socket.on('message', function (user) {
 socket.on('system', function(message){
     $system.time = getCurrentDate();
     $system.message = message.message;
+    $system.rank = 1;
     handleMessage($system);
 });
 
