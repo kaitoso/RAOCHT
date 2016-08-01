@@ -171,7 +171,7 @@ class AppSchemas
     }
 
     function down(){
-
+        Capsule::schema()->dropIfExists('smilies');
         Capsule::schema()->dropIfExists('user_achievements');
         Capsule::schema()->dropIfExists('achievements');
         Capsule::schema()->dropIfExists('salas');
