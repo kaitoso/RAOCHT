@@ -104,6 +104,7 @@ function chatBottom() {
 function handleMessage(message) {
     if (!$config.ready) return;
     var rank = getRank(message.rank);
+    console.log(message.rank, rank);
     message.message = linkifyChat(message.message, rank.permission);
     message.message = smilies(message.message);
     if (message.user != $config.lastUser) {
@@ -224,6 +225,7 @@ function getCache() {
         $.each($config.smilies, function(i, v){
             $config.autocomplete[0].push(':' + v.code + ':');
         });
+        socket.emit('ready', {ready: true});
         $config.ready = true;
     });
 }

@@ -106,6 +106,16 @@ io.on('connection', (socket) => {
         io.emit('message', message);
         currentUser.last = _.now();
     });
+
+    socket.on('ready', () => {
+        io.to(socket.id).emit('error', {
+            message: '¡Bienvenido al chat de Radio Anime Obsesión!'
+        });
+        io.to(socket.id).emit('error', {
+            message: '¡Ahora locuta ' + streamData.announcer + '!'
+        });
+    });
+
     socket.on('disconnect', () => {
         let userId = globalUsers[socket.id];
         let sockets = getUserSockets(userId, globalUsers);
