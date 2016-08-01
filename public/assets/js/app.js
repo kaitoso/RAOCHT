@@ -295,7 +295,7 @@ socket.on('kick', function (message) {
 
 socket.on("disconnect", function () {
     console.log('Desconectado');
-    swal("Lo sentimos...", "Hubo un error con la conexión del chat. Quizá esté en mantenimiento. Intenta mas tarde o actualiza la ventana del chat.", "error");
+    /*swal("Lo sentimos...", "Hubo un error con la conexión del chat. Quizá esté en mantenimiento. Intenta mas tarde o actualiza la ventana del chat.", "error");*/
 });
 
 /* Page events */

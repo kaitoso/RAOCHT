@@ -37,7 +37,6 @@
 
             if (!match.length) {
                 $.each(currentList,function (i, v){
-                    console.log(i, v);
                     if (currentList[i] === undefined)
                         return true;
                     match = $.grep(currentList[i], function(w) {
