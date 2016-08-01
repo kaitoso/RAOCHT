@@ -191,6 +191,14 @@ var $utils = {
     smiliesShown: 0,
     smiliesLock: false
 };
+var $system = {
+    user: 'Sistema',
+    chatName: 'Sistema',
+    chatText: 'f50c0c',
+    chatColor: 'f50c0c',
+    image: 'http://dev.asner.xyz/avatar/sys.png',
+    rank: 1,
+}
 var $chat = {
     last: new Date().getTime(),
     title: document.title,
@@ -224,6 +232,12 @@ socket.on('message', function (user) {
     user.time = getCurrentDate();
     handleMessage(user);
 });
+
+socket.on('system', function(message){
+    $system.time = getCurrentDate();
+    $system.message = message.message;
+    handleMessage($system);
+})
 
 socket.on('update', function (user) {
     var userRank = getRank(user.rank);

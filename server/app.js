@@ -10,13 +10,38 @@ var fs = require('fs');
 var _ = require('lodash');
 var cookie = require('cookie');
 var escape = require('escape-html');
+var radio = require('node-internet-radio');
 var subscriber = redis.createClient();
 var redisClient = redis.createClient();
 var globalUsers = [];
 var userData = [];
+var streamData = {
+    title: '',
+    announcer: '',
+    url: ''
+};
 server.listen(8080);
+getStreamData();
 
+setInterval(function() {
+    getStreamData();
+}, 30000);
 
+function getStreamData() {
+    radio.getStationInfo('http://animeobsesion.net:8000', (error, station) => {
+        let oldData = streamData;
+        streamData = {
+            title: station.title,
+            announcer: station.headers['icy-name'],
+            url: station.headers['icy-url']
+        }
+        if(streamData.announcer !== oldData.announcer){
+            io.emit('system', {
+                message: '¡Ahora locuta ' + streamData.announcer + '!'
+            });
+        }
+    }, radio.StreamSource.STREAM);
+}
 function httpHandler (req, res) {
     fs.readFile(__dirname + '/index.html', (err, data) => {
             if (err) {

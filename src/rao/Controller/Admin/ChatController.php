@@ -65,7 +65,6 @@ class ChatController extends BaseController
                 'background' => $imagePath. $chatConfig->background,
                 'side' => $chatConfig->side !== null ? $imagePath.$chatConfig->side : null
             ]));
-            $this->logger->info('Settings background: '. $imagePath. $chatConfig->background);
             /* Remover imagenes */
             if(!empty($oldfile) && file_exists($fondoPath.'/'.$oldfile)){
                 unlink($fondoPath.'/'.$oldfile);
@@ -131,7 +130,6 @@ class ChatController extends BaseController
                 'background' => $chatConfig->background !== null ? $imagePath.$chatConfig->background : null,
                 'side' => $imagePath. $chatConfig->side
             ]));
-            $this->logger->info('Settings side: '. $imagePath. $chatConfig->side);
             /* Remover imagenes */
             if(!empty($oldfile) && file_exists($fondoPath.'/'.$oldfile)){
                 unlink($fondoPath.'/'.$oldfile);
