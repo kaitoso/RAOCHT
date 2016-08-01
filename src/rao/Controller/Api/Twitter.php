@@ -2,6 +2,7 @@
 namespace App\Controller\Api;
 
 use App\Controller\BaseController;
+use App\Model\Ban;
 use App\Model\User;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;

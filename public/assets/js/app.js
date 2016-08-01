@@ -57,7 +57,7 @@ function smilies(str) {
 }
 
 function linkifyChat(str, permissions) {
-    var urlRegex = /(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/;
+    var urlRegex = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
     var imageRegex = /\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/;
     var audioRegex = /\b(https?:\/\/\S+(?:mp3|ogg)\S*)\b/;
     var videoRegex = /\b(https?:\/\/\S+(?:mp4|webm|ogv)\S*)\b/;
@@ -197,7 +197,7 @@ var $chat = {
     seed: Math.floor(Math.random() * (20 - 30 + 1)) + 20
 };
 /* Get client cache */
-$.getJSON('cache/client.json', function (data) {
+$.getJSON('cache/client.json?time' +  new Date().getTime(), function (data) {
     $config.rangos = [];
     $config.smilies = data.smilies;
     $.each(data.ranks, function (i, v) {

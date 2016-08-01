@@ -120,8 +120,9 @@ class AppSchemas
     function createRanks(){
         $rol = new \App\Model\Rank();
         $rol->name = 'Administrador';
-        $rol->permissions = '["ban", "unban", "rank", "user", "logro", "chat", "global"]';
+        $rol->permissions = '["ban", "unban", "rank", "user", "logro", "chat", "smilie, "global"]';
         $rol->chatPermissions = '["images","videos","audio"]';
+        $rol->immunity = 1;
         $rol->save();
         $rol = new \App\Model\Rank();
         $rol->name = 'Nuevo';
@@ -142,7 +143,7 @@ class AppSchemas
         $admin->user = 'Sistema';
         $admin->rank = 1;
         $admin->chatName = 'Sistema';
-        $admin->image = $image;
+        $admin->image = $image.'.png';
         $admin->ip = '127.0.0.1';
         $admin->lastLogin = date('Y-m-d H:i:s');
         $admin->save();
@@ -160,7 +161,7 @@ class AppSchemas
         $prueba->user = 'Asner';
         $prueba->rank = 1;
         $prueba->chatName = 'Asner';
-        $prueba->image = $image;
+        $prueba->image = $image.'.png';
         $prueba->ip = '127.0.0.1';
         $prueba->lastLogin = date('Y-m-d H:i:s');
         $prueba->save();

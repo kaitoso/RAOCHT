@@ -17,7 +17,7 @@ class ClientCache
     public static function createCache($redis)
     {
         $json = array();
-        $json['ranks'] = Rank::select('id', 'name', 'chatPermissions')->get();
+        $json['ranks'] = Rank::select('id', 'name', 'chatPermissions')->get()->toArray();
         $json['smilies'] = Smilie::select('id', 'code', 'url', 'local')->get()->toArray();
 
         /* Almacenamos el archivo */
