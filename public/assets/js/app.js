@@ -38,21 +38,21 @@ function getRank(rank) {
 function smilies(str) {
     var limit = 0;
     $.each($config.smilies, function (i, val) {
-        var d = new RegExp(':' + val.code + ':', "g");
         var currentSmilie = val;
+        var d = new RegExp(':' + currentSmilie.code + ':', "g");
         if (limit > 3) {
             return false;
         }
         str = str.replace(d, function (match) {
             limit++;
             if (limit > 3) {
-                return match;
+                return val.code;
             }
+            var url = currentSmilie.url;
             if (currentSmilie.local) {
-                console.log(currentSmilie.url, $baseUrl);
-                currentSmilie.url = $baseUrl + '/smilies/' + currentSmilie.url;
+                url = $baseUrl + '/smilies/' + currentSmilie.url;
             }
-            return '<span class="smilie"><img src="' + currentSmilie.url + '" title="' + currentSmilie.code + '"/></span>';
+            return '<span class="smilie"><img src="' + url + '" title="' + currentSmilie.code + '"/></span>';
         });
     });
     return str;
