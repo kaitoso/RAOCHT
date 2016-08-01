@@ -108,10 +108,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on('ready', () => {
-        io.to(socket.id).emit('error', {
+        io.to(socket.id).emit('system', {
             message: '¡Bienvenido al chat de Radio Anime Obsesión!'
         });
-        io.to(socket.id).emit('error', {
+        io.to(socket.id).emit('system', {
             message: '¡Ahora locuta ' + streamData.announcer + '!'
         });
     });
