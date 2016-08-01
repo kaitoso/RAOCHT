@@ -38,7 +38,7 @@ io.on('connection', (socket) => {
         return;
     }
     console.log(cookies.rao_session);
-    let sessid = cookies.rao_session;
+    var sessid = cookies.rao_session;
     let currentUser = null;
     redisClient.get(sessid, (err, data) => {
         if(err){
