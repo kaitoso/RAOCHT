@@ -37,12 +37,15 @@ io.on('connection', (socket) => {
         socket.disconnect();
         return;
     }
-    console.log(cookies.rao_session);
-    var sessid = cookies.rao_session;
+    let sessid = cookies.rao_session;
     let currentUser = null;
     redisClient.get(sessid, (err, data) => {
         if(err){
             console.log(err);
+            return;
+        }
+        if(data == null){
+            console.error('Null value');
             return;
         }
         let json = JSON.parse(data);
