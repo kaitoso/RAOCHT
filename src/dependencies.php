@@ -149,6 +149,10 @@ $container['App\Admin\ChatController'] = function ($c){
     return new App\Controller\Admin\ChatController($c);
 };
 
+$container['App\Admin\GlobalController'] = function ($c){
+    return new App\Controller\Admin\GlobalController($c);
+};
+
 $container['App\Api\Facebook'] = function($c){
     return new App\Controller\Api\Facebook($c);
 };

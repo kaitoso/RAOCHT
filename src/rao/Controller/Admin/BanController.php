@@ -28,7 +28,7 @@ class BanController extends BaseController
         $validation = $this->validator->validate($request, [
             'inputName' => v::noWhitespace()->notEmpty()->alnum('_')->length(4, 50),
             'banTime' => v::notEmpty()->intVal()->positive(),
-            'inputRazon' => v::notEmpty()->alnum(',;.:-_^*+-/¡!¿?()áéíóú')->length(4, 255),
+            'inputRazon' => v::notEmpty()->alnum(',;.:-_^*+-/¡!¿?()áéíóúÁÉÍÓÚñÑ')->length(4, 255),
             'raoToken' => v::noWhitespace()->notEmpty()
         ]);
 
@@ -73,7 +73,8 @@ class BanController extends BaseController
             $newBan->save();
             /* Publicar usuario al servidor del chat para kikearlo */
             $this->redis->publish('ban-chat', json_encode([
-                'id' => $this->session->getSessionId(),
+                'id' => $user->id,
+                'who' => $this->session->get('user_id')
             ]));
             $this->flash->addMessage('success', '¡Se ha expulsado al usuario ' . $user->user . ' con éxito!');
         }else{
@@ -85,7 +86,7 @@ class BanController extends BaseController
 
     public function deleteUnban(Request $request, Response $response, $args)
     {
-        $validation = $this->validator->validateArgs($args, [
+        $validation = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         $token = $request->getParam('token');

@@ -121,7 +121,7 @@ class SearchController extends BaseController
 
     public function getAchievementUsers(Request $request, Response $response, $args)
     {
-        $validation = $this->validator->validateArgs($args, [
+        $validation = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         if($validation->failed()){
@@ -139,7 +139,10 @@ class SearchController extends BaseController
         $users = UserAchievements::select('users.id', 'users.user', 'user_achievements.created_at')
             ->join('users', 'user_achievements.user_id', '=', 'users.id')
             ->join('achievements', 'user_achievements.achievement_id', '=', 'achievements.id')
-            ->where('users.user', 'like', "{$search}%")
+            ->where([
+                ['achievements.id', $args['id']],
+                ['users.user', 'like', "{$search}%"]
+            ])
             ->skip($offset)
             ->take($limit)
             ->orderBy('users.id', $order)

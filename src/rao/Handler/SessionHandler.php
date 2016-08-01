@@ -14,8 +14,6 @@ class SessionHandler
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             self::$isStarted = true;
-            session_name('rao_session');
-            session_start();
         }
     }
 

@@ -18,14 +18,15 @@
             width: 100%;
             box-shadow: none;
         }
-        .form-group{
+
+        .form-group {
             margin-bottom: 1.4rem;
         }
 
-        .separador::before{
+        .separador::before {
             margin-right: 10px;
-            background: rgba(0,0,0,0.2);
-            box-shadow: 0 1px 0 rgba(255,255,255, 0.5);
+            background: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
             content: "";
             display: inline-block;
             height: 1px;
@@ -33,16 +34,17 @@
             vertical-align: middle;
             width: 38%;
         }
+
         .separador {
             margin: 10px 0;
             text-align: center;
             overflow: hidden;
         }
 
-        .separador::after{
+        .separador::after {
             margin-left: 10px;
-            background: rgba(0,0,0,0.2);
-            box-shadow: 0 1px 0 rgba(255,255,255, 0.5);
+            background: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
             content: "";
             display: inline-block;
             height: 1px;
@@ -53,84 +55,92 @@
 
     </style>
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
-        <script src="/assets/js/html5shiv.js"></script>
-        <script src="/assets/js/respond.min.js"></script>
+    <!--[if lt IE 9]>
+    <script src="/assets/js/html5shiv.js"></script>
+    <script src="/assets/js/respond.min.js"></script>
     <![endif]-->
 </head>
 <body>
-    <div class="container">
+<div class="container">
     <noscript>
         <div class="alert alert-danger alert-fixed-top">
-              <strong>¡Javascript desactivado!</strong> Este sitio funciona mejor con javascript activado.
-              Por favor, actívalo para este sitio.
+            <strong>¡Javascript desactivado!</strong> Este sitio funciona mejor con javascript activado.
+            Por favor, actívalo para este sitio.
         </div>
     </noscript>
-        {% include 'templates/flash.twig' %}
-        {% if errors.general %}
+    {% include 'templates/flash.twig' %}
+    {% if errors.general %}
         <div class="alert alert-danger">
             <strong>¡Oops!</strong> {{ errors.general | first }}
         </div>
-        {% endif %}
-        {% if not csrf.token %}
-            <div class="alert alert-danger">
-                <strong>¡Oops!</strong> ¡No HAY SESIÓN!
-            </div>
-        {% endif %}
-        <form class="form-signin" id="loginForm" role="form" method="post" action="/login">
-            <!--<div class="social-buttons text-center">
-                <a href="#" class="btn btn-social-icon btn-facebook"><i class="fa fa-facebook"></i></a>
-                <a href="#" class="btn btn-social-icon btn-twitter"><i class="fa fa-twitter"></i></a>
-                <a href="#" class="btn btn-social-icon btn-google"><i class="fa fa-google"></i></a>
-            </div>-->
-            <a class="btn btn-block btn-social btn-facebook" href="/facebook/login">
-                <span class="fa fa-facebook"></span>
-                Iniciar sesión con Facebook
-            </a>
-            <a class="btn btn-block btn-social btn-twitter" href="/twitter/login">
-                <span class="fa fa-twitter"></span>
-                Iniciar sesión con Twitter
-            </a>
-            <a class="btn btn-block btn-social btn-google" href="/google/login">
-                <span class="fa fa-google"></span>
-                Iniciar sesión con Google
-            </a>
-            <div class="separador">o</div>
-            <div class="form-group{% if errors.user %} has-error {% endif %}">
-                <input type="text" name="user" id="userLogin" class="form-control" placeholder="Usuario" value="{{ old.user }}" maxlength="30" required autofocus>
-                <span class="help-block">
+    {% endif %}
+    {% if not csrf.token %}
+        <div class="alert alert-danger">
+            <strong>¡Oops!</strong> ¡No HAY SESIÓN! {{ csrf.token }}
+        </div>
+    {% endif %}
+    <form class="form-signin" id="loginForm" role="form" method="post" action="/login">
+        <a class="btn btn-block btn-social btn-facebook" href="/facebook/login">
+            <span class="fa fa-facebook"></span>
+            Iniciar sesión con Facebook
+        </a>
+        <a class="btn btn-block btn-social btn-twitter" href="/twitter/login">
+            <span class="fa fa-twitter"></span>
+            Iniciar sesión con Twitter
+        </a>
+        <a class="btn btn-block btn-social btn-google" href="/google/login">
+            <span class="fa fa-google"></span>
+            Iniciar sesión con Google
+        </a>
+        <div class="separador">o</div>
+        <div class="form-group{% if errors.user %} has-error {% endif %}">
+            <input type="text" name="user" id="userLogin" class="form-control" placeholder="Usuario"
+                   value="{{ old.user }}" maxlength="30" required autofocus>
+            <span class="help-block">
                     {% if errors.user %}
                         {{ errors.user | first }}
                     {% endif %}
                 </span>
-            </div>
-            <div class="form-group{% if errors.password %} has-error {% endif %}">
-                <input type="password" name="password" id="passLogin" class="form-control" placeholder="Contraseña" value="" required>
-                <span class="help-block">
+        </div>
+        <div class="form-group{% if errors.password %} has-error {% endif %}">
+            <input type="password" name="password" id="passLogin" class="form-control" placeholder="Contraseña" value=""
+                   required>
+            <span class="help-block">
                     {% if errors.user %}
                         {{ errors.password | first }}
                     {% endif %}</span>
-                <div class="help-block text-right"><a href="">¿Olvidaste tu contraseña?</a></div>
-            </div>
-            <div class="col-sm-1-offset checkbox">
-                <input type="checkbox" name="rememberMe" id="rememberMe"{% if old.rememberMe %} checked {% endif %}> Mantenerme conectado
-            </div>
-            {{ csrf.field | raw }}
-            <button class="btn btn-lg btn-danger btn-block" id="btnIngresar" type="submit">Ingresar</button>
-            <div class="bottom text-center">
-                ¿No tienes cuenta? <a href="/signup"><b>Regístrate</b></a>
-            </div>
-        </form>
-    </div>
-    <script src="//code.jquery.com/jquery.js"></script>
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.0/sweetalert.min.js"></script>
-    <script type="text/javascript">
-    $('#userLogin').blur(function(event) {
+            <div class="help-block text-right"><a href="">¿Olvidaste tu contraseña?</a></div>
+        </div>
+        <div class="col-sm-1-offset checkbox">
+            <input type="checkbox" name="rememberMe" id="rememberMe"{% if old.rememberMe %} checked {% endif %}>
+            Mantenerme conectado
+        </div>
+        {{ csrf.field | raw }}
+        <button class="btn btn-lg btn-danger btn-block" id="btnIngresar" type="submit">Ingresar</button>
+        <div class="bottom text-center">
+            ¿No tienes cuenta? <a href="/signup"><b>Regístrate</b></a>
+        </div>
+    </form>
+</div>
+<script src="//code.jquery.com/jquery.js"></script>
+<script src="{{ base_url() }}/dist/js/moment.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.0/sweetalert.min.js"></script>
+{% if ban %}
+    <script>
+        moment.locale('es');
+        var bantime = moment('{{ ban.date_ban }}').format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a');
+        $('#loginForm').prepend('<div class="alert alert-danger">' +
+                '<strong>¡Expulsado!</strong>' +
+                ' Estás expulsado de este chat por <strong>{{ ban.reason }}</strong>. Tu expulsión termina el día <strong>' + bantime +'</strong></div>')
+    </script>
+{% endif %}
+<script type="text/javascript">
+    $('#userLogin').blur(function (event) {
         var $input = $(this);
         var $helper = $input.next();
         var $parent = $input.parent();
-        if(!$input.val()) return;
+        if (!$input.val()) return;
         if ($input.val().length < 4) {
             $helper.text('Ingresa al menos un usuario válido.');
             $parent.addClass('has-error');
@@ -140,11 +150,11 @@
         }
     });
 
-    $('#passLogin').blur(function(event) {
+    $('#passLogin').blur(function (event) {
         var $input = $(this);
         var $helper = $input.next();
         var $parent = $input.parent();
-        if(!$input.val()) return;
+        if (!$input.val()) return;
         if ($input.val().length < 4) {
             $helper.text('Ingresa al menos una contraseña válida.');
             $parent.addClass('has-error');
@@ -153,6 +163,6 @@
             $parent.removeClass('has-error');
         }
     });
-    </script>
+</script>
 </body>
 </html>

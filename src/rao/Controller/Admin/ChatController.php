@@ -60,8 +60,10 @@ class ChatController extends BaseController
             $oldfile = $chatConfig->background;
             $chatConfig->background = $file->getNameWithExtension();
             /* Pubsub nueva imagen */
+            $imagePath = $request->getUri()->getBaseUrl().'/assets/img/';
             $this->redis->publish('admin-update-background', json_encode([
-                'background' => $request->getUri()->getBaseUrl().'/assets/img/'. $file->getNameWithExtension(),
+                'background' => $imagePath. $chatConfig->background,
+                'side' => $chatConfig->side !== null ? $imagePath.$chatConfig->side : null
             ]));
             /* Remover imagenes */
             if(!empty($oldfile) && file_exists($fondoPath.'/'.$oldfile)){
@@ -123,8 +125,10 @@ class ChatController extends BaseController
             $chatConfig->side = $file->getNameWithExtension();
             file_put_contents(__DIR__.'/../../Config/Chat.json', json_encode($chatConfig));
             /* Pubsub nueva imagen */
-            $this->redis->publish('admin-update-side', json_encode([
-                'background' => $request->getUri()->getBaseUrl().'/assets/img/'. $file->getNameWithExtension(),
+            $imagePath = $request->getUri()->getBaseUrl().'/assets/img/';
+            $this->redis->publish('admin-update-background', json_encode([
+                'background' => $chatConfig->background !== null ? $imagePath.$chatConfig->background : null,
+                'side' => $imagePath. $chatConfig->side
             ]));
             /* Remover imagenes */
             if(!empty($oldfile) && file_exists($fondoPath.'/'.$oldfile)){
@@ -139,5 +143,66 @@ class ChatController extends BaseController
             $this->showJSONResponse($response, $resp);
         }
     }
-    
+
+    public function deleteBackground(Request $request, Response $response, $args)
+    {
+        $validation = $this->validator->validate($request, [
+            'raoToken' => v::noWhitespace()->notEmpty()
+        ]);
+        if($validation->failed()){
+            return $response->withJson([
+                'error' => 'El token está vacio. Intenta actualizar la página.'
+            ]);
+        }
+
+        $chatConfig = json_decode(file_get_contents(__DIR__.'/../../Config/Chat.json'));
+        $fondoPath = __DIR__.'/../../../../public/assets/img';
+        $oldfile = $chatConfig->background;
+        if(empty($oldfile)){
+            return $this->showJSONResponse($response, ['error' => 'No hay imagen que borrar.']);
+        }
+        if(file_exists($fondoPath.'/'.$oldfile)){
+            unlink($fondoPath.'/'.$oldfile);
+        }
+        $chatConfig->background = null;
+        /* Pubsub nueva imagen */
+        $imagePath = $request->getUri()->getBaseUrl().'/assets/img/';
+        $this->redis->publish('admin-update-background', json_encode([
+            'background' => $chatConfig->background,
+            'side' => $chatConfig->side !== null ? $imagePath.$chatConfig->side : null
+        ]));
+        file_put_contents(__DIR__.'/../../Config/Chat.json', json_encode($chatConfig));
+        return $this->showJSONResponse($response, ['success' => 'Se ha eliminado el fondo correctamente.']);
+    }
+
+    public function deleteSide(Request $request, Response $response, $args)
+    {
+        $validation = $this->validator->validate($request, [
+            'raoToken' => v::noWhitespace()->notEmpty()
+        ]);
+        if($validation->failed()){
+            return $response->withJson([
+                'error' => 'El token está vacio. Intenta actualizar la página.'
+            ]);
+        }
+
+        $chatConfig = json_decode(file_get_contents(__DIR__.'/../../Config/Chat.json'));
+        $fondoPath = __DIR__.'/../../../../public/assets/img';
+        $oldfile = $chatConfig->side;
+        if(empty($oldfile)){
+            return $this->showJSONResponse($response, ['error' => 'No hay imagen que borrar.']);
+        }
+        if(file_exists($fondoPath.'/'.$oldfile)){
+            unlink($fondoPath.'/'.$oldfile);
+        }
+        $chatConfig->side = null;
+        /* Pubsub nueva imagen */
+        $imagePath = $request->getUri()->getBaseUrl().'/assets/img/';
+        $this->redis->publish('admin-update-background', json_encode([
+            'background' => $chatConfig->background !== null ? $imagePath.$chatConfig->background : null,
+            'side' => $chatConfig->side
+        ]));
+        file_put_contents(__DIR__.'/../../Config/Chat.json', json_encode($chatConfig));
+        return $this->showJSONResponse($response, ['success' => 'Se ha eliminado el fondo correctamente.']);
+    }
 }

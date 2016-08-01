@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Handler\Avatar;
 use App\Model\User;
+use App\Model\UserAchievements;
 use Respect\Validation\Validator as v;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -16,6 +17,44 @@ class CuentaController extends BaseController
         $id = $this->session->get('user_id');
         $user = User::find($id);
         return $this->view->render($response, 'cuenta.twig', ['user' => $user]);
+    }
+
+    public function getLogros(Request $request, Response $response, $args)
+    {
+        if ($this->session->get('user_id') === null) {
+            return $this->showJSONResponse($response, ['error' => 'No te has conectado al chat.']);
+        }
+        $validation = $this->validator->validateArgs($request, [
+            'id' => v::optional(v::notEmpty()->intVal()->positive()),
+        ]);
+        if($validation->failed()){
+            return $this->showJSONResponse($response, [
+                'error' => 'El ID es incorrecto.'
+            ]);
+        }
+        $id = $request->getAttribute('id');
+        if(!empty($id) && $this->redis->exists('logro-'.$id)){
+            $hasLogro = UserAchievements::where([
+                ['achievement_id', $id],
+                ['user_id', $this->session->get('user_id')]
+            ])->first();
+            if(!$hasLogro){
+                $newLogro = new UserAchievements();
+                $newLogro->user_id = $this->session->get('user_id');
+                $newLogro->achievement_id = $id;
+                $newLogro->save();
+            }
+        }
+        $logros = UserAchievements::select('ach.name', 'ach.description', 'ach.image')
+            ->join('achievements as ach', 'user_achievements.achievement_id', '=', 'ach.id')
+            ->where([
+                ['user_achievements.user_id', $this->session->get('user_id')],
+                ['user_achievements.seen', 0]
+            ])
+            ->get();
+        UserAchievements::where('user_id', $this->session->get('user_id'))
+            ->update(['seen' => 1]);
+        return $this->showJSONResponse($response, $logros->toArray());
     }
 
     public function postImagen(Request $request, Response $response, $args){

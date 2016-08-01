@@ -5,10 +5,11 @@ composer.lock
 !/logs/.gitkeep
 /cache/*
 !/cache/.gitkeep
-/public/avatar/b/*
-/public/avatar/s/*
-/public/smilies/*
-/public/achievements/*
+!/public/avatar/preduser.png
+/public/avatar/b/
+/public/avatar/s/
+/public/smilies/
+/public/achievements/
 .idea
 /server/.idea
 /server/node_modules

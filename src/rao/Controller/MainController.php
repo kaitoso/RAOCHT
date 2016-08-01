@@ -4,7 +4,9 @@ namespace App\Controller;
 use App\Handler\Avatar;
 use App\Handler\Email;
 use App\Model\AuthToken;
+use App\Model\Ban;
 use App\Model\User;
+use App\Model\UserAchievements;
 use Dflydev\FigCookies\FigRequestCookies;
 use Dflydev\FigCookies\SetCookie;
 use Psr\Http\Message\RequestInterface as Request;
@@ -22,6 +24,17 @@ class MainController extends BaseController
     public function index(Request $request, Response $response, $args)
     {
         if ($this->session->get('user_id') === null) {
+            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+        }
+        $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
+        if($ban){
+            $hoy = date('Y-m-d H:i:s');
+            if(strtotime($hoy) > strtotime($ban->date_ban)) {
+                $ban->delete();
+            }else{
+                $this->session->set('user_ban', true);
+            }
+            $this->session->delete('user_id');
             return $this->withRedirect($response, $this->router->pathFor('auth.login'));
         }
         $user = User::find($this->session->get('user_id'));
@@ -56,10 +69,22 @@ class MainController extends BaseController
             }
             $this->session->set('redirect', $redirect);
         }
-
-        return $this->view->render($response, 'login.twig', [
-            'redir' => $this->session->get('redirect')
-        ]);
+        $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
+        if($ban){
+            $hoy = date('Y-m-d H:i:s');
+            if(strtotime($hoy) > strtotime($ban->date_ban)) {
+                $ban->delete();
+                if(!empty($this->session->get('user_ban'))){
+                    $this->session->delete('user_ban');
+                }
+                $ban = null;
+            }else{
+                $this->session->set('user_ban', true);
+            }
+        }else{
+            $this->session->delete('user_ban');
+        }
+        return $this->view->render($response, 'login.twig', ['ban' => $ban]);
     }
 
     public function getLogout(Request $request, Response $response, $args)
@@ -89,6 +114,11 @@ class MainController extends BaseController
         if ($this->session->get('user_id') !== null) {
             $redirect = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $this->router->pathFor('main.page');
             return $this->withRedirect($response, $redirect);
+        }
+        $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
+        if(!empty($this->session->get('user_ban')) || $ban){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
         }
         return $this->view->render($response, 'registro.twig');
     }
@@ -122,12 +152,26 @@ class MainController extends BaseController
             return $this->withRedirect($response, $this->router->pathFor('auth.login'));
         }
 
+        if(!empty($this->session->get('user_ban'))){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+        }
+
         $user = User::where('user', $inputUser)->first();
         if(!$user){
             $this->session->addWithKey('errors', 'user', 'Este usuario no existe.');
             if($request->isXhr()){
                 return $response->withJson(['error' => $this->session->get('errors')]);
             }
+            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+        }
+        if($user->getBan){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+        }
+        if(!$user->activated){
+            $this->flash->addMessage('error', '¡Aún no has activado tu cuenta! Revisa tu correo. 
+                El correo de activación puede estar en correos no deseados.');
             return $this->withRedirect($response, $this->router->pathFor('auth.login'));
         }
         $password = base64_encode(hash('sha256', $password, true));
@@ -146,7 +190,7 @@ class MainController extends BaseController
             /* Publicar la sesión al servidor */
             //$this->redis->publish('login', $this->session->getSessionId());
             $this->redis->setEx($this->session->getSessionId(), 3600, json_encode(array(
-                'user_id' => $user->id,
+                'id' => $user->id,
                 'user' => $user->user,
                 'chatName' => $user->chatName,
                 'chatColor' => $user->chatColor,

@@ -20,19 +20,25 @@ $app->get('/twitter/callback', 'App\Api\Twitter:getCallback')->setName('auth.twi
 $app->get('/google/login', 'App\Api\Google:getIndex')->setName('auth.google');
 $app->get('/google/callback', 'App\Api\Google:getCallback')->setName('auth.google.callback');
 
-$app->get('/cuenta', 'App\CuentaController:index')->setName('cuenta.main');
+$app->group('/cuenta', function(){
+    $this->get('[/]', 'App\CuentaController:index')->setName('cuenta.main');
+    $this->get('/logros.json[/{id}]', 'App\CuentaController:getLogros')->setName('cuenta.logros');
+    $this->get('/facebook/login', 'App\Api\Facebook:getCuentaLogin')->setName('cuenta.facebook.login');
+    $this->get('/facebook/callback', 'App\Api\Facebook:getFacebookCallbackLink')->setName('cuenta.facebook.callback');
+    $this->get('/facebook/unlink', 'App\Api\Facebook:getUnlink')->setName('cuenta.facebook.logout');
 
-$app->get('/cuenta/facebook/login', 'App\Api\Facebook:getCuentaLogin')->setName('cuenta.facebook.login');
-$app->get('/cuenta/facebook/callback', 'App\Api\Facebook:getFacebookCallbackLink')->setName('cuenta.facebook.callback');
-$app->get('/cuenta/facebook/unlink', 'App\Api\Facebook:getUnlink')->setName('cuenta.facebook.logout');
+    $this->get('/twitter/login','App\Api\Twitter:getLink')->setName('cuenta.twitter.login');
+    $this->get('/twitter/callback','App\Api\Twitter:getCuentaCallback')->setName('cuenta.twitter.callback');
+    $this->get('/twitter/unlink', 'App\Api\Twitter:getUnlink')->setName('cuenta.twitter.logout');
 
-$app->get('/cuenta/twitter/login','App\Api\Twitter:getLink')->setName('cuenta.twitter.login');
-$app->get('/cuenta/twitter/callback','App\Api\Twitter:getCuentaCallback')->setName('cuenta.twitter.callback');
-$app->get('/cuenta/twitter/unlink', 'App\Api\Twitter:getUnlink')->setName('cuenta.twitter.logout');
+    $this->get('/google/login', 'App\Api\Google:getLink')->setName('cuenta.google.login');
+    $this->get('/google/callback', 'App\Api\Google:getLinkCallback')->setName('cuenta.google.callback');
+    $this->get('/google/unlink', 'App\Api\Google:getUnlink')->setName('cuenta.google.logout');
 
-$app->get('/cuenta/google/login', 'App\Api\Google:getLink')->setName('cuenta.google.login');
-$app->get('/cuenta/google/callback', 'App\Api\Google:getLinkCallback')->setName('cuenta.google.callback');
-$app->get('/cuenta/google/unlink', 'App\Api\Google:getUnlink')->setName('cuenta.google.logout');
+    $this->put('/chatinfo', 'App\CuentaController:putChatInfo');
+    $this->put('/password', 'App\CuentaController:putPassword');
+    $this->put('/email', 'App\CuentaController:putEmail');
+});
 
 $app->group('/admin', function () {
     $this->get('[/]', 'App\AdminController:index')->setName('admin.main');
@@ -78,9 +84,14 @@ $app->group('/admin', function () {
     $this->put('/logro/{id}', 'App\Admin\LogroController:putUpdate');
     $this->delete('/logro/{id}', 'App\Admin\LogroController:deleteLogro');
 
+    $this->get('/global', 'App\Admin\GlobalController:getIndex')->setName('admin.global');
+    $this->post('/global', 'App\Admin\GlobalController:postGlobal');
+
     $this->get('/chat', 'App\Admin\ChatController:getIndex')->setName('admin.chat');
     $this->post('/chat/background', 'App\Admin\ChatController:postBackground');
     $this->post('/chat/side', 'App\Admin\ChatController:postSide');
+    $this->delete('/chat/background','App\Admin\ChatController:deleteBackground');
+    $this->delete('/chat/side','App\Admin\ChatController:deleteSide');
 
     $this->get('/search/user/{user}', 'App\Admin\SearchController:getUser');
     $this->get('/search/users', 'App\Admin\SearchController:getUsers');
@@ -103,12 +114,6 @@ $app->get('/article/{query}', 'App\SearchController:getArticle');
 $app->post('/login', 'App\MainController:postLogin');
 $app->post('/signup', 'App\MainController:postSignUp');
 $app->post('/cuenta/image', 'App\CuentaController:postImagen');
-
-
-$app->put('/cuenta/chatinfo', 'App\CuentaController:putChatInfo');
-$app->put('/cuenta/password', 'App\CuentaController:putPassword');
-$app->put('/cuenta/email', 'App\CuentaController:putEmail');
-
 
 $app->post('/search', 'App\SearchController:postFilterSearch');
 

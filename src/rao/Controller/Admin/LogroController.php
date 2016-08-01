@@ -24,7 +24,7 @@ class LogroController extends BaseController
 
     public function getUpdate(Request $request, Response $response, $args)
     {
-        $validation = $this->validator->validateArgs($args, [
+        $validation = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         if($validation->failed()){
@@ -44,8 +44,8 @@ class LogroController extends BaseController
     public function postNew(Request $request, Response $response, $args)
     {
         $validation = $this->validator->validate($request, [
-            'inputName' => v::notEmpty()->alnum(',;.:-_^*+-/¡!¿?()áéíóúñ')->length(1, 50),
-            'inputDesc' =>  v::notEmpty()->alnum(',;.:-_^*+-/¡!¿?()áéíóúñ')->length(1, 100),
+            'inputName' => v::notEmpty()->alnum(',;.:-_^*+-/¡!¿?()áéíóúÁÉÍÓÚñÑ')->length(1, 50),
+            'inputDesc' =>  v::notEmpty()->alnum(',;.:-_^*+-/¡!¿?()áéíóúÁÉÍÓÚñÑ')->length(1, 100),
             'raoToken' => v::noWhitespace()->notEmpty()
         ]);
 
@@ -190,7 +190,7 @@ class LogroController extends BaseController
 
     public function putUpdate(Request $request, Response $response, $args)
     {
-        $validationGet = $this->validator->validateArgs($args, [
+        $validationGet = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
@@ -310,7 +310,7 @@ class LogroController extends BaseController
     public function deleteLogro(Request $request, Response $response, $args)
     {
 
-        $validationGet = $this->validator->validateArgs($args, [
+        $validationGet = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [

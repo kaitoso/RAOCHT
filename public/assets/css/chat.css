@@ -1,7 +1,4 @@
 /* Body rules */
-body{
-    padding-left: 300px;
-}
 /* Navbar rules */
 .navmenu-default .navmenu-text,
 .navbar-default .navbar-offcanvas .navmenu-text {
@@ -13,19 +10,21 @@ body{
 .navmenu-default .navmenu-brand:focus,
 .navmenu-default .navbar-offcanvas .navmenu-brand:focus {
     color: #fff;
-    background-color: transparent;
+    background: rgba(0, 0, 0, 0.87);
 }
 
 .navmenu-default .navmenu-brand,
 .navbar-default .navbar-offcanvas .navmenu-brand:hover {
+    margin: 0;
     color: #FFF;
+    background: rgba(0, 0, 0, 0.57);
 }
 .navmenu-default .navmenu-nav > .active > a,
 .navbar-default .navbar-offcanvas .navmenu-nav > .active > a,
 .navmenu-default .navmenu-nav > .active > a:hover,
 .navbar-default .navbar-offcanvas .navmenu-nav > .active > a:hover,
 .navmenu-default .navmenu-nav > .active > a:focus, .navbar-default .navbar-offcanvas .navmenu-nav > .active > a:focus{
-    background-color: rgba(255, 255, 255, 0.20);
+    background-color: rgba(0, 0, 0, 0.87);
     color: #FFF;
 }
 .navmenu-default .navmenu-nav > li > a,
@@ -37,7 +36,12 @@ body{
 .navmenu-default .navmenu-nav > li > a:focus,
 .navbar-default .navbar-offcanvas .navmenu-nav > li > a:focus {
     color: #FFF;
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(0, 0, 0, 0.57);
+}
+
+.navmenu-default .navmenu-nav.dropdown-menu,
+.navbar-default .navbar-offcanvas .navmenu-nav.dropdown-menu {
+    background-color: rgba(0, 0, 0, 0.57);
 }
 
 .navmenu-default .navmenu-nav > .open > a,
@@ -47,13 +51,9 @@ body{
 .navmenu-default .navmenu-nav > .open > a:focus,
 .navbar-default .navbar-offcanvas .navmenu-nav > .open > a:focus {
     color: #FFF;
-    background-color: rgba(33, 33, 33, 0.5);
+    background-color: rgba(0, 0, 0, 0.87);
 }
 
-.navmenu-default .navmenu-nav.dropdown-menu,
-.navbar-default .navbar-offcanvas .navmenu-nav.dropdown-menu {
-    background-color: rgba(33, 33, 33, 0.5);
-}
 
 .navmenu-default .navmenu-nav > .disabled > a,
 .navbar-default .navbar-offcanvas .navmenu-nav > .disabled > a,
@@ -65,12 +65,11 @@ body{
 }
 
 .navmenu.navmenu-default.navmenu-fixed-left ul.nav.navmenu-nav li {
-
+    background: rgba(0,0,0,0.57);
 }
 
 .navmenu.navmenu-default.navmenu-fixed-left ul.nav.navmenu-nav li:hover{
-    background-color: inherit;
-    opacity: 1;
+    background: rgba(0,0,0,0.67);
 }
 
 .navmenu.navmenu-default.navmenu-fixed-left .dropdown-menu.navmenu-nav li:hover{
@@ -79,7 +78,10 @@ body{
 
 .navmenu.navmenu-default.navmenu-fixed-left h3.navbar-text{
     float: none;
+    margin: 0;
+    padding: 15px;
     color: #FFF;
+    background: rgba(0,0,0,0.57);
 }
 /* Custom rules */
 #mainContainer{
@@ -106,6 +108,11 @@ body{
     height: 40px;
     width: 40px;
     margin-right: 5px;
+}
+.smilie img{
+    vertical-align: text-top;
+    max-height: 120px;
+    max-width: 320px;
 }
 .contenido{
     position: relative;
@@ -141,4 +148,49 @@ ul.nav.navmenu-nav{
     margin: 10px auto;
     width: 80px;
     height: 80px;
+}
+
+.swal2-content img{
+    max-height: 180px;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+}
+@media only screen and (max-width: 480px){
+    .text-time{
+        width: 20px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+}
+@media only screen and (min-width: 481px) and (max-width: 600px){
+    .text-time{
+        width: 30%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+}
+@media only screen and (max-width: 550px){
+    body{
+        padding-left: 0px;
+    }
+    .swal2-modal{
+        margin-top: -200px !important;
+    }
+}
+@media (min-width: 958px) {
+    body {
+        padding: 0 0 0 300px;
+    }
+    .offcanvas-sm{
+        display: block;
+    }
+    .navmenu {
+        padding-top: 0;
+    }
+    .navbar {
+        display: none !important; /* IE8 fix */
+    }
 }

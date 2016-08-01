@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Controller\BaseController;
+use App\Model\Ban;
 use App\Model\User;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -11,8 +12,17 @@ class Google extends BaseController
 {
     public function getIndex(Request $request, Response $response, $args)
     {
+        if(!empty($this->session->get('user_ban'))){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+        }
         if ($this->session->get('user_id') !== null) {
             return $this->withRedirect($response, $this->router->pathFor('main.page'));
+        }
+        $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
+        if($ban){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
         }
         $client = $this->google;
         $client->setRedirectUri($request->getUri()->getBaseUrl().$this->router->pathFor('auth.google.callback'));
@@ -28,6 +38,10 @@ class Google extends BaseController
 
     public function getCallback(Request $request, Response $response, $args)
     {
+        if(!empty($this->session->get('user_ban'))){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+        }
         $query = $request->getQueryParams();
         if(!empty($query['error'])){
             $this->flash->addMessage(

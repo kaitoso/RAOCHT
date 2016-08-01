@@ -24,7 +24,11 @@
             <div class="col-sm-10">
                 <div class="file-background fileinput fileinput-new" data-provides="fileinput">
                     <div class="fileinput-new thumbnail preview-img">
-                        <img src="{{ base_url() }}/assets/img/{{ chat.background }}" alt="..." id="currentBackground">
+                        {% if chat.background %}
+                            <img class="placeholder" src="{{ base_url() }}/assets/img/{{ chat.background }}" alt="..." id="currentBackground">
+                        {% else %}
+                            <img class="placeholder" data-src="holder.js/320x320" alt="..." id="currentBackground">
+                        {% endif %}
                     </div>
                     <div class="fileinput-preview fileinput-exists thumbnail preview-img"></div>
                     <div>
@@ -44,7 +48,7 @@
                 <button type="submit" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> Cambiar imagen</button>
             </div>
             <div class="col-sm-5">
-                <a href="#" class="btn btn-danger pull-right {% if not chat.background %}hidden{% endif %}"><i class="fa fa-times"></i> Eliminar esta imagen</a>
+                <a href="#" id="btn-background" class="btn btn-danger pull-right {% if not chat.background %}hidden{% endif %}"><i class="fa fa-times"></i> Eliminar esta imagen</a>
             </div>
         </div>
     </form>
@@ -58,9 +62,9 @@
                 <div class="file-side fileinput fileinput-new" data-provides="fileinput">
                     <div class="fileinput-new thumbnail preview-img">
                         {% if chat.side  %}
-                            <img src="{{ base_url() }}/assets/img/{{ chat.side }}" alt="..." id="currentSide">
+                            <img class="placeholder-side" src="{{ base_url() }}/assets/img/{{ chat.side }}" alt="..." id="currentSide">
                         {% else %}
-                            <img data-src="holder.js/320x320" alt="..." id="currentImage">
+                            <img class="placeholder-side" data-src="holder.js/320x320" alt="..." id="currentSide">
                         {% endif %}
                     </div>
                     <div class="fileinput-preview fileinput-exists thumbnail preview-img"></div>
@@ -81,7 +85,7 @@
                 <button type="submit" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> Cambiar imagen</button>
             </div>
             <div class="col-sm-5">
-                <a href="#" class="btn btn-danger pull-right {% if not chat.side %}hidden{% endif %}"><i class="fa fa-times"></i> Eliminar esta imagen</a>
+                <a href="#" id="btn-side" class="btn btn-danger pull-right {% if not chat.side %}hidden{% endif %}"><i class="fa fa-times"></i> Eliminar esta imagen</a>
             </div>
         </div>
     </form>
@@ -160,6 +164,7 @@
                 }
                 $('#currentBackground').attr('src', data.image);
                 $('.file-background').fileinput('clear');
+                $('#btn-background').removeClass('hidden').show();
                 swal("¡Buen trabajo!", "Has cambiado imagen del chat correctamente", "success");
             })
             .fail(function() {
@@ -199,6 +204,7 @@
                     return;
                 }
                 $('#currentSide').attr('src', data.image);
+                $('#btn-side').removeClass('hidden').show();
                 $('.file-side').fileinput('clear');
                 swal("¡Buen trabajo!", "Has cambiado imagen del chat correctamente", "success");
             })
@@ -206,5 +212,48 @@
                 sweetAlert("Oops...", '¡Hubo un error al actualizar la imagen del chat! Intenta mas tarde', "error");
             });
         });
+
+        $('#btn-background').on('click', function (event) {
+            event.preventDefault();
+            swal({
+                title: "Eliminando fondo del chat...",
+                text: "Espere un momento mientras se elimina el fondo del chat...",
+                imageUrl: "{{ base_url() }}/assets/img/loading_spin.gif",
+                showConfirmButton: false
+            });
+            $.delete('{{ base_url() }}/admin/chat/background',{
+                raoToken: $('input[name=raoToken]').val()
+            }, function (data) {
+                if(data.error){
+                    swal("¡Oops!", data.error, "error");
+                }
+                $('#currentBackground').attr('src', 'holder.js/320x320');
+                $('#btn-background').hide();
+                Holder.run({images:".placeholder"})
+                swal("¡Borrado!", data.success, "success");
+            });
+        });
+
+        $('#btn-side').on('click', function (event) {
+            event.preventDefault();
+            swal({
+                title: "Eliminando fondo del chat...",
+                text: "Espere un momento mientras se elimina el fondo del chat...",
+                imageUrl: "{{ base_url() }}/assets/img/loading_spin.gif",
+                showConfirmButton: false
+            });
+            $.delete('{{ base_url() }}/admin/chat/side',{
+                raoToken: $('input[name=raoToken]').val()
+            }, function (data) {
+                if(data.error){
+                    swal("¡Oops!", data.error, "error");
+                }
+                $('#currentSide').attr('src', 'holder.js/320x320');
+                $('#btn-side').hide();
+                Holder.run({images:".placeholder-side"})
+                swal("¡Borrado!", data.success, "success");
+            });
+        });
+
     </script>
 {% endblock %}

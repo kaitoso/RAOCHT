@@ -25,7 +25,7 @@ class UserController extends BaseController
 
     public function getUpdate(Request $request, Response $response, $args)
     {
-        $validation = $this->validator->validateArgs($args, [
+        $validation = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         if($validation->failed()){
@@ -100,7 +100,7 @@ class UserController extends BaseController
 
     public function postImage(Request $request, Response $response, $args)
     {
-        $validationGet = $this->validator->validateArgs($args, [
+        $validationGet = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
@@ -181,7 +181,7 @@ class UserController extends BaseController
 
     public function putGeneral(Request $request, Response $response, $args)
     {
-        $validationGet = $this->validator->validateArgs($args, [
+        $validationGet = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
@@ -260,7 +260,7 @@ class UserController extends BaseController
     }
 
     public function putChatInfo(Request $request, Response $response, $args){
-        $validationGet = $this->validator->validateArgs($args, [
+        $validationGet = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
@@ -307,7 +307,7 @@ class UserController extends BaseController
 
     public function putPassword(Request $request, Response $response, $args)
     {
-        $validationGet = $this->validator->validateArgs($args, [
+        $validationGet = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
@@ -351,7 +351,7 @@ class UserController extends BaseController
 
     public function putEmail(Request $request, Response $response, $args)
     {
-        $validationGet = $this->validator->validateArgs($args, [
+        $validationGet = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
@@ -395,7 +395,7 @@ class UserController extends BaseController
 
     public function deleteUser(Request $request, Response $response, $args)
     {
-        $validationGet = $this->validator->validateArgs($args, [
+        $validationGet = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [

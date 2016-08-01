@@ -2,6 +2,7 @@
 namespace App\Controller\Api;
 
 use App\Controller\BaseController;
+use App\Model\Ban;
 use App\Model\User;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -15,6 +16,15 @@ class Facebook extends BaseController
     {
         if ($this->session->get('user_id') !== null) {
             return $this->withRedirect($response, $this->router->pathFor('main.page'));
+        }
+        if(!empty($this->session->get('user_ban'))){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+        }
+        $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
+        if($ban){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
         }
         $fbHelper = $this->fb->getRedirectLoginHelper();
         $url = $fbHelper->getLoginUrl(

@@ -1,5 +1,5 @@
 {% extends 'templates/admin.twig' %}
-{% block titulo %}{% endblock %}
+{% block titulo %}Gestion del logro: {{ logro.name }}{% endblock %}
 {% block css %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
@@ -156,7 +156,7 @@
             minLength: 3
         }, {
             display: 'user',
-            items: 4,
+            limit: 10,
             source: $user.ttAdapter(),
             templates: {
                 empty: [
@@ -208,6 +208,7 @@
                     swal("¡Hey!", data.error, "error");
                     return;
                 }
+                $('.typeahead').typeahead('val', '');
                 swal("¡Hey!", data.success, "success");
                 $('#tableLogro').bootstrapTable('refresh');
             }, 'json')

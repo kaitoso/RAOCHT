@@ -18,7 +18,7 @@ class ClientCache
     {
         $json = array();
         $json['ranks'] = Rank::select('id', 'name', 'chatPermissions')->get();
-        $json['smilies'] = Smilie::get()->toArray();
+        $json['smilies'] = Smilie::select('id', 'code', 'url', 'local')->get()->toArray();
 
         /* Almacenamos el archivo */
         file_put_contents(__DIR__ . '/../../../public/cache/client.json', json_encode($json));

@@ -60,7 +60,7 @@ class AppSchemas
             $table->increments('id');
             $table->integer('user')->unsigned()->unique();
             $table->integer('who')->unsigned();
-            $table->timestamp('date_ban')->useCurrent();
+            $table->dateTime('date_ban')->useCurrent();
             $table->string('reason', 255);
             $table->string('ip', 15);
             $table->timestamps();
@@ -119,7 +119,7 @@ class AppSchemas
     function createRanks(){
         $rol = new \App\Model\Rank();
         $rol->name = 'Administrador';
-        $rol->permissions = '["ban", "unban", "rank", "user", "logro", "chat"]';
+        $rol->permissions = '["ban", "unban", "rank", "user", "logro", "chat", "global"]';
         $rol->chatPermissions = '["images","videos","audio"]';
         $rol->save();
         $rol = new \App\Model\Rank();
@@ -128,6 +128,11 @@ class AppSchemas
     }
 
     function createUsers(){
+        $image = 'Sistema'. uniqid();
+        Avatar::generateAvatar(
+            __DIR__. '/../../../public/avatar/preduser.png',
+            $image
+        );
         $admin = new \App\Model\User();
         $admin->email = 'contacto@asner.xyz';
         $admin->password = password_hash(base64_encode(
@@ -136,11 +141,16 @@ class AppSchemas
         $admin->user = 'Sistema';
         $admin->rank = 1;
         $admin->chatName = 'Sistema';
-        $admin->image = 'sys.jpg';
+        $admin->image = $image;
         $admin->ip = '127.0.0.1';
         $admin->lastLogin = date('Y-m-d H:i:s');
         $admin->save();
 
+        $image = 'Asner'. uniqid();
+        Avatar::generateAvatar(
+            __DIR__. '/../../../public/avatar/preduser.png',
+            $image
+        );
         $prueba = new \App\Model\User();
         $prueba->email = 'jose.gaytan@outlook.com';
         $prueba->password = password_hash(base64_encode(
@@ -149,7 +159,7 @@ class AppSchemas
         $prueba->user = 'Asner';
         $prueba->rank = 1;
         $prueba->chatName = 'Asner';
-        $prueba->image = 'sys.jpg';
+        $prueba->image = $image;
         $prueba->ip = '127.0.0.1';
         $prueba->lastLogin = date('Y-m-d H:i:s');
         $prueba->save();

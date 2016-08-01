@@ -11,8 +11,17 @@ class Twitter extends BaseController
 {
     public function getIndex(Request $request, Response $response, $args)
     {
+        if(!empty($this->session->get('user_ban'))){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+        }
         if ($this->session->get('user_id') !== null) {
             return $this->withRedirect($response, $this->router->pathFor('main.page'));
+        }
+        $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
+        if($ban){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
         }
         $request_token = $this->twitter->oauth('oauth/request_token', array(
             'oauth_callback' => $request->getUri()->getBaseUrl().$this->router->pathFor('auth.twitter.callback')

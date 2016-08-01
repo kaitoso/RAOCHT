@@ -29,7 +29,7 @@ class RankController extends BaseController
 
     public function getUpdate(Request $request, Response $response, $args)
     {
-        $validation = $this->validator->validateArgs($args, [
+        $validation = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         if($validation->failed()){
@@ -99,7 +99,7 @@ class RankController extends BaseController
 
     public function putRank(Request $request, Response $response, $args)
     {
-        $validationGet = $this->validator->validateArgs($args, [
+        $validationGet = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
@@ -158,7 +158,7 @@ class RankController extends BaseController
 
     public function deleteRank(Request $request, Response $response, $args)
     {
-        $validation = $this->validator->validateArgs($args, [
+        $validation = $this->validator->validateArgs($request, [
             'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
         ]);
         $token = $request->getParam('token');
