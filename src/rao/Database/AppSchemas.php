@@ -1,5 +1,6 @@
 <?php
 namespace App\Database;
+use App\Handler\Avatar;
 use App\Model\Permisos;
 use App\Model\RankPermisos;
 use Illuminate\Database\Capsule\Manager as Capsule;
