@@ -4,6 +4,87 @@
 {% endblock  %}
 {% block contenido %}
     {% include 'templates/flash.twig' %}
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="table-responsive">
+                <h3 id="mes"></h3>
+                <canvas id="chartUsers" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3 text-center">
+            <h1 id="onlineUsers">Cargando...</h1>
+            <h3>Usuarios conectados</h3>
+        </div>
+        <div class="col-sm-3 text-center">
+            <h1 id="banUsers">Cargando...</h1>
+            <h3>Expulsados de hoy</h3>
+        </div>
+        <div class="col-sm-3 text-center">
+            <h1 id="logrosToday">Cargando...</h1>
+            <h3>Logros entregados</h3>
+        </div>
+        <div class="col-sm-3 text-center">
+            <h1 id="messagesMinute">Cargando...</h1>
+            <h3>Mensajes por minuto</h3>
+        </div>
+    </div>
 {% endblock %}
 {% block js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
+    <script>
+        var meses = [
+            'Enero',
+            'Febrero',
+            'Marzo',
+            'Abril',
+            'Mayo',
+            'Junio',
+            'Julio',
+            'Agosto',
+            'Septiembre',
+            'Octubre',
+            'Noviembre',
+            'Diciembre'
+        ];
+        $('#mes').text('Mes actual ' + meses[(new Date).getMonth()]);
+        Chart.defaults.global.responsive = true;
+        Chart.defaults.global.maintainAspectRatio = false;
+
+        function getUserData(){
+            $.getJSON('{{ path_for('admin.main.stats') }}', function (data) {
+                $('#banUsers').text(data.bans);
+                $('#logrosToday').text(data.logros);
+                var ctx = document.getElementById("chartUsers").getContext("2d");
+                var lineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: Object.keys(data.users),
+                        datasets: [{
+                            fill: false,
+                            borderColor: '#42a5f5',
+                            label: '# de usuarios registrados este mes',
+                            data: Object.values(data.users),
+                            borderWidth: 1
+                        }]
+                    }
+                });
+            });
+        }
+        function getServerData(){
+            $.getJSON('/socket.io', function (data) {
+                $('#onlineUsers').text(data.users);
+                var currentTime = new Date().getTime();
+                var diff = ((currentTime - data.messages.start)/1000)/60;
+                console.log(diff);
+                $('#messagesMinute').text((data.messages.count/diff).toFixed(2));
+            });
+        }
+        setInterval(function() {
+            getServerData();
+        }, 30000);
+        getServerData();
+        getUserData();
+    </script>
 {% endblock %}

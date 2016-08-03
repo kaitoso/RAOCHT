@@ -5,7 +5,6 @@ $app->get('/error', 'App\MainController:error')->setName('main.error');
 $app->get('/login', 'App\MainController:getLogin')->setName('auth.login');
 $app->get('/signup', 'App\MainController:getSignUp')->setName('auth.signup');
 $app->get('/logout', 'App\MainController:getLogout')->setName('auth.logout');
-
 $app->group('/email', function(){
    $this->get('/subscribe/{token}', 'App\SubscriptionController:getActivation');
     $this->get('/unsubscribe/{token}', 'App\SubscriptionController:getUnsubscribe');
@@ -42,6 +41,7 @@ $app->group('/cuenta', function(){
 
 $app->group('/admin', function () {
     $this->get('[/]', 'App\AdminController:index')->setName('admin.main');
+    $this->get('/stats', 'App\AdminController:getUsers')->setName('admin.main.stats');
 
     $this->get('/ban[/{name}]', 'App\Admin\BanController:banindex')->setName('admin.ban');
     $this->post('/ban', 'App\Admin\BanController:postBan');
@@ -90,6 +90,7 @@ $app->group('/admin', function () {
     $this->get('/chat', 'App\Admin\ChatController:getIndex')->setName('admin.chat');
     $this->post('/chat/background', 'App\Admin\ChatController:postBackground');
     $this->post('/chat/side', 'App\Admin\ChatController:postSide');
+    $this->post('/chat/welcome', 'App\Admin\ChatController:postWelcome')->setName('admin.chat.welcome');
     $this->delete('/chat/background','App\Admin\ChatController:deleteBackground');
     $this->delete('/chat/side','App\Admin\ChatController:deleteSide');
 

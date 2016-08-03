@@ -15,12 +15,28 @@ var subscriber = redis.createClient();
 var redisClient = redis.createClient();
 var globalUsers = [];
 var userData = [];
+var chatConfig = {
+    start: _.now(),
+    message: '¡Bienvenido al chat de Radio Anime Obsesión!',
+    sessionMessages: 0
+};
 var streamData = {
     title: '',
     announcer: '',
     url: ''
 };
 server.listen(8080);
+fs.readFile(__dirname + '/../src/rao/Config/Chat.json', (err, data) => {
+        if (err) {
+            console.error('Error reading chat config file.');
+            return;
+        }
+        let json = JSON.parse(data);
+        if(json.message !== undefined){
+            chatConfig.message = json.message;
+        }
+    }
+);
 getStreamData();
 
 setInterval(function() {
@@ -29,6 +45,10 @@ setInterval(function() {
 
 function getStreamData() {
     radio.getStationInfo('http://animeobsesion.net:8000', (error, station) => {
+        if(error){
+            console.error('Error on station: ', error);
+            return;
+        }
         let oldData = streamData;
         streamData = {
             title: station.title,
@@ -43,7 +63,17 @@ function getStreamData() {
     }, radio.StreamSource.STREAM);
 }
 function httpHandler (req, res) {
-    fs.readFile(__dirname + '/index.html', (err, data) => {
+    res.setHeader('content-type', 'application/json; charset=utf-8');
+    res.writeHead(200);
+    res.end(JSON.stringify({
+        users: userData.length,
+        messages: {
+            count: chatConfig.sessionMessages,
+            start: chatConfig.start
+        },
+        stream: streamData
+    }));
+    /*fs.readFile(__dirname + '/index.html', (err, data) => {
             if (err) {
                 res.writeHead(500);
                 return res.end('Error loading index.html');
@@ -51,7 +81,7 @@ function httpHandler (req, res) {
             res.writeHead(200);
             res.end(data);
         }
-    );
+    );*/
 }
 
 io.on('connection', (socket) => {
@@ -105,11 +135,12 @@ io.on('connection', (socket) => {
         }
         io.emit('message', message);
         currentUser.last = _.now();
+        chatConfig.sessionMessages++;
     });
 
     socket.on('ready', () => {
         io.to(socket.id).emit('system', {
-            message: '¡Bienvenido al chat de Radio Anime Obsesión!'
+            message: chatConfig.message
         });
         io.to(socket.id).emit('system', {
             message: '¡Ahora locuta ' + streamData.announcer + '!'
@@ -263,11 +294,12 @@ subscriber.on('message', (channel, data) => {
         io.to(socket).emit('update', newUser);
     }
 
+    if(channel === 'admin-update-welcome'){
+        chatConfig.message = message.message;
+    }
+
     if(channel === 'ban-chat'){
-        let index = getUserIndexById(message.id, userData);
-        if(index === null) return;
-        let user = userData[index];
-        let socket = getUserSockets(user.id, globalUsers);
+        let socket = getUserSockets(message.id, globalUsers);
         if(socket.length === 0) return;
         socket.forEach(function(val, index){
             io.to(val).emit('offline');
@@ -282,6 +314,7 @@ subscriber.on('message', (channel, data) => {
         });
     }
 
+
 });
 subscriber.subscribe(
     'admin-update-background', // Actualización del fondo
@@ -293,6 +326,7 @@ subscriber.subscribe(
     'admin-update-image',
     'admin-update-user',
     'admin-update-chat',
+    'admin-update-welcome',
     'ban-chat',
     'admin-global'
 );

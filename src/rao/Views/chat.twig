@@ -33,16 +33,15 @@
             <div id="userData"></div>
         </div>
         <h3 class="navbar-text">Opciones</h3>
-        <ul class="nav navmenu-nav">
-            {% if permissions|length > 0 %}
-            <li><a href="/admin" target="_blank"> Administración</a></li>
-            {% endif %}
+        <ul class="nav navmenu-nav" id="navList">
+            {% if permissions|length == 0 %}{% endif %}
+            <li><a href="/admin" target="_blank" id="adminView" class="{% if permissions|length == 0 %}hidden{% endif %}"><i class="fa fa-cogs"></i> Administración</a></li>
             <li><a href="/cuenta" target="_blank"><i class="fa fa-cog"></i> Configuración</a></li>
             <li><a href="/privados" target="_blank"><i class="fa fa-envelope" aria-hidden="true"></i> Mensajes privados <span class="label label-default pull-right">0</span></a></li>
             <li><a href="#" id="openSmilies"><i class="fa fa-smile-o"></i> Smilies</a></li>
             <li><a href="/logout"><i class="fa fa-sign-out"></i> Salir</a></li>
             <li class="dropdown open">
-                <a href="#"><i class="fa fa-users"></i> Usuarios <span class="label label-default pull-right" id="onlineCount">10</span></a>
+                <a href="#"><i class="fa fa-users"></i> Usuarios <span class="label label-default pull-right" id="onlineCount">Cargando...</span></a>
                 <ul class="dropdown-menu navmenu-nav" role="menu" id="chatUsuarios">
                 </ul>
             </li>

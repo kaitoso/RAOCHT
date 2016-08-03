@@ -144,6 +144,31 @@ class ChatController extends BaseController
         }
     }
 
+    public function postWelcome(Request $request, Response $response, $args)
+    {
+        $validation = $this->validator->validate($request, [
+            'inputWelcome' => v::notEmpty()->alnum(',;.:-_^*+-/¡!¿?()áéíóúÁÉÍÓÚñÑ')->length(4, 255),
+            'raoToken' => v::noWhitespace()->notEmpty()
+        ]);
+        if($validation->failed()){
+            return $this->withRedirect($response, $this->router->pathFor('admin.chat').'#formWelcome');
+        }
+        $inputWelcome = $request->getParam('inputWelcome');
+        $inputToken = $request->getParam('raoToken');
+        if($this->session->get('token') !== $inputToken){
+            $this->flash->addMessage('error', 'Éste token es inválido.');
+            return $this->withRedirect($response, $this->router->pathFor('admin.chat'));
+        }
+        $chatConfig = json_decode(file_get_contents(__DIR__.'/../../Config/Chat.json'));
+        $chatConfig->message = $inputWelcome;
+        file_put_contents(__DIR__.'/../../Config/Chat.json', json_encode($chatConfig));
+        $this->redis->publish('admin-update-welcome', json_encode([
+            'message' => $chatConfig->message
+        ]));
+        $this->flash->addMessage('success', '¡Se ha cambiado el mensaje de bienvenida con éxito!');
+        return $this->withRedirect($response, $this->router->pathFor('admin.chat').'#formWelcome');
+    }
+
     public function deleteBackground(Request $request, Response $response, $args)
     {
         $validation = $this->validator->validate($request, [

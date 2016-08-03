@@ -11,6 +11,10 @@
             max-height: 480px;
             max-width: 320px;
         }
+        #inputWelcome{
+            max-width: 100%;
+            min-width: 100%;
+        }
     </style>
 {% endblock  %}
 {% block contenido %}
@@ -89,7 +93,20 @@
             </div>
         </div>
     </form>
-    {{ csrf.field | raw }}
+
+    <form id="formWelcome" action="{{ path_for('admin.chat.welcome') }}" method="post" role="form">
+    	<legend>Mensaje de bienvenida</legend>
+        {% include 'templates/flash.twig' %}
+    	<div class="form-group {% if errors.inputWelcome %}has-error{% endif %}">
+    		<label for="inputWelcome">Mensaje:</label>
+            <textarea name="inputWelcome" id="inputWelcome" class="form-control" cols="30" rows="10">{{ chat.message }}</textarea>
+            <span class="helper-block">
+                {{ errors.inputWelcome | first }}
+            </span>
+    	</div>
+        {{ csrf.field | raw }}
+    	<button type="submit" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> Actualizar mensaje</button>
+    </form>
 {% endblock %}
 {% block js %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.3/holder.min.js"></script>

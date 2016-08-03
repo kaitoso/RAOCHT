@@ -23,7 +23,7 @@ class AdminMiddleware extends Middleware
         }
         $permisos = require __DIR__.'/../Config/RankPermissions.php';
         $path = explode('/', $request->getUri()->getPath());
-        if(!empty($path[2]) && $path[2] !== 'search'){
+        if(!empty($path[2]) && !in_array($path[2], ['search', 'stats'])){
             $currentPermisos = array_intersect_key($permisos, array_flip($permissions));
             if(empty($currentPermisos[$path[2]])){ // No tiene el permiso de acceder aquí
                 $this->container->flash->addMessage('error', 'No tienes los suficientes permisos para acceder a esta sección');

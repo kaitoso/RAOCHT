@@ -104,6 +104,7 @@ class AppSchemas
             $table->increments('id');
             $table->integer('user_id')->unsigned();
             $table->integer('achievement_id')->unsigned();
+            $table->boolean('seen')->default(0);
             $table->timestamps();
             $table->foreign('user_id')
                 ->references('id')

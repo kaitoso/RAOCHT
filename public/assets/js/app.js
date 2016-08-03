@@ -144,6 +144,30 @@ function getCurrentDate() {
     );
 }
 
+/* Get client cache */
+function getCache() {
+    $.getJSON('cache/client.json?time' +  new Date().getTime(), function (data) {
+        $config.rangos = [];
+        $config.smilies = data.smilies;
+        $config.autocomplete[0] = [];
+        $.each(data.ranks, function (i, v) {
+            $config.autocomplete[0].push(v.name);
+            $config.rangos.push({
+                'id': v.id,
+                'name': v.name,
+                'permission': JSON.parse(v.chatPermissions)
+            });
+        });
+        $.each($config.smilies, function(i, v){
+            $config.autocomplete[0].push(':' + v.code + ':');
+        });
+        if(!$config.ready){
+            socket.emit('ready', {ready: true});
+            $config.ready = true;
+        }
+    });
+}
+
 function getLogros(id) {
     var logQueue = [];
     var url = $baseUrl+ '/cuenta/logros.json';
@@ -208,27 +232,6 @@ var $chat = {
     interval: null,
     seed: Math.floor(Math.random() * (20 - 30 + 1)) + 20
 };
-/* Get client cache */
-function getCache() {
-    $.getJSON('cache/client.json?time' +  new Date().getTime(), function (data) {
-        $config.rangos = [];
-        $config.smilies = data.smilies;
-        $config.autocomplete[0] = [];
-        $.each(data.ranks, function (i, v) {
-            $config.autocomplete[0].push(v.name);
-            $config.rangos.push({
-                'id': v.id,
-                'name': v.name,
-                'permission': JSON.parse(v.chatPermissions)
-            });
-        });
-        $.each($config.smilies, function(i, v){
-            $config.autocomplete[0].push(':' + v.code + ':');
-        });
-        socket.emit('ready', {ready: true});
-        $config.ready = true;
-    });
-}
 /* Chat Events */
 socket.on('message', function (user) {
     user.time = getCurrentDate();
@@ -247,6 +250,11 @@ socket.on('update', function (user) {
     $('#controlUser').text(user.user);
     $('#controlRank').text(userRank.name);
     $('#controlImage').attr('src', user.image);
+    if(userRank.permission.length > 0){
+        $('#adminView').show();
+    }else{
+        $('#adminView').hide();
+    }
 });
 
 socket.on('global', function (message) {

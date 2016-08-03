@@ -48,7 +48,6 @@ class RankController extends BaseController
         $permisos = require __DIR__.'/../../Config/RankPermissions.php';
         $chatPermisos = require __DIR__.'/../../Config/ClientPermissions.php';
         return $this->view->render($response, 'admin/rank-update.twig', [
-            'permisos' => $permisos,
             'chatPermisos'=> $chatPermisos,
             'rank' => $rank,
             'rankPerm' => json_decode($rank->permissions),
