@@ -58,6 +58,10 @@ $container['errorHandler'] = function ($c) {
     return new App\Handler\Error\ErrorHandler($c['logger']);
 };
 
+$c['notFoundHandler'] = function ($c) {
+    return new App\Handler\Error\NotFound($c['view']);
+};
+
 $container['email'] = function($c){
     $config = $c->get('settings')['smtp'];
     $transport = Swift_SmtpTransport::newInstance($config['smtp_server'], $config['smtp_port']);
@@ -103,6 +107,10 @@ $container['google'] = function($c) {
 
 $container['App\MainController'] = function($c){
     return new App\Controller\MainController($c);
+};
+
+$container['App\PerfilController'] = function($c){
+    return new App\Controller\PerfilController($c);
 };
 
 $container['App\SubscriptionController'] = function($c){

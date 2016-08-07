@@ -4,6 +4,7 @@ namespace App\Controller;
 use App\Handler\Avatar;
 use App\Model\User;
 use App\Model\UserAchievements;
+use App\Model\UserProfile;
 use Respect\Validation\Validator as v;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -129,6 +130,32 @@ class CuentaController extends BaseController
         }finally{
             $this->showJSONResponse($response, $resp);
         }
+    }
+
+    public function postAbout(Request $request, Response $response, $args)
+    {
+        $validation = $this->validator->validate($request, [
+            'inputAbout' => v::stringType()->length(null, 1000),
+            'raoToken' => v::noWhitespace()->notEmpty()
+        ]);
+        if($validation->failed()){
+            if($request->isXhr()){
+                return $response->withJson(['error' => $this->session->get('errors')]);
+            }
+            return $this->withRedirect($response, $this->router->pathFor('cuenta.main').'#formAbout');
+        }
+        $inputAbout = $request->getParam('inputAbout');
+        $inputToken = $request->getParam('raoToken');
+
+        if($this->session->get('token') !== $inputToken){
+            $this->flash->addMessage('error', 'Éste token es inválido.');
+            return $this->withRedirect($response, $this->router->pathFor('cuenta.main').'#formAbout');
+        }
+        $userProfile = UserProfile::find($this->session->get('user_id'));
+        $userProfile->about_me = $inputAbout;
+        $userProfile->save();
+        $this->flash->addMessage('about-change', '¡Se ha cambiado tu información de tu perfil con éxito');
+        return $this->withRedirect($response, $this->router->pathFor('cuenta.main').'#formAbout');
     }
 
     public function putChatInfo(Request $request, Response $response, $args){

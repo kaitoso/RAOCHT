@@ -80,7 +80,7 @@
         var eliminar_template = Handlebars.compile($('#eliminar-template').html());
 
         function localHour(value, row, index){
-            return moment(value).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a')
+            return moment.unix(value).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a')
         }
 
         function imageFormater(value, row, index) {

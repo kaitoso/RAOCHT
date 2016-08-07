@@ -1,15 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: joseg
- * Date: 06/08/2016
- * Time: 10:36 AM
- */
-
 namespace App\Model;
 
-
-class ProfileComment
+use \Illuminate\Database\Eloquent\Model;
+class ProfileComment extends Model
 {
+    protected $table = 'profile_comments';
 
+    protected $guarded = array('id');
+
+    public function getCreatedAtAttribute($date)
+    {
+        return \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('U');
+    }
+    public function getUpdatedAtAttribute($date)
+    {
+        return \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('U');
+    }
 }

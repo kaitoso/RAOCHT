@@ -9,36 +9,70 @@
             max-height: 480px;
             max-width: 320px;
         }
+
         .current-img {
             max-height: 480px;
             max-width: 320px;
         }
-        .container{
+
+        .container {
             margin-bottom: 10px;
+        }
+
+        #inputAbout{
+            max-width: 100%;
+            min-width: 100%;
         }
     </style>
 {% endblock %}
 {% block contenido %}
-<div class="container">
-    <div class="row">
-        <div class="col-xs-12">
-            <form class="form-horizontal" id="imagenForm" method="post" action="/cuenta/image" enctype="multipart/form-data">
+    <nav class="navbar navbar-default" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Chat Anime Obsesion</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="{{ path_for('perfil.main') }}">Perfil</a></li>
+                <li class="active"><a href="#">Cuenta</a></li>
+            </ul>
+            <form class="navbar-form navbar-left" role="search">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Buscar por usuario...">
+                </div>
+                <button type="submit" class="btn btn-default">Buscar</button>
+            </form>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+            <form class="form-horizontal" id="imagenForm" method="post" action="/cuenta/image"
+                  enctype="multipart/form-data">
                 <legend>Imagen para mostrar</legend>
                 <div class="form-group">
                     <label for="fileImage" class="col-sm-2 control-label">Imagen</label>
                     <div class="col-sm-10">
                         <div class="fileinput fileinput-new" data-provides="fileinput">
                             <div class="fileinput-new thumbnail preview-img">
-                                <img src="{{ base_url() }}/avatar/b/{{user.image}}" alt="..." id="currentImage">
+                                <img src="{{ base_url() }}/avatar/b/{{ user.image }}" alt="..." id="currentImage">
                             </div>
                             <div class="fileinput-preview fileinput-exists thumbnail preview-img"></div>
                             <div>
-                            <span class="btn btn-default btn-file">
-                                <span class="fileinput-new">Seleccionar Imagen</span>
-                                <span class="fileinput-exists">Cambiar</span>
-                                <input type="file" name="fileImage" id="fileImage">
-                            </span>
-                            <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Quitar</a>
+                                <span class="btn btn-default btn-file">
+                                    <span class="fileinput-new">Seleccionar Imagen</span>
+                                    <span class="fileinput-exists">Cambiar</span>
+                                    <input type="file" name="fileImage" id="fileImage">
+                                </span>
+                                <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Quitar</a>
                             </div>
                         </div>
                     </div>
@@ -50,9 +84,38 @@
                 </div>
             </form>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12">
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <form action="{{ path_for('cuenta.post.about') }}" method="post" role="form" id="formAbout">
+                    <legend>Información del perfil</legend>
+                    {% if flash.getMessage('about-change') %}
+                        <div class="alert alert-success">
+                            {{ flash.getMessage('about-change') | first }}
+                        </div>
+                    {% endif %}
+                    <div class="form-group {% if errors.inputAbout %}has-error{% endif %}">
+                        <label for="inputAbout">Acerca de mi:</label>
+                        <textarea name="inputAbout" id="inputAbout" rows="10" class="form-control" placeholder="Escribe algo acerca de ti..." maxlength="1000">{{ user.getProfile.about_me }}</textarea>
+                        <span class="pull-right" id="charLeft">0 / 1000</span>
+                        <span class="help-block">
+                            {% if errors.inputAbout %}
+                                {{ errors.inputAbout | first }}
+                            {% else %}
+                            Puedes usar links de imagenes, videos (.mp4 y .webm), y audios (.ogg y .mp3) en tu perfil.
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        {{ csrf.field | raw }}
+                        <button type="submit" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> Editar informacion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
             <form class="form-horizontal" id="chatForm" method="post" action="{{ base_url() }}/cuenta/chatinfo">
                 <legend>Datos del chat</legend>
                 {% if flash.getMessage('chatInfo-change') %}
@@ -63,7 +126,8 @@
                 <div class="form-group {% if errors.chatName %}has-error{% endif %}">
                     <label for="chatNombre" class="col-sm-2 control-label">Nombre para mostrar</label>
                     <div class="col-sm-10">
-                        <input type="text" name="chatName" class="form-control" id="chatNombre" required placeholder="Nombre..." value="{{ user.chatName }}" maxlength="50">
+                        <input type="text" name="chatName" class="form-control" id="chatNombre" required
+                               placeholder="Nombre..." value="{{ user.chatName }}" maxlength="50">
                         <span class="help-block">
                             {% if errors.chatName %}
                                 {{ errors.chatName | first }}
@@ -74,7 +138,8 @@
                 <div class="form-group {% if errors.chatColor %}has-error{% endif %}">
                     <label for="chatColor" class="col-sm-2 control-label">Color de nombre</label>
                     <div class="col-sm-10">
-                        <input type="hidden" name="chatColor" value="#{{ user.chatColor }}" class="minicolors" size="7" id="chatColor">
+                        <input type="hidden" name="chatColor" value="#{{ user.chatColor }}" class="minicolors" size="7"
+                               id="chatColor">
                         <span class="help-block">
                             {% if errors.chatColor %}
                                 {{ errors.chatColor | first }}
@@ -85,7 +150,8 @@
                 <div class="form-group {% if errors.chatTexto %}has-error{% endif %}">
                     <label for="chatTexto" class="col-sm-2 control-label">Color de texto</label>
                     <div class="col-sm-10">
-                        <input type="hidden" name="chatTexto" value="#{{ user.chatText }}" class="minicolors" size="7" id="chatTexto">
+                        <input type="hidden" name="chatTexto" value="#{{ user.chatText }}" class="minicolors" size="7"
+                               id="chatTexto">
                         <span class="help-block">
                             {% if errors.chatTexto %}
                                 {{ errors.chatTexto | first }}
@@ -102,9 +168,9 @@
                 </div>
             </form>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12">
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
             <form class="form-horizontal" id="passwordForm" method="post" action="/cuenta/password">
                 <legend>Contraseña</legend>
                 {% if flash.getMessage('password-change') %}
@@ -120,7 +186,8 @@
                 <div class="form-group {% if errors.currentPassword %}has-error{% endif %}">
                     <label for="inputOldPassword" class="col-sm-2 control-label">Contraseña actual</label>
                     <div class="col-sm-10">
-                        <input type="password" name="currentPassword" class="form-control" id="inputOldPassword" placeholder="Ingresa tu contraseña actual...">
+                        <input type="password" name="currentPassword" class="form-control" id="inputOldPassword"
+                               placeholder="Ingresa tu contraseña actual...">
                         <span class="help-block">
                             {% if errors.currentPassword %}
                                 {{ errors.currentPassword | first }}
@@ -131,7 +198,8 @@
                 <div class="form-group {% if errors.newPassword %}has-error{% endif %}">
                     <label for="inputNewPassword" class="col-sm-2 control-label">Nueva contraseña</label>
                     <div class="col-sm-10">
-                        <input type="password" name="newPassword" class="form-control" id="inputNewPassword" placeholder="Ingresa tu contraseña nueva...">
+                        <input type="password" name="newPassword" class="form-control" id="inputNewPassword"
+                               placeholder="Ingresa tu contraseña nueva...">
                         <span class="help-block">
                             {% if errors.newPassword %}
                                 {{ errors.newPassword | first }}
@@ -142,7 +210,8 @@
                 <div class="form-group {% if errors.newRPassword %}has-error{% endif %}">
                     <label for="inputRPassword" class="col-sm-2 control-label">Repetir nueva contraseña</label>
                     <div class="col-sm-10">
-                        <input type="password" name="newRPassword" class="form-control" id="inputRPassword" placeholder="Repite la nueva contraseña...">
+                        <input type="password" name="newRPassword" class="form-control" id="inputRPassword"
+                               placeholder="Repite la nueva contraseña...">
                         <span class="help-block">
                             {% if errors.newRPassword %}
                                 {{ errors.newRPassword | first }}
@@ -159,9 +228,9 @@
                 </div>
             </form>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12">
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
             <form class="form-horizontal" id="correoForm" method="post" action="{{ base_url() }}/cuenta/email">
                 <legend>Correo electrónico</legend>
                 {% if flash.getMessage('email-change') %}
@@ -177,7 +246,8 @@
                 <div class="form-group {% if errors.currentPassword %}has-error{% endif %}">
                     <label for="inputEPassword" class="col-sm-2 control-label">Contraseña actual</label>
                     <div class="col-sm-10">
-                        <input type="password" name="currentPassword" class="form-control" id="inputEPassword" required placeholder="Ingresa tu contraseña actual...">
+                        <input type="password" name="currentPassword" class="form-control" id="inputEPassword" required
+                               placeholder="Ingresa tu contraseña actual...">
                         <span class="help-block">
                             {% if errors.currentPassword %}
                                 {{ errors.currentPassword | first }}
@@ -188,7 +258,8 @@
                 <div class="form-group {% if errors.newEmail %}has-error{% endif %}">
                     <label for="inputNewEmail" class="col-sm-2 control-label">Correo electrónico nuevo</label>
                     <div class="col-sm-10">
-                        <input type="email" name="newEmail" class="form-control" id="inputNewEmail" required placeholder="Correo electrónico nuevo...">
+                        <input type="email" name="newEmail" class="form-control" id="inputNewEmail" required
+                               placeholder="Correo electrónico nuevo...">
                         <span class="help-block">
                             {% if errors.newEmail %}
                                 {{ errors.newEmail | first }}
@@ -199,7 +270,8 @@
                 <div class="form-group {% if errors.newREmail %}has-error{% endif %}">
                     <label for="inputREmail" class="col-sm-2 control-label">Repetir correo electrónico</label>
                     <div class="col-sm-10">
-                        <input type="email" name="newREmail" class="form-control" id="inputREmail" required placeholder="Repetir correo electrónico...">
+                        <input type="email" name="newREmail" class="form-control" id="inputREmail" required
+                               placeholder="Repetir correo electrónico...">
                         <span class="help-block">
                             {% if errors.newREmail %}
                                 {{ errors.newREmail | first }}
@@ -216,9 +288,9 @@
                 </div>
             </form>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12">
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
             <div class="form-horizontal" id="formSocial">
                 <legend>Redes sociales</legend>
                 {% if flash.getMessage('social') %}
@@ -235,15 +307,17 @@
                     <label class="col-sm-2 control-label">Facebook</label>
                     <div class="col-sm-10">
                         {% if not user.facebookId %}
-                        <a class="btn btn-block btn-social btn-facebook" href="{{ base_url() }}/cuenta/facebook/login">
-                            <span class="fa fa-facebook"></span>
-                            Unir esta cuenta con Facebook
-                        </a>
+                            <a class="btn btn-block btn-social btn-facebook"
+                               href="{{ base_url() }}/cuenta/facebook/login">
+                                <span class="fa fa-facebook"></span>
+                                Unir esta cuenta con Facebook
+                            </a>
                         {% else %}
-                        <a class="btn btn-block btn-social btn-facebook" href="{{ base_url() }}/cuenta/facebook/unlink">
-                            <span class="fa fa-facebook"></span>
-                            Quitar el vínculo entre esta cuenta y Facebook
-                        </a>
+                            <a class="btn btn-block btn-social btn-facebook"
+                               href="{{ base_url() }}/cuenta/facebook/unlink">
+                                <span class="fa fa-facebook"></span>
+                                Quitar el vínculo entre esta cuenta y Facebook
+                            </a>
                         {% endif %}
                     </div>
                 </div>
@@ -251,12 +325,14 @@
                     <label class="col-sm-2 control-label">Twitter</label>
                     <div class="col-sm-10">
                         {% if not user.twitterId %}
-                        <a class="btn btn-block btn-social btn-twitter" href="{{ base_url() }}/cuenta/twitter/login">
-                            <span class="fa fa-twitter"></span>
-                            Unir esta cuenta con Twitter
-                        </a>
+                            <a class="btn btn-block btn-social btn-twitter"
+                               href="{{ base_url() }}/cuenta/twitter/login">
+                                <span class="fa fa-twitter"></span>
+                                Unir esta cuenta con Twitter
+                            </a>
                         {% else %}
-                            <a class="btn btn-block btn-social btn-twitter" href="{{ base_url() }}/cuenta/twitter/unlink">
+                            <a class="btn btn-block btn-social btn-twitter"
+                               href="{{ base_url() }}/cuenta/twitter/unlink">
                                 <span class="fa fa-twitter"></span>
                                 Quitar el vínculo entre esta cuenta y Twitter
                             </a>
@@ -267,33 +343,33 @@
                     <label class="col-sm-2 control-label">Google+</label>
                     <div class="col-sm-10">
                         {% if not user.googleId %}
-                        <a class="btn btn-block btn-social btn-google" href="{{ base_url() }}/cuenta/google/login">
-                            <span class="fa fa-google"></span>
-                            Unir esta cuenta con Google
-                        </a>
+                            <a class="btn btn-block btn-social btn-google" href="{{ base_url() }}/cuenta/google/login">
+                                <span class="fa fa-google"></span>
+                                Unir esta cuenta con Google
+                            </a>
                         {% else %}
-                        <a class="btn btn-block btn-social btn-google" href="{{ base_url() }}/cuenta/google/unlink">
-                            <span class="fa fa-google"></span>
-                            Quitar el vínculo entre esta cuenta y Google+
-                        </a>
+                            <a class="btn btn-block btn-social btn-google" href="{{ base_url() }}/cuenta/google/unlink">
+                                <span class="fa fa-google"></span>
+                                Quitar el vínculo entre esta cuenta y Google+
+                            </a>
                         {% endif %}
                     </div>
                 </div>
             </div>
         </div>
+        </div>
     </div>
-</div>
 {% endblock %}
 {% block js %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.0/sweetalert.min.js"></script>
     <script src="{{ base_url() }}/dist/js/minicolors.min.js"></script>
     <script>
-        function is_hex(string){
+        function is_hex(string) {
             var hex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
             return hex.test(string);
         }
         /* Init */
-        $(".minicolors").each(function() {
+        $(".minicolors").each(function () {
             $(this).minicolors({
                 defaultValue: $(this).val(),
                 position: "bottom left",
@@ -301,29 +377,29 @@
             });
         });
         /* Form Image */
-        $('#fileImage').change(function(event) {
-            if(!this.files.length){
+        $('#fileImage').change(function (event) {
+            if (!this.files.length) {
                 return;
             }
             var file = this.files[0];
             var type = file.type;
-            if(!/^(image\/(gif|p?jpeg|(x-)?png))$/.test(type)){
+            if (!/^(image\/(gif|p?jpeg|(x-)?png))$/.test(type)) {
                 $('.fileinput').fileinput('clear');
                 swal("Lo sentimos...", "Selecciona una imagen (gif, jpg o png)", "error");
                 return;
             }
-            if(file.size > 2e6){
+            if (file.size > 2e6) {
                 $('.fileinput').fileinput('clear');
                 swal("Lo sentimos...", "La imagen es mayor a 2MB. Por favor usa una imagen de menor tamaño.", "error");
                 return;
             }
         });
 
-        $('#imagenForm').submit(function(event) {
+        $('#imagenForm').submit(function (event) {
             event.preventDefault();
             var $form = new FormData();
             var files = $('#fileImage').prop('files');
-            if(!files.length){
+            if (!files.length) {
                 sweetAlert("Oops...", '¡Selecciona una imagen!', "error");
                 return;
             }
@@ -345,8 +421,8 @@
                 contentType: false,
                 processData: false
             })
-            .done(function(data) {
-                if(data.error){
+            .done(function (data) {
+                if (data.error) {
                     sweetAlert("Oops...", data.message, "error");
                     return;
                 }
@@ -354,9 +430,13 @@
                 $('.fileinput').fileinput('clear');
                 swal("¡Buen trabajo!", "Has cambiado tu imagen correctamente", "success");
             })
-            .fail(function() {
+            .fail(function () {
                 sweetAlert("Oops...", '¡Hubo un error al actualizar tu imagen! Intenta mas tarde', "error");
             });
+        });
+        $('#charLeft').text($('#inputAbout').val().length + ' / 1000');
+        $('#inputAbout').on('keyup', function(event){
+           $('#charLeft').text($('#inputAbout').val().length + ' / 1000');
         });
     </script>
 {% endblock %}

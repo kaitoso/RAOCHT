@@ -73,15 +73,12 @@ class Facebook extends BaseController
             $fbResp = $this->fb->get('/me', $accessToken->getValue() );
             $userNode = $fbResp->getGraphUser();
         } catch(FacebookResponseException $e) {
-            // When Graph returns an error
-            echo 'Graph returned an error: ' . $e->getMessage();
-            exit;
+            $this->logger->critical("FB-Error [{$e->getLine()}]: ". $e->getMessage());
+            return $this->withRedirectWithout($response, 'error.html');
         } catch(FacebookSDKException $e) {
-            // When validation fails or other local issues
-            echo 'Facebook SDK returned an error: ' . $e->getMessage();
-            exit;
+            $this->logger->critical("FB-Error [{$e->getLine()}]: ". $e->getMessage());
+            return $this->withRedirectWithout($response, 'error.html');
         }
-        $this->session->set('fb_token', $accessToken->getValue());
         $this->session->set('fb_id', $userNode->getId());
         $user = User::where('facebookId', '=', $userNode->getId())->first();
         if(empty($user)){
@@ -100,7 +97,6 @@ class Facebook extends BaseController
         $user->ip = $request->getAttribute('ip_address');
         $user->lastLogin = date('Y-m-d H:i:s');
         $user->facebookId = $userNode->getId();
-        $user->facebookToken = $accessToken->getValue();
         $user->save();
         return $this->withRedirect($response, $this->router->pathFor('main.page'));
     }
@@ -144,12 +140,10 @@ class Facebook extends BaseController
             $this->flash->addMessage('social-error', '¡Esta cuenta de Facebook ya está ligada a otra cuenta del chat!');
             return $this->withRedirect($response, $this->router->pathFor('cuenta.main').'#formSocial');
         }
-        $this->session->set('fb_token', $accessToken->getValue());
         $this->session->set('fb_id', $userNode->getId());
         $user = User::find($this->session->get('user_id'));
         // Guardamos token
         $user->facebookId = $userNode->getId();
-        $user->facebookToken = $accessToken->getValue();
         $user->save();
         $this->flash->addMessage('social', '¡Se ligo esta cuenta a Facebook!');
         return $this->withRedirect($response, $this->router->pathFor('cuenta.main').'#formSocial');
@@ -166,7 +160,6 @@ class Facebook extends BaseController
         }
         // Guardamos token
         $user->facebookId = null;
-        $user->facebookToken = null;
         $user->save();
         $this->flash->addMessage('social', 'Se desligo esta cuenta de Facebook.');
         return $this->withRedirect($response, $this->router->pathFor('cuenta.main').'#formSocial');

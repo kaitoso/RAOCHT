@@ -5,18 +5,22 @@
         .container{
             margin-top: 50px;
         }
+        .row{
+            margin-bottom: 30px;
+        }
     </style>
 {% endblock %}
 {% block contenido %}
     <div class="container">
-        {% include 'templates/flash.twig' %}
-        <a href="{{ base_url() }}" class="btn btn-default">Volver al inicio</a>
-
+        <div class="row">
+            <h1 class="text-center">Lo sentimos, esta página no existe.</h1>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 text-center">
+                <a href="{{ base_url() }}" class="btn btn-lg btn-primary"><i class="fa fa-home"></i> Ir al inicio</a>
+            </div>
+        </div>
     </div>
 {% endblock %}
 {% block js %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
-    <script>var $baseUrl = '{{ base_url() }}';</script>
-    <script src="{{ base_url() }}/assets/js/app.js"></script>
 {% endblock %}

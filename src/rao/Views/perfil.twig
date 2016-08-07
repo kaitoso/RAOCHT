@@ -1,8 +1,393 @@
-{% extends 'templates/admin.twig' %}
-{% block titulo %}{% endblock %}
+{% extends 'templates/base.twig' %}
+{% block titulo %}Perfil de {{ user.user }}{% endblock %}
 {% block css %}
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
+	<style>
+        body{
+        {% if config.background %}
+            background: url("{{ base_url() }}/assets/img/{{ config.background }}") no-repeat fixed left;
+        {% endif %}
+            background-size: cover;
+        }
+		.center-img{
+			margin-left: auto;
+			margin-right: auto;
+		}
+		.inline-img{
+			display: inline-block;
+		}
+        .info-img {
+			max-height: 120px;
+            max-width: 320px;
+			vertical-align: text-top;
+        }
+		.col-logro{
+			min-height: 320px;
+		}
+		.text-justify{
+			text-align: justify;
+		}
+		.badge-success{
+			background-color: #4caf50;
+		}
+		.container {
+			border-radius: 5px;
+			background-color: white;
+			margin-bottom: 1em;
+		}
+		.autor a:hover {
+			text-decoration: none !important;
+		}
+		.mensaje{
+			clear: both;
+		}
+		.comentario {
+			margin-bottom: 10px;
+			background-color: rgba(255, 255, 255, 0.8);
+			padding: 5px;
+			-webkit-border-radius: 5px;
+			-moz-border-radius: 5px;
+			border-radius: 5px;
+			border: solid 1px rgba(0,0,0,0.1);
+		}
+		.avatar img{
+			float: left;
+			height: 40px;
+			width: 40px;
+			margin-right: 5px;
+		}
+		.text-time{
+			display: block;
+		}
+		#inputAbout{
+			max-width: 100%;
+			min-width: 100%;
+		}
+	</style>
 {% endblock  %}
 {% block contenido %}
+    <nav class="navbar navbar-default" role="navigation">
+    	<!-- Brand and toggle get grouped for better mobile display -->
+    	<div class="navbar-header">
+    		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+    			<span class="sr-only">Toggle navigation</span>
+    			<span class="icon-bar"></span>
+    			<span class="icon-bar"></span>
+    			<span class="icon-bar"></span>
+    		</button>
+    		<a class="navbar-brand" href="#">Chat Anime Obsesion</a>
+    	</div>
+    
+    	<!-- Collect the nav links, forms, and other content for toggling -->
+    	<div class="collapse navbar-collapse navbar-ex1-collapse">
+    		<ul class="nav navbar-nav">
+    			<li class="active"><a href="#">Perfil</a></li>
+    			<li><a href="{{ path_for('cuenta.main') }}">Cuenta</a></li>
+    		</ul>
+    		<form class="navbar-form navbar-left" role="search">
+    			<div class="form-group">
+    				<input type="text" class="form-control" placeholder="Buscar por usuario...">
+    			</div>
+    			<button type="submit" class="btn btn-default">Buscar</button>
+    		</form>
+    	</div><!-- /.navbar-collapse -->
+    </nav>
+	<div class="container">
+		<div class="col-xs-12 col-sm-3">
+			<div class="text-center">
+                {% set rango = user.getRank.name %}
+				<h3 style="color: #{{ user.chatColor }}">{{ user.user }}</h3>
+				<h4 style="color: #{{ user.chatText }}">{{ rango }}</h4>
+			</div>
+			<img src="http://dev.asner.xyz/avatar/b/{{ user.image }}" alt="{{ user.user }}" class="img-rounded img-responsive center-img">
+			<dl>
+				<dt>Registrado el día:</dt>
+				<dd id="registerDay">Cargando...</dd>
+				<dt>Último inicio de sesión:</dt>
+				<dd><span id="lastSesion" class="badge badge-success">Cargando...</span></dd>
+				<dt>Mensajes enviados:</dt>
+				<dd id="messageSend">0</dd>
+				<dt>Tiempo conectado:</dt>
+				<dd id="onlineTime">0 segundos</dd>
+				<dt>Mensajes por minuto:</dt>
+				<dd id="messagesMinute">0.00</dd>
+			</dl>
+		</div>
+		<div class="col-xs-12 col-sm-9 col-md-9 col-lg-9">
+			<div class="row" id="blockAbout">
+				<h2>Acerca de mi:</h2>
+			</div>
+			<div class="row well well-sm">
+				<div class="col-xs-12">
+					<h2>Últimos logros:</h2>
+					<div class="row" id="logrosSet">
+						<div class="alert alert-info text-center"><img src="http://i.imgur.com/9W0DRiu.gif" alt="" class="center-img img-responsive">Este usuario aún no tiene logros.<br></div>
+					</div>
+				</div>
+			</div>
+			<div class="row well well-sm" id="lastComments">
+				<div class="col-xs-12">
+					<h2>Últimos comentarios:</h2>
+					<div class="row" id="commentSet">
+						<div class="alert alert-info text-center"><img src="http://i.imgur.com/9W0DRiu.gif" alt="" class="center-img img-responsive">Este usuario aún no tiene comentarios.<br></div>
+					</div>
+					<div class="row">
+						<form id="formComment" role="form">
+							<div class="form-group">
+								<textarea name="inputAbout" id="inputMessage" rows="10" class="form-control" placeholder="Escribe un mensaje para {{ user.user }}..." maxlength="1000"></textarea>
+								<span class="pull-right" id="charLeft">0 / 1000</span>
+								<span class="help-block">
+									Puedes usar links de imagenes, videos (.mp4 y .webm), y audios (.ogg y .mp3).
+								</span>
+							</div>
+							{{ csrf.field | raw }}
+							<button type="submit" class="btn btn-primary pull-right"><i class="fa fa-plus"></i> Agregar comentario</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% verbatim %}
+	<script id="logroTemplate" type="text/x-handlebars-template">
+		<div class="col-xs-12 col-sm-3">
+			<div class="col-logro">
+				<img src="{% endverbatim %}{{ base_url() }}{% verbatim %}/achievements/{{image}}" class="img-responsive img-logro center-img" alt="{{name}}">
+				<p class="text-center">
+					<strong>{{name}}</strong><br>
+					<span class="text-description">{{description}}</span><br>
+					<small>{{created_at}}</small>
+				</p>
+			</div>
+		</div>
+	</script>
+	{% endverbatim %}
+	{% verbatim %}
+	<script id="messageTemplate" type="text/x-handlebars-template">
+		<div class="comentario clearfix" id="comment-{{ id }}">
+			<div class="avatar">
+				<img src="{% endverbatim %}{{ base_url() }}{% verbatim %}/avatar/s/{{image}}" alt="{{user}}" class="img-circle">
+			</div>
+			<div class="contenido">
+				<div class="autor">
+					<a href="{% endverbatim %}{{ path_for('perfil.main') }}{% verbatim %}/{{ user }}" style="color: #{{ chatColor }}"><strong>{{ user }}</strong> - {{ rank }}</a>
+{% endverbatim %}
+    {% if delete %}
+					<div class="pull-right">
+						<a href="#" class="btn btn-danger btnEliminar" data-id="{% verbatim %}{{ id }}{% endverbatim %}"><span aria-hidden="true">&times;</span></a>
+					</div>
+    {% endif %}
+{% verbatim %}
+					<small class="text-muted text-time"><i class="fa fa-clock-o"></i> {{ created_at }}</small>
+				</div>
+				<div class="mensaje" style="color: #{{chatText}}">{{unescape message}}</div>
+			</div>
+		</div>
+	</script>
+	{% endverbatim %}
+	{% verbatim %}
+    <script id="videoTemplate" type="text/x-handlebars-template">
+        <div align="center" class="embed-responsive embed-responsive-16by9">
+            <video src="{{video}}" controls></video>
+        </div>
+    </script>
+	<script id="aboutTemplate" type="text/x-handlebars-template">
+	    {{#if about_me }}
+        <p class="text-justify">
+        {{unescape about_me}}
+        </p>
+        {{else}}
+        <div class="alert alert-info text-center">
+            <img src="http://i.imgur.com/IdhRD4a.gif" alt="" class="center-img img-responsive">
+            Este usuario aún no ha puesto información acerca de él.<br>
+        </div>
+        {{/if}}
+</script>
+	{% endverbatim %}
 {% endblock %}
 {% block js %}
+	<script src="{{ base_url() }}/dist/js/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+	<script>
+		var $userUrl = '{{ path_for('perfil.userinfo', {'user': user.user}) }}';
+		var registerDay = moment.unix({{ user.created_at }});
+		var lastSession = moment.unix({{ user.lastLogin }});
+        var $user = {
+            image: '{{ user.image }}',
+            user: '{{ user.user }}',
+            rank: '{{ rango }}',
+            chatColor: '{{ user.chatColor }}',
+            chatText: '{{ user.chatText }}'
+        }
+	</script>
+	<script>
+		jQuery.each(["put", "delete"], function(i, method) {
+			jQuery[method] = function(url, data, callback, type) {
+				if (jQuery.isFunction(data)) {
+					type = type || callback;
+					callback = data;
+					data = undefined;
+				}
+				return jQuery.ajax({
+					url: url,
+					type: method,
+					dataType: type,
+					data: data,
+					success: callback
+				});
+			};
+		});
+        Handlebars.registerHelper("unescape", function (a) {
+            return new Handlebars.SafeString(a);
+        });
+        function nl2br (str) {
+            return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br>$2');
+        }
+        function htmlEntities(str){
+            return $('<div/>').text(str).html();
+        }
+        function linkifyGlobal(str) {
+            var urlRegex = /(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\%\.-]*)*\/?\S*?/ig;
+            var imageRegex = /\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/;
+            var audioRegex = /\b(https?:\/\/\S+(?:mp3|ogg)\S*)\b/;
+            var videoRegex = /\b(https?:\/\/\S+(?:mp4|webm|ogv)\S*)\b/;
+            return str.replace(urlRegex, function (match) {
+                if (imageRegex.test(match)) {
+                    return '<a href="' + match + '" target="_blank"><img src="' + match + '" title="' + match + '" class="img-responsive info-img inline-img"></a>';
+                }
+                if (audioRegex.test(match)) {
+                    return '<audio controls><source src="' + match + '">Tu navegador no soporta la etiqueta "Audio"</audio>';
+                }
+                if (videoRegex.test(match)) {
+                    return videoTemplate({video: match});
+                }
+
+                return '<a href="' + match + '" target="_blank">' + match + '</a>';
+            });
+        }
+        function parseTime(time) {
+            var msec = time;
+            var time = '';
+            var day = Math.floor(msec / 1000 / 60 / 60 / 24);
+            msec -= day * 1000 * 60 * 60 * 24;
+            var hh = Math.floor(msec / 1000 / 60 / 60);
+            msec -= hh * 1000 * 60 * 60;
+            var mm = Math.floor(msec / 1000 / 60);
+            msec -= mm * 1000 * 60;
+            var ss = Math.floor(msec / 1000);
+            if(day > 0){
+                time += day + ((day === 1) ? ' día ' : ' días ');
+            }
+            if(hh > 0){
+                time += hh + ' horas ';
+            }
+            if(mm > 0){
+                time += mm + ' minutos ';
+            }
+            time += ss + ' segundos.';
+           return time;
+        };
+
+        function getInfo(){
+            $.getJSON($userUrl, function(data){
+                if(data.logros.length !== 0){
+                    $('#logrosSet').html('');
+                    $.each(data.logros, function (i, v) {
+                        v.created_at = moment.unix(v.created_at).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a');
+                        $('#logrosSet').append(logroTemplate(v));
+                    });
+                }
+                if(data.comments.length !== 0){
+                    $('#commentSet').html('');
+                    $.each(data.comments, function (i, v) {
+                        v.created_at = moment.unix(v.created_at).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a');
+                        v.message = linkifyGlobal(nl2br(htmlEntities(v.message)));
+                        $('#commentSet').append(messageTemplate(v));
+                    });
+                }
+                data.user.about_me = linkifyGlobal(nl2br(htmlEntities(data.user.about_me)));
+                $('#blockAbout').append(aboutTemplate(data.user));
+                var onlineMinutes = (data.user.online_time / 1000) / 60;
+                onlineMinutes = (onlineMinutes === 0) ? 1 : onlineMinutes;
+                $('#messageSend').text((data.user.messages).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                $('#onlineTime').text(parseTime(data.user.online_time));
+                $('#messagesMinute').text((data.user.messages/onlineMinutes).toFixed(2));
+            });
+        }
+		var messageTemplate = Handlebars.compile($('#messageTemplate').html());
+		var logroTemplate = Handlebars.compile($('#logroTemplate').html());
+        var aboutTemplate = Handlebars.compile($('#aboutTemplate').html());
+        var videoTemplate = Handlebars.compile($('#videoTemplate').html());
+		$('#registerDay').html(registerDay.format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a') + '<br><span class="badge badge-success">'+registerDay.fromNow()+'</span>');
+		$('#lastSesion').html(lastSession.fromNow());
+		$('#commentSet').on('click', '.btnEliminar', function(event){
+			event.preventDefault();
+			var that = $(this);
+			var comid = that.data('id');
+			swal({
+				title: "¿Está seguro de que quiere eliminar éste comentario?",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#DD6B55",
+				confirmButtonText: "Eliminar",
+				cancelButtonText: "Cancelar",
+				closeOnConfirm: false,
+				closeOnCancel: true
+			},
+			function(isConfirm) {
+				if (!isConfirm)
+					return;
+				$.delete($userUrl, {
+					id: comid,
+					raoToken: $('input[name="raoToken"]').val()
+				}, function(data){
+					if(data.error){
+						swal("¡Oops!", data.error, "error");
+						return;
+					}
+					swal("¡Borrado!", "Se ha eliminado el comentario con éxito.", "success");
+					$('#comment-' + comid).remove();
+				}).fail(function(){
+					swal("¡Oops!", "Hubo un error al tratar de eliminar éste comentario.", "error");
+				})
+			});
+		});
+
+		$('#formComment').submit(function(event){
+			event.preventDefault();
+			var $message = $('#inputMessage');
+			if(!$message.val().length){
+				swal("¡Oops!", "Hubo un error al tratar de eliminar éste comentario.", "error");
+				return;
+			}
+			swal({
+				title: "Agregando mensaje...",
+				text: "Espere un momento mientras se agrega este mensaje...",
+				imageUrl: "{{ base_url() }}/assets/img/loading_spin.gif",
+				showConfirmButton: false
+			});
+			$.post($userUrl,{
+				message: $message.val(),
+				raoToken: $('input[name="raoToken"]').val()
+			},function(data){
+			    if(data.error){
+                    swal("¡Oops!", data.error, "error");
+                    return;
+                }
+                $user.message = linkifyGlobal(nl2br(htmlEntities($message.val())));
+                $user.created_at = moment().format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a');
+                $('#commentSet').prepend(messageTemplate($user));
+                window.location.href = '#lastComments';
+                $('#inputMessage').val('');
+                swal("¡Oops!", data.success, "success");
+			}, 'json')
+		});
+
+		$('#charLeft').text($('#inputMessage').val().length + ' / 1000');
+		$('#inputMessage').on('keyup', function(event){
+			$('#charLeft').text($('#inputMessage').val().length + ' / 1000');
+		});
+        getInfo();
+	</script>
 {% endblock %}

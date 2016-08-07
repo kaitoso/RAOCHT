@@ -6,6 +6,7 @@ use App\Controller\BaseController;
 use App\Model\Rank;
 use App\Model\User;
 use App\Handler\Avatar;
+use App\Model\UserProfile;
 use Respect\Validation\Validator as v;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -257,6 +258,38 @@ class UserController extends BaseController
             $response,
             $this->router->pathFor('admin.user.update', ['id' => $args['id']]).'#generalForm'
         );
+    }
+
+    public function putPefilInfo(Request $request, Response $response, $args)
+    {
+        $validationGet = $this->validator->validateArgs($request, [
+            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+        ]);
+        $validation = $this->validator->validate($request, [
+            'inputAbout' => v::stringType()->length(null, 1000),
+            'raoToken' => v::noWhitespace()->notEmpty()
+        ]);
+        if($validation->failed() || $validationGet->failed()){
+            if($request->isXhr()){
+                return $response->withJson(['error' => $this->session->get('errors')]);
+            }
+            return $this->withRedirect($response, $this->router->pathFor('admin.user.update', ['id' => $args['id']]).'#formAbout');
+        }
+
+        $inputUser = $request->getAttribute('id');
+        $inputAbout = $request->getParam('inputAbout');
+        $inputToken = $request->getParam('raoToken');
+
+        if($this->session->get('token') !== $inputToken){
+            $this->flash->addMessage('error', 'Éste token es inválido.');
+            return $this->withRedirect($response, $this->router->pathFor('admin.user.update', ['id' => $args['id']]).'#formAbout');
+        }
+
+        $userProfile = UserProfile::find($inputUser);
+        $userProfile->about_me = $inputAbout;
+        $userProfile->save();
+        $this->flash->addMessage('about-change', '¡Se ha cambiado la información del perfil con éxito');
+        return $this->withRedirect($response, $this->router->pathFor('admin.user.update', ['id' => $args['id']]).'#formAbout');
     }
 
     public function putChatInfo(Request $request, Response $response, $args){

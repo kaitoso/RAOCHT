@@ -31,9 +31,7 @@ class AppSchemas
             $table->boolean('activated')->default(0);
             $table->string('ip', 15);
             $table->bigInteger('facebookId')->unsigned()->nullable();
-            $table->string('facebookToken', 510)->nullable();
             $table->bigInteger('twitterId')->unsigned()->nullable();
-            $table->string('twitterToken', 510)->nullable();
             $table->string('googleId', 32)->nullable();
             $table->timestamp('lastLogin')->useCurrent();
             $table->timestamps();
@@ -41,6 +39,18 @@ class AppSchemas
                 ->references('id')
                 ->on('ranks')
                 ->onDelete('restrict');
+        });
+
+        Capsule::schema()->create('user_profiles', function($table){
+            $table->integer('user_id')->unsigned();
+            $table->text('about_me')->nullable();
+            $table->bigInteger('online_time')->unsigned()->default(0);
+            $table->integer('messages')->unsigned()->default(0);
+            $table->primary('user_id');
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
 
         Capsule::schema()->create('auth_token', function($table){
@@ -83,15 +93,6 @@ class AppSchemas
             $table->timestamps();
         });
 
-        Capsule::schema()->create('salas', function($table){
-            $table->increments('id');
-            $table->string('nombre', 50);
-            $table->string('description');
-            $table->string('password', 72)->nullable();
-            $table->integer('admin_id')->unsigned();
-            $table->timestamps();
-        });
-
         Capsule::schema()->create('achievements', function($table){
             $table->increments('id');
             $table->string('name', 50);
@@ -113,6 +114,22 @@ class AppSchemas
             $table->foreign('achievement_id')
                 ->references('id')
                 ->on('achievements')
+                ->onDelete('cascade');
+        });
+
+        Capsule::schema()->create('profile_comments', function ($table){
+            $table->increments('id');
+            $table->integer('user_id')->unsigned();
+            $table->integer('who_id')->unsigned();
+            $table->text('message')->nullable();
+            $table->timestamps();
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+            $table->foreign('who_id')
+                ->references('id')
+                ->on('users')
                 ->onDelete('cascade');
         });
 
@@ -143,6 +160,7 @@ class AppSchemas
         ), PASSWORD_BCRYPT, ['cost' => 10]);
         $admin->user = 'Sistema';
         $admin->rank = 1;
+        $admin->activated = 1;
         $admin->chatName = 'Sistema';
         $admin->image = $image.'.png';
         $admin->ip = '127.0.0.1';
@@ -161,11 +179,20 @@ class AppSchemas
         ), PASSWORD_BCRYPT, ['cost' => 10]);
         $prueba->user = 'Asner';
         $prueba->rank = 1;
+        $prueba->activated = 1;
         $prueba->chatName = 'Asner';
         $prueba->image = $image.'.png';
         $prueba->ip = '127.0.0.1';
         $prueba->lastLogin = date('Y-m-d H:i:s');
         $prueba->save();
+
+        $aprofile = new \App\Model\UserProfile();
+        $aprofile->user_id = $admin->id;
+        $aprofile->save();
+
+        $uprofile = new \App\Model\UserProfile();
+        $uprofile->user_id = $prueba->id;
+        $uprofile->save();
     }
 
     function seed(){
@@ -175,9 +202,10 @@ class AppSchemas
 
     function down(){
         Capsule::schema()->dropIfExists('smilies');
+        Capsule::schema()->dropIfExists('profile_comments');
+        Capsule::schema()->dropIfExists('user_profiles');
         Capsule::schema()->dropIfExists('user_achievements');
         Capsule::schema()->dropIfExists('achievements');
-        Capsule::schema()->dropIfExists('salas');
         Capsule::schema()->dropIfExists('bans');
         Capsule::schema()->dropIfExists('permissions');
         Capsule::schema()->dropIfExists('auth_token');

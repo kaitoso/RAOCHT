@@ -80,7 +80,7 @@ function linkifyChat(str, permissions) {
 }
 
 function linkifyGlobal(str) {
-    var urlRegex = /(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/;
+    var urlRegex = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
     var imageRegex = /\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/;
     var audioRegex = /\b(https?:\/\/\S+(?:mp3|ogg)\S*)\b/;
     var videoRegex = /\b(https?:\/\/\S+(?:mp4|webm|ogv)\S*)\b/;
@@ -221,7 +221,7 @@ var $system = {
     chatName: 'Sistema',
     chatText: 'f50c0c',
     chatColor: 'f50c0c',
-    image: 'http://dev.asner.xyz/avatar/sys.png',
+    image: $baseUrl+'/avatar/sys.png',
     rank: 1,
 }
 var $chat = {

@@ -134,7 +134,7 @@ class SmilieController extends BaseController
     public function putUpdate(Request $request, Response $response, $args)
     {
         $validationGet = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
             'inputCode' => v::noWhitespace()->notEmpty()->alnum()->length(1, 10),

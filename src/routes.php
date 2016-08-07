@@ -5,9 +5,22 @@ $app->get('/error', 'App\MainController:error')->setName('main.error');
 $app->get('/login', 'App\MainController:getLogin')->setName('auth.login');
 $app->get('/signup', 'App\MainController:getSignUp')->setName('auth.signup');
 $app->get('/logout', 'App\MainController:getLogout')->setName('auth.logout');
+
+$app->post('/login', 'App\MainController:postLogin');
+$app->post('/signup', 'App\MainController:postSignUp');
+
 $app->group('/email', function(){
    $this->get('/subscribe/{token}', 'App\SubscriptionController:getActivation');
     $this->get('/unsubscribe/{token}', 'App\SubscriptionController:getUnsubscribe');
+});
+
+$app->group('/perfil', function(){
+    $this->get('/logros.json[/{limit}]', 'App\PerfilController:getLogrosJSON')->setName('perfil.logros.json');
+    $this->get('/user.json/{user}', 'App\PerfilController:getUserInfo')->setName('perfil.userinfo');
+    $this->post('/user.json/{user}', 'App\PerfilController:postComment');
+    $this->delete('/user.json/{user}', 'App\PerfilController:deleteComment');
+
+    $this->get('[/{user}]', 'App\PerfilController:getIndex')->setName('perfil.main');
 });
 
 $app->get('/facebook/login', 'App\Api\Facebook:getIndex')->setName('auth.facebook');
@@ -21,7 +34,7 @@ $app->get('/google/callback', 'App\Api\Google:getCallback')->setName('auth.googl
 
 $app->group('/cuenta', function(){
     $this->get('[/]', 'App\CuentaController:index')->setName('cuenta.main');
-    $this->get('/logros.json[/{id}]', 'App\CuentaController:getLogros')->setName('cuenta.logros');
+    $this->get('/logros.json', 'App\CuentaController:getLogros')->setName('cuenta.logros');
     $this->get('/facebook/login', 'App\Api\Facebook:getCuentaLogin')->setName('cuenta.facebook.login');
     $this->get('/facebook/callback', 'App\Api\Facebook:getFacebookCallbackLink')->setName('cuenta.facebook.callback');
     $this->get('/facebook/unlink', 'App\Api\Facebook:getUnlink')->setName('cuenta.facebook.logout');
@@ -33,6 +46,9 @@ $app->group('/cuenta', function(){
     $this->get('/google/login', 'App\Api\Google:getLink')->setName('cuenta.google.login');
     $this->get('/google/callback', 'App\Api\Google:getLinkCallback')->setName('cuenta.google.callback');
     $this->get('/google/unlink', 'App\Api\Google:getUnlink')->setName('cuenta.google.logout');
+
+    $this->post('/image', 'App\CuentaController:postImagen');
+    $this->post('/about', 'App\CuentaController:postAbout')->setName('cuenta.post.about');
 
     $this->put('/chatinfo', 'App\CuentaController:putChatInfo');
     $this->put('/password', 'App\CuentaController:putPassword');
@@ -62,6 +78,7 @@ $app->group('/admin', function () {
     $this->post('/user/new', 'App\Admin\UserController:postNew');
     $this->post('/user/{id}/image', 'App\Admin\UserController:postImage');
     $this->put('/user/{id}/general', 'App\Admin\UserController:putGeneral');
+    $this->put('/user/{id}/perfil', 'App\Admin\UserController:putPefilInfo');
     $this->put('/user/{id}/chatinfo', 'App\Admin\UserController:putChatInfo');
     $this->put('/user/{id}/password', 'App\Admin\UserController:putPassword');
     $this->put('/user/{id}/email', 'App\Admin\UserController:putEmail');
@@ -104,23 +121,3 @@ $app->group('/admin', function () {
     $this->get('/search/achievements/{id}', 'App\Admin\SearchController:getAchievementUsers');
 
 })->add(new \App\Middleware\AdminMiddleware($app->getContainer()));
-
-$app->get('/search/{query}', 'App\SearchController:getSearch');
-$app->get('/articles', 'App\SearchController:getArticles');
-$app->get('/title/{query}', 'App\SearchController:getTitle');
-$app->get('/chapter/{title}/{id}', 'App\SearchController:getChapter');
-$app->get('/article/{query}', 'App\SearchController:getArticle');
-
-
-$app->post('/login', 'App\MainController:postLogin');
-$app->post('/signup', 'App\MainController:postSignUp');
-$app->post('/cuenta/image', 'App\CuentaController:postImagen');
-
-$app->post('/search', 'App\SearchController:postFilterSearch');
-
-$app->get('/pass/{id}', function($request, $response, $args){
-    $pass = password_hash(base64_encode(
-        hash('sha256', $args['id'], true)
-    ), PASSWORD_BCRYPT, ['cost' => 12]);
-    var_dump($pass);
-});

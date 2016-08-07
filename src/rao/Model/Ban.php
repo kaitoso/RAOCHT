@@ -15,4 +15,13 @@ class Ban extends Model
     {
         return $this->hasOne('App\Model\User', 'id', 'who');
     }
+
+    public function getCreatedAtAttribute($date)
+    {
+        return \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('U');
+    }
+    public function getUpdatedAtAttribute($date)
+    {
+        return \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('U');
+    }
 }

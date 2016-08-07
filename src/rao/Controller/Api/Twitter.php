@@ -114,7 +114,6 @@ class Twitter extends BaseController
             'oauth_token_secret' => $access_token['oauth_token_secret']
         ];
         $user->twitterId = $access_token['user_id'];
-        $user->twitterToken = json_encode($auth);
         $user->ip = $request->getAttribute('ip_address');
         $user->save();
         $this->flash->addMessage('social', '¡Se ligo esta cuenta a Twitter!');
@@ -134,7 +133,6 @@ class Twitter extends BaseController
         }
         // Guardamos token
         $user->twitterId = null;
-        $user->twitterToken = null;
         $user->save();
         $this->flash->addMessage('social', 'Se desligo esta cuenta de Twitter.');
         return $this->withRedirect($response, $this->router->pathFor('cuenta.main').'#formSocial');

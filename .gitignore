@@ -16,3 +16,4 @@ composer.lock
 /public/dist/js/core
 /public/dist/js/components
 /public/cache/client.json
+/src/rao/Config/Chat.json

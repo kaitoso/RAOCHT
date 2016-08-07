@@ -20,6 +20,12 @@ final class ErrorHandler Extends Error{
     public function __invoke(Request $request, Response $response, \Exception $exception)
     {
         $this->logger->critical($exception->getFile()."[{$exception->getLine()}]: {$exception->getMessage()}.\nFull-Stack: ".$exception->getTraceAsString());
+        if($request->isXHR()){
+            $response->getBody()
+                ->write(json_encode(['error' => 'Hubo un error interno al procesar la solicitud.']));
+            return $response->withStatus(500)
+                ->withHeader('Content-Type', 'application/json; charset=utf-8');
+        }
         return $response->withStatus(302)->withHeader('Location', $request->getUri()->getBasePath().'/error.html');
     }
 

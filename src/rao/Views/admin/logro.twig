@@ -66,8 +66,8 @@
 {% endblock %}
 {% block js %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
-    <script src="{{ base_url }}/dist/js/moment.min.js"></script>
-    <script src="{{ base_url }}/dist/js/bootstrap-table.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/moment.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/bootstrap-table.min.js"></script>
     <script>
         moment.locale('es');
         var button_template = Handlebars.compile($("#button-template").html());
@@ -75,7 +75,7 @@
         var eliminar_template = Handlebars.compile($('#eliminar-template').html());
 
         function localHour(value, row, index){
-            return moment(value).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a')
+            return moment.unix(value).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a');
         }
 
         function imageFormater(value, row, index) {

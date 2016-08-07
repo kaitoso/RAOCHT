@@ -109,7 +109,36 @@
             </form>
         </div>
     </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <form action="{{ base_url() }}/admin/user/{{ upUser.id }}/perfil" method="post" role="form" id="formAbout">
+                <legend>Información del perfil</legend>
+                {% if flash.getMessage('about-change') %}
+                    <div class="alert alert-success">
+                        {{ flash.getMessage('about-change') | first }}
+                    </div>
+                {% endif %}
+                <div class="form-group {% if errors.inputAbout %}has-error{% endif %}">
+                    <label for="inputAbout">Acerca de:</label>
+                    <textarea name="inputAbout" id="inputAbout" rows="10" class="form-control" placeholder="Escribe algo..." maxlength="1000">{{ upUser.getProfile.about_me }}</textarea>
+                    <span class="pull-right" id="charLeft">0 / 1000</span>
+                    <span class="help-block">
+                            {% if errors.inputAbout %}
+                                {{ errors.inputAbout | first }}
+                            {% else %}
+                                Puedes usar links de imagenes, videos (.mp4 y .webm), y audios (.ogg y .mp3) en tu perfil.
+                            {% endif %}
+                        </span>
+                </div>
 
+                <div class="form-group">
+                    <input type="hidden" name="_METHOD" value="PUT">
+                    {{ csrf.field | raw }}
+                    <button type="submit" class="btn btn-success"><i class="fa fa-pencil-square-o"></i> Editar informacion</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <div class="row">
         <div class="col-xs-12">
             <form class="form-horizontal" id="chatForm" method="post" action="{{ base_url() }}/admin/user/{{ upUser.id }}/chatinfo">
@@ -366,6 +395,10 @@
                 });
             }
             return true;
+        });
+        $('#charLeft').text($('#inputAbout').val().length + ' / 1000');
+        $('#inputAbout').on('keyup', function(event){
+            $('#charLeft').text($('#inputAbout').val().length + ' / 1000');
         });
     </script>
 {% endblock %}

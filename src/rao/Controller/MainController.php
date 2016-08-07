@@ -7,6 +7,7 @@ use App\Model\AuthToken;
 use App\Model\Ban;
 use App\Model\User;
 use App\Model\UserAchievements;
+use App\Model\UserProfile;
 use Dflydev\FigCookies\FigRequestCookies;
 use Dflydev\FigCookies\SetCookie;
 use Psr\Http\Message\RequestInterface as Request;
@@ -318,9 +319,15 @@ class MainController extends BaseController
             $newUser->googleId = $this->session->get('google_id');
         }
         $newUser->save();
+        $profile = new UserProfile();
+        $profile->user_id = $newUser->id;
+        $profile->save();
+
         $email = new Email($this->email);
         $email->sendActivationEmail($this->view->getEnvironment(), $newUser);
-        $this->flash->addMessage('success', '¡Te has registrado correctamente en el chat! Te hemos enviado un correo electrónico con los datos de activación.');
+        $this->flash->addMessage('success', '¡Te has registrado correctamente en el chat!
+        En unos momentos te estaremos enviando un correo electrónico con los datos de activación.
+        Si éste no llega en menos de 10 minutos, revisa tu bandeja de correos no deseados o spam.');
         return $this->withRedirect($response,  $this->router->pathFor('auth.login'));
     }
 }
