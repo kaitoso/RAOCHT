@@ -127,7 +127,7 @@
         </div>
         <div class="contenido">
             <div class="autor">
-                <a href="#" style="color: #{{ chatColor }}"><strong>{{chatName}}</strong></a>
+                <a href="{% endverbatim %}{{ path_for('perfil.main') }}{% verbatim %}/{{ user }}" style="color: #{{ chatColor }}"><strong>{{chatName}}</strong></a>
                 <span class="info">@{{user}} - {{rank}}</span>
                 <small class="pull-right text-muted text-time"><i class="fa fa-clock-o"></i> {{ time }}</small>
             </div>
