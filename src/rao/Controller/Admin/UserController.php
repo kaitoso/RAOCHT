@@ -95,6 +95,11 @@ class UserController extends BaseController
         $newUser->ip = '127.0.0.1';
         $newUser->lastLogin = date('Y-m-d H:i:s');
         $newUser->save();
+        /* Create profile */
+        $profile = new UserProfile();
+        $profile->user_id = $newUser->id;
+        $profile->save();
+        /* Send response */
         $this->flash->addMessage('success', "¡Se ha registrado correctamente al usuario {$$newUser->user} con éxito!");
         return $this->withRedirect($response,  $this->router->pathFor('admin.user'));
     }

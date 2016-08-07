@@ -39,6 +39,11 @@ class MainController extends BaseController
             return $this->withRedirect($response, $this->router->pathFor('auth.login'));
         }
         $user = User::find($this->session->get('user_id'));
+        if(empty($user->getProfile)){
+            $profile = new UserProfile();
+            $profile->user_id = $user->id;
+            $profile->save();
+        }
         $permissions = json_decode($user->getRank->permissions);
         $chatConfig = json_decode(file_get_contents(__DIR__.'/../Config/Chat.json'));
         return $this->view->render($response, 'chat.twig', [
