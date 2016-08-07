@@ -162,8 +162,10 @@ io.on('connection', (socket) => {
             userData.splice(index, 1);
             delete globalUsers[socket.id];
         }
-        currentUser.logTime = _.now() - currentUser.logTime;
-        user.updateData(currentUser);
+        if(currentUser === null){
+            currentUser.logTime = _.now() - currentUser.logTime;
+            user.updateData(currentUser);
+        }
         generateOnlineUsers(userData);
     });
 });
@@ -369,6 +371,7 @@ function generateOnlineUsers(users) {
 }
 
 function getUserSocket(id, users) {
+    if(id === undefined) return null;
     let socketid = null;
     _.forOwn(users, (val, key) => {
         console.log(id, val, key);
@@ -381,6 +384,7 @@ function getUserSocket(id, users) {
 }
 
 function getUserSockets(id, users) {
+    if(id === undefined) return [];
     let socketid = [];
     _.forOwn(users, (val, key) => {
         console.log(id, val, key);
@@ -392,10 +396,10 @@ function getUserSockets(id, users) {
 }
 
 function getIndexSocket(id, users) {
+    if(id === undefined) return -1;
     let index = -1;
     var found = false;
     _.forOwn(users, (userid, key) => {
-        console.log(id, userid, key);
         index++;
         if(id === userid){
             found = true;
