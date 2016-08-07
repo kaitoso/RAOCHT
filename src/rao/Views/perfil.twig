@@ -214,11 +214,11 @@
 		var registerDay = moment.unix({{ user.created_at }});
 		var lastSession = moment.unix({{ user.lastLogin }});
         var $user = {
-            image: '{{ user.image }}',
-            user: '{{ user.user }}',
-            rank: '{{ rango }}',
-            chatColor: '{{ user.chatColor }}',
-            chatText: '{{ user.chatText }}'
+            image: '{{ who.image }}',
+            user: '{{ who.user }}',
+            rank: '{{ whoRank.name }}',
+            chatColor: '{{ who.chatColor }}',
+            chatText: '{{ who.chatText }}'
         }
 	</script>
 	<script>

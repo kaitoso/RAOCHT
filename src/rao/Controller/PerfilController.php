@@ -31,10 +31,13 @@ class PerfilController extends BaseController
             return $response->withStatus(404);
         }
         $who = User::find($this->session->get('user_id'));
-        $perm = array_flip(json_decode($who->getRank->permissions));
+        $whoRank = $who->getRank;
+        $perm = array_flip(json_decode($whoRank->permissions));
         $delete = !empty($perm['user']) || $user->id === $this->session->get('user_id') ? true : false;
         $chatConfig = json_decode(file_get_contents(__DIR__.'/../Config/Chat.json'));
         return $this->view->render($response, 'perfil.twig', [
+            'who' => $who,
+            'whoRank' => $whoRank,
             'user' => $user,
             'delete' => $delete,
             'config' => $chatConfig
