@@ -1,8 +1,9 @@
 "use strict";
 process.title = "RAO-CHAT";
 process.on('exit', (code) => {
-    console.log('Saliendo...');
+    console.log('Saliendo...', code);
 });
+var config = require('./lib/config');
 var server = require('http').createServer(httpHandler);
 var redis = require('redis');
 var io = require('socket.io')(server);
@@ -11,8 +12,9 @@ var _ = require('lodash');
 var cookie = require('cookie');
 var escape = require('escape-html');
 var radio = require('node-internet-radio');
-var subscriber = redis.createClient();
-var redisClient = redis.createClient();
+var user = require('./lib/user');
+var subscriber = redis.createClient(config.redis);
+var redisClient = redis.createClient(config.redis);
 var globalUsers = [];
 var userData = [];
 var chatConfig = {
@@ -106,6 +108,8 @@ io.on('connection', (socket) => {
         let json = JSON.parse(data);
         json.session = sessid;
         json.last = _.now();
+        json.messages = 0;
+        json.logTime = _.now();
         currentUser = json;
         if(getUserIndexById(json.id, userData) === -1){
             userData.push(json);
@@ -135,6 +139,7 @@ io.on('connection', (socket) => {
         }
         io.emit('message', message);
         currentUser.last = _.now();
+        currentUser.messages++;
         chatConfig.sessionMessages++;
     });
 
@@ -157,7 +162,8 @@ io.on('connection', (socket) => {
             userData.splice(index, 1);
             delete globalUsers[socket.id];
         }
-        console.log('Global users: ', globalUsers, 'User data: ', userData);
+        currentUser.logTime = _.now() - currentUser.logTime;
+        user.updateData(currentUser);
         generateOnlineUsers(userData);
     });
 });
