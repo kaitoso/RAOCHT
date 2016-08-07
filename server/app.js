@@ -162,7 +162,7 @@ io.on('connection', (socket) => {
             userData.splice(index, 1);
             delete globalUsers[socket.id];
         }
-        if(currentUser === null){
+        if(currentUser !== null){
             currentUser.logTime = _.now() - currentUser.logTime;
             user.updateData(currentUser);
         }
