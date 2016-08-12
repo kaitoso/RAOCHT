@@ -12,7 +12,7 @@ function Privado(io, ChatIO) {
     PrivIO.on('connection', (socket) => {
         let cookies = cookie.parse(socket.handshake.headers.cookie);
         if(cookies.rao_session === undefined){
-            console.error('Undefined session');
+            console.error('Undefined session', socket.handshake.headers.cookie);
             PrivIO.to(socket).emit('restart');
             socket.disconnect();
             return;
@@ -26,7 +26,7 @@ function Privado(io, ChatIO) {
                 return;
             }
             if(data == null){
-                console.error('Null value');
+                console.error('Null value. Sessid: ', sessid, cookies);
                 socket.disconnect();
                 return;
             }

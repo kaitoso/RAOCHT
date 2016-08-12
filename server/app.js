@@ -17,8 +17,6 @@ var escape = require('escape-html');
 var User = require('./lib/user');
 var subscriber = redis.createClient(config.redis);
 var redisClient = redis.createClient(config.redis);
-var globalUsers = [];
-var userData = [];
 var chatConfig = {
     start: _.now(),
     message: '¡Bienvenido al chat de Radio Anime Obsesión!',
@@ -58,7 +56,7 @@ function httpHandler (req, res) {
 ChatIO.on('connection', (socket) => {
     let cookies = cookie.parse(socket.handshake.headers.cookie);
     if(cookies.rao_session === undefined){
-        console.error('Undefined session');
+        console.error('Undefined session', socket.handshake.headers.cookie);
         ChatIO.to(socket).emit('restart');
         socket.disconnect();
         return;
@@ -72,7 +70,7 @@ ChatIO.on('connection', (socket) => {
             return;
         }
         if(data == null){
-            console.error('Null value');
+            console.error('Null value. Sessid: ', sessid, cookies);
             socket.disconnect();
             return;
         }
@@ -176,7 +174,7 @@ subscriber.on('message', (channel, data) => {
         let socket = User.getUserSocket(user.id);
         if(socket === null) return;
         user.image = message.image;
-        userData[index] = user;
+        User.onlineUsers[index] = user;
         // Emit user change
         let newUser = {
             'user': user.user,
