@@ -59,8 +59,8 @@
 {% endblock %}
 {% block js %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
-    <script type="text/javascript" src="/dist/js/moment.min.js"></script>
-    <script src="{{ base_url }}/dist/js/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="{{ base_url() }}/dist/js/moment.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/bootstrap-table.min.js"></script>
     <script type="text/javascript">
         moment.locale('es');
         var button_template = Handlebars.compile($("#button-template").html());

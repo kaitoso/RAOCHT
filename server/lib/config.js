@@ -1,7 +1,8 @@
+"use strict";
 var config = {};
 
 config.db = {};
-config.db.connectionLimit = 10;
+config.db.connectionLimit = 20;
 config.db.host = 'localhost';
 config.db.user = 'rao';
 config.db.password = 'Xu2iXI7i14RA';

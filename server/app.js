@@ -4,15 +4,17 @@ process.on('exit', (code) => {
     console.log('Saliendo...', code);
 });
 var config = require('./lib/config');
+var stream = require('./lib/stream');
 var server = require('http').createServer(httpHandler);
 var redis = require('redis');
 var io = require('socket.io')(server);
+var ChatIO = io.of('/chat');
+var Privado = require('./lib/privado')(io, ChatIO);
 var fs = require('fs');
 var _ = require('lodash');
 var cookie = require('cookie');
 var escape = require('escape-html');
-var radio = require('node-internet-radio');
-var user = require('./lib/user');
+var User = require('./lib/user');
 var subscriber = redis.createClient(config.redis);
 var redisClient = redis.createClient(config.redis);
 var globalUsers = [];
@@ -22,12 +24,7 @@ var chatConfig = {
     message: '¡Bienvenido al chat de Radio Anime Obsesión!',
     sessionMessages: 0
 };
-var streamData = {
-    title: '',
-    announcer: '',
-    url: ''
-};
-server.listen(8080);
+server.listen(config.app.port);
 fs.readFile(__dirname + '/../src/rao/Config/Chat.json', (err, data) => {
         if (err) {
             console.error('Error reading chat config file.');
@@ -39,58 +36,30 @@ fs.readFile(__dirname + '/../src/rao/Config/Chat.json', (err, data) => {
         }
     }
 );
-getStreamData();
+stream.getStreamData(ChatIO);
 
 setInterval(function() {
-    getStreamData();
+    stream.getStreamData(ChatIO);
 }, 30000);
 
-function getStreamData() {
-    radio.getStationInfo('http://animeobsesion.net:8000', (error, station) => {
-        if(error){
-            console.error('Error on station: ', error);
-            return;
-        }
-        let oldData = streamData;
-        streamData = {
-            title: station.title,
-            announcer: station.headers['icy-name'],
-            url: station.headers['icy-url']
-        }
-        if(streamData.announcer !== oldData.announcer){
-            io.emit('system', {
-                message: '¡Ahora locuta ' + streamData.announcer + '!'
-            });
-        }
-    }, radio.StreamSource.STREAM);
-}
 function httpHandler (req, res) {
     res.setHeader('content-type', 'application/json; charset=utf-8');
     res.writeHead(200);
     res.end(JSON.stringify({
-        users: userData.length,
+        users: User.onlineUsers.length,
         messages: {
             count: chatConfig.sessionMessages,
             start: chatConfig.start
         },
-        stream: streamData
+        stream: stream.getData()
     }));
-    /*fs.readFile(__dirname + '/index.html', (err, data) => {
-            if (err) {
-                res.writeHead(500);
-                return res.end('Error loading index.html');
-            }
-            res.writeHead(200);
-            res.end(data);
-        }
-    );*/
 }
 
-io.on('connection', (socket) => {
+ChatIO.on('connection', (socket) => {
     let cookies = cookie.parse(socket.handshake.headers.cookie);
     if(cookies.rao_session === undefined){
         console.error('Undefined session');
-        io.to(socket).emit('restart');
+        ChatIO.to(socket).emit('restart');
         socket.disconnect();
         return;
     }
@@ -99,10 +68,12 @@ io.on('connection', (socket) => {
     redisClient.get(sessid, (err, data) => {
         if(err){
             console.log(err);
+            socket.disconnect();
             return;
         }
         if(data == null){
             console.error('Null value');
+            socket.disconnect();
             return;
         }
         let json = JSON.parse(data);
@@ -110,19 +81,27 @@ io.on('connection', (socket) => {
         json.last = _.now();
         json.messages = 0;
         json.logTime = _.now();
+        json.private = false;
+        json.ready = false;
         currentUser = json;
-        if(getUserIndexById(json.id, userData) === -1){
-            userData.push(json);
+        if(User.pushData(json)){
+            let online = User.generateOnlineUsers();
+            ChatIO.emit('online', online); // Volvemos a generar los usuarios conectados.
+            console.log(online);
         }
-        globalUsers[socket.id] = json.id;
-        generateOnlineUsers(userData);
+        User.pushSocket(socket.id, json.id, false);
     });
     socket.on('message', (data) => {
         if (typeof(data.message) !== 'string') return;
         if (data.message.length > 255) {
-            io.to(socket.id).emit('error', {
+            ChatIO.to(socket.id).emit('error', {
                 message: "El mensaje es muy grande."
             });
+            return;
+        }
+        if(currentUser === undefined){
+            console.error('Undefined user on Message');
+            socket.disconnect();
             return;
         }
         if(_.now() - currentUser.last < 250){
@@ -137,36 +116,47 @@ io.on('connection', (socket) => {
             'rank': currentUser.rank,
             'message': escape(data.message)
         }
-        io.emit('message', message);
+        console.log('[Message]', message.user, ':', message.message);
+        ChatIO.emit('message', message);
         currentUser.last = _.now();
         currentUser.messages++;
         chatConfig.sessionMessages++;
     });
 
     socket.on('ready', () => {
-        io.to(socket.id).emit('system', {
+        if(currentUser === undefined){
+            console.error('Undefined user on Ready');
+            socket.disconnect();
+        }
+        if(currentUser.ready){
+            ChatIO.to(socket.id).emit('system', {
+                message: '¿Para que intentas enviar de nuevo esta petición?'
+            });
+            return;
+        }
+        ChatIO.to(socket.id).emit('system', {
             message: chatConfig.message
         });
-        io.to(socket.id).emit('system', {
-            message: '¡Ahora locuta ' + streamData.announcer + '!'
+        ChatIO.to(socket.id).emit('system', {
+            message: '¡Ahora locuta ' + stream.announcer + '!'
         });
+        currentUser.ready = true;
     });
 
     socket.on('disconnect', () => {
-        let userId = globalUsers[socket.id];
-        let sockets = getUserSockets(userId, globalUsers);
+        let userId = User.socketUsers[socket.id];
+        let sockets = User.getUserSockets(userId);
         if(sockets.length > 1){
-            delete globalUsers[socket.id];
+            User.deleteSocket(socket.id);
         }else if(userId != null){
-            let index = getUserIndexById(userId, userData);
-            userData.splice(index, 1);
-            delete globalUsers[socket.id];
+            User.deleteUser(userId)
+            User.deleteSocket(socket.id);
+            ChatIO.emit('online', User.generateOnlineUsers()); // Volvemos a generar los usuarios conectados.
         }
         if(currentUser !== null){
             currentUser.logTime = _.now() - currentUser.logTime;
-            user.updateData(currentUser);
+            User.updateData(currentUser);
         }
-        generateOnlineUsers(userData);
     });
 });
 
@@ -175,13 +165,13 @@ subscriber.on('message', (channel, data) => {
    console.log(channel, data);
     let message = JSON.parse(data);
     if(channel === 'admin-update-background'){
-        io.emit('background', message);
+        ChatIO.emit('background', message);
     }
     if(channel === 'update-image'){
-        let index = getUserIndexBySession(message.id, userData);
+        let index = User.getUserIndexBySession(message.id);
         if(index === -1) return;
         let user = userData[index];
-        let socket = getUserSocket(user.id, globalUsers);
+        let socket = User.getUserSocket(user.id);
         if(socket === null) return;
         user.image = message.image;
         userData[index] = user;
@@ -194,16 +184,16 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        io.to(socket).emit('update', newUser);
+        ChatIO.to(socket).emit('update', newUser);
     }
     if(channel == 'update-client'){
-        io.emit('client-update', message);
+        ChatIO.emit('client-update', message);
     }
     if(channel === 'update-chat'){
-        let index = getUserIndexBySession(message.id, userData);
+        let index = User.getUserIndexBySession(message.id);
         if(index === -1) return;
         let user = userData[index];
-        let socket = getUserSocket(user.id, globalUsers);
+        let socket = User.getUserSocket(user.id);
         if(socket === null) return;
         user.chatName = message.chatName;
         user.chatColor = message.chatColor;
@@ -218,32 +208,32 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        io.to(socket).emit('update', newUser);
+        ChatIO.to(socket).emit('update', newUser);
     }
 
     if(channel === 'user-achievement'){
-        let index = getUserIndexById(message.user_id, userData);
+        let index = User.getUserIndexById(message.user_id);
         if(index === null) return;
         let user = userData[index];
-        let socket = getUserSocket(user.id, globalUsers);
+        let socket = User.getUserSocket(user.id);
         if(socket.length === 0) return;
-        io.to(socket).emit('achievement', {
+        ChatIO.to(socket).emit('achievement', {
             achievement: true
         });
     }
 
     if(channel === 'global-achievement'){
-        io.emit('achievement', {
+        ChatIO.emit('achievement', {
             achievement: true,
             id: message.logro_id
         });
     }
 
     if(channel === 'admin-update-image'){
-        let index = getUserIndexById(message.id, userData);
+        let index = User.getUserIndexById(message.id);
         if(index === null) return;
         let user = userData[index];
-        let socket = getUserSocket(user.id, globalUsers);
+        let socket = User.getUserSocket(user.id);
         if(socket.length === 0) return;
         user.image = message.image;
         userData[index] = user;
@@ -256,14 +246,14 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        io.to(socket).emit('update', newUser);
+        ChatIO.to(socket).emit('update', newUser);
     }
 
     if(channel === 'admin-update-user'){
-        let index = getUserIndexById(message.id, userData);
+        let index = User.getUserIndexById(message.id);
         if(index === null) return;
         let user = userData[index];
-        let socket = getUserSocket(user.id, globalUsers);
+        let socket = User.getUserSocket(user.id);
         if(socket.length === 0) return;
         user.user = message.user;
         user.rank = message.rank;
@@ -277,14 +267,14 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        io.to(socket).emit('update', newUser);
+        ChatIO.to(socket).emit('update', newUser);
     }
 
     if(channel === 'admin-update-chat'){
-        let index = getUserIndexById(message.id, userData);
+        let index = User.getUserIndexById(message.id);
         if(index === null) return;
         let user = userData[index];
-        let socket = getUserSocket(user.id, globalUsers);
+        let socket = User.getUserSocket(user.id);
         if(socket.length === 0) return;
         user.chatName = message.chatName;
         user.chatColor = message.chatColor;
@@ -299,7 +289,7 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        io.to(socket).emit('update', newUser);
+        ChatIO.to(socket).emit('update', newUser);
     }
 
     if(channel === 'admin-update-welcome'){
@@ -307,25 +297,25 @@ subscriber.on('message', (channel, data) => {
     }
 
     if(channel === 'ban-chat'){
-        let socket = getUserSockets(message.id, globalUsers);
+        let socket = User.getUserSockets(message.id);
         if(socket.length === 0) return;
         socket.forEach(function(val, index){
-            io.to(val).emit('offline');
-            io.sockets.connected[val].disconnect();
+            ChatIO.to(val.id).emit('offline');
+            ChatIO.sockets.connected[val.id].disconnect();
+            Privado.disconnect(val.id);
         });
     }
 
     if(channel == 'admin-global'){
-        io.emit('global', {
+        ChatIO.emit('global', {
             user: message.user,
             message: message.message
         });
     }
 
-
 });
 subscriber.subscribe(
-    'admin-update-background', // Actualización del fondo
+    'admin-update-background',
     'update-image',
     'update-client',
     'update-chat',
@@ -338,76 +328,3 @@ subscriber.subscribe(
     'ban-chat',
     'admin-global'
 );
-
-function getUserIndexById(id, users){
-    return _.findIndex(users, (u) => {return u.id == id});
-};
-
-function getUserIndexBySession(session, users){
-    return _.findIndex(users, (u) => {return u.session == session});
-};
-
-function getUserById(id, users){
-    let index = _.findIndex(users, (u) => {return u.id == id});
-    return users[index];
-}
-
-function generateOnlineUsers(users) {
-    var online = [];
-    users.forEach(function(val, index){
-        online.push({
-            user: val.user,
-            image: val.image
-        });
-    });
-    online.sort((a, b) => {
-        if (a.user > b.user)
-            return 1;
-        if (a.user < b.user)
-            return -1;
-        return 0;
-    })
-    io.sockets.emit('online', online);
-}
-
-function getUserSocket(id, users) {
-    if(id === undefined) return null;
-    let socketid = null;
-    _.forOwn(users, (val, key) => {
-        console.log(id, val, key);
-        if(id === val){
-            socketid = key;
-            return false;
-        }
-    });
-    return socketid;
-}
-
-function getUserSockets(id, users) {
-    if(id === undefined) return [];
-    let socketid = [];
-    _.forOwn(users, (val, key) => {
-        console.log(id, val, key);
-        if(id === val){
-            socketid.push(key);
-        }
-    });
-    return socketid;
-}
-
-function getIndexSocket(id, users) {
-    if(id === undefined) return -1;
-    let index = -1;
-    var found = false;
-    _.forOwn(users, (userid, key) => {
-        index++;
-        if(id === userid){
-            found = true;
-            return false;
-        }
-    });
-    if(found)
-        return index;
-    else
-        return -1;
-}

@@ -1,14 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Chat - Registro </title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-social/5.0.0/bootstrap-social.min.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
-    <link href="/assets/css/login.css" rel="stylesheet">
+{% extends 'templates/base-login.twig' %}
+{% block title %}Registro{% endblock %}
+{% block css %}
     <style type="text/css">
         .form-control {
             background-color: #ecf2f4;
@@ -22,16 +14,8 @@
             margin-bottom: 1.4rem;
         }
     </style>
-</head>
-<body>
-<div class="container">
-    <noscript>
-        <div class="alert alert-danger alert-fixed-top">
-            <strong>¡Javascript desactivado!</strong> Este sitio funciona mejor con javascript activado.
-            Por favor, actívalo para este sitio.
-        </div>
-    </noscript>
-    {% include 'templates/flash.twig' %}
+{% endblock %}
+{% block contenido %}
     <form class="form-signin" id="loginForm" role="form" method="post" action="/signup">
         <legend><i class="fa fa-user-plus"></i> Registro</legend>
         <div class="form-group {% if errors.user %} has-error {% endif %}">
@@ -68,65 +52,55 @@
         </div>
         {{ csrf.field | raw }}
         <button class="btn btn-lg btn-danger btn-block" id="btnIngresar" type="submit">Registrarme</button>
+        <div class="bottom text-center">
+            ¿Ya tienes cuenta? <a href="{{ path_for('auth.login') }}"><b>Inicia sesión</b></a>
+        </div>
     </form>
-</div>
-<script src="//code.jquery.com/jquery.js"></script>
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
-<script type="text/javascript">
-    function isEmail(email) {
-        return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email);
-    }
-    $('#inputEmail').blur(function(event) {
-        var $input = $(this);
-        var $helper = $input.next();
-        var $parent = $input.parent();
-        if(!$input.val()) return;
-        if (!isEmail($input.val())) {
-            $helper.text('Este correo electrónico no es valido.');
-            $parent.addClass('has-error');
-        } else {
-            $helper.text('');
-            $parent.removeClass('has-error');
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        function isEmail(email) {
+            return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email);
         }
-    });
+        $('#inputEmail').blur(function(event) {
+            var $input = $(this);
+            var $helper = $input.next();
+            var $parent = $input.parent();
+            if(!$input.val()) return;
+            if (!isEmail($input.val())) {
+                $helper.text('Este correo electrónico no es valido.');
+                $parent.addClass('has-error');
+            } else {
+                $helper.text('');
+                $parent.removeClass('has-error');
+            }
+        });
 
-    $('#inputPassword').blur(function(event) {
-        var $input = $(this);
-        var $helper = $input.next();
-        var $parent = $input.parent();
-        if(!$input.val()) return;
-        if ($input.val().length < 4) {
-            $helper.text('Ingresa al menos una contraseña válida.');
-            $parent.addClass('has-error');
-        } else {
-            $helper.text('');
-            $parent.removeClass('has-error');
-        }
-    });
-    $('#inputPasswordRepeat').blur(function(event) {
-        var $input = $(this);
-        var $helper = $input.next();
-        var $parent = $input.parent();
-        if(!$input.val()) return;
-        if ($input.val().length < 4) {
-            $helper.text('Ingresa al menos una contraseña válida.');
-            $parent.addClass('has-error');
-        } else {
-            $helper.text('');
-            $parent.removeClass('has-error');
-        }
-    });
-</script>
-<script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-38624952-4', 'auto');
-    ga('send', 'pageview');
-
-</script>
-</body>
-</html>
+        $('#inputPassword').blur(function(event) {
+            var $input = $(this);
+            var $helper = $input.next();
+            var $parent = $input.parent();
+            if(!$input.val()) return;
+            if ($input.val().length < 4) {
+                $helper.text('Ingresa al menos una contraseña válida.');
+                $parent.addClass('has-error');
+            } else {
+                $helper.text('');
+                $parent.removeClass('has-error');
+            }
+        });
+        $('#inputPasswordRepeat').blur(function(event) {
+            var $input = $(this);
+            var $helper = $input.next();
+            var $parent = $input.parent();
+            if(!$input.val()) return;
+            if ($input.val().length < 4) {
+                $helper.text('Ingresa al menos una contraseña válida.');
+                $parent.addClass('has-error');
+            } else {
+                $helper.text('');
+                $parent.removeClass('has-error');
+            }
+        });
+    </script>
+{% endblock %}

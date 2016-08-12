@@ -75,14 +75,15 @@
     			<span class="icon-bar"></span>
     			<span class="icon-bar"></span>
     		</button>
-    		<a class="navbar-brand" href="#">Chat Anime Obsesion</a>
+    		<a class="navbar-brand" href="{{ base_url() }}">Chat Anime Obsesion</a>
     	</div>
     
     	<!-- Collect the nav links, forms, and other content for toggling -->
     	<div class="collapse navbar-collapse navbar-ex1-collapse">
     		<ul class="nav navbar-nav">
-    			<li class="active"><a href="#">Perfil</a></li>
+    			<li class="active"><a href="{{ path_for('perfil.main') }}">Perfil</a></li>
     			<li><a href="{{ path_for('cuenta.main') }}">Cuenta</a></li>
+				<li><a href="{{ path_for('private.main') }}">Mensajes privados</a></li>
     		</ul>
     		<form class="navbar-form navbar-left" role="search">
     			<div class="form-group">
@@ -99,7 +100,7 @@
 				<h3 style="color: #{{ user.chatColor }}">{{ user.user }}</h3>
 				<h4 style="color: #{{ user.chatText }}">{{ rango }}</h4>
 			</div>
-			<img src="http://dev.asner.xyz/avatar/b/{{ user.image }}" alt="{{ user.user }}" class="img-rounded img-responsive center-img">
+			<img src="{{ base_url() }}/avatar/b/{{ user.image }}" alt="{{ user.user }}" class="img-rounded img-responsive center-img">
 			<dl>
 				<dt>Registrado el día:</dt>
 				<dd id="registerDay">Cargando...</dd>
@@ -112,17 +113,21 @@
 				<dt>Mensajes por minuto:</dt>
 				<dd id="messagesMinute">0.00</dd>
 			</dl>
+			{% if who.id != user.id %}
+				<a href="{{ path_for('private.main') }}#{{ user.id }}" class="btn btn-info btn-block">Enviar mensaje privado</a>
+			{% endif %}
 		</div>
-		<div class="col-xs-12 col-sm-9 col-md-9 col-lg-9">
+		<div class="col-xs-12 col-sm-9">
+			<h2>Acerca de mi:</h2>
 			<div class="row" id="blockAbout">
-				<h2>Acerca de mi:</h2>
 			</div>
-			<div class="row well well-sm">
-				<div class="col-xs-12">
-					<h2>Últimos logros:</h2>
-					<div class="row" id="logrosSet">
+			<div class="row">
+				<h2>Últimos logros:</h2>
+				<div class="col-xs-12 well well-sm">
+					<div id="logrosSet">
 						<div class="alert alert-info text-center"><img src="http://i.imgur.com/9W0DRiu.gif" alt="" class="center-img img-responsive">Este usuario aún no tiene logros.<br></div>
 					</div>
+					<div class="col-xs-12"><a class="logrosMore pull-right btn btn-info" href="#">Ver mas logros</a></div>
 				</div>
 			</div>
 			<div class="row well well-sm" id="lastComments">
@@ -297,6 +302,9 @@
                         v.created_at = moment.unix(v.created_at).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a');
                         $('#logrosSet').append(logroTemplate(v));
                     });
+					if(data.logros.length == 4){
+						$('.logrosMore').show();
+					}
                 }
                 if(data.comments.length !== 0){
                     $('#commentSet').html('');
@@ -315,10 +323,26 @@
                 $('#messagesMinute').text((data.user.messages/onlineMinutes).toFixed(2));
             });
         }
+        function getLogros(){
+        	if(curLogrosOffet == -1)
+        		return;
+        	$.getJSON('{{ path_for('perfil.logros.json') }}/30/'+curLogrosOffet, function(data){
+        		if(!data.length || !data.length < 30){
+					$('.logrosMore').remove();
+					curLogrosOffet = -1;
+				}
+				$.each(data, function (i, v) {
+					v.created_at = moment.unix(v.created_at).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a');
+					$('#logrosSet').append(logroTemplate(v));
+				});
+				curLogrosOffet += 30;
+			});
+		}
 		var messageTemplate = Handlebars.compile($('#messageTemplate').html());
 		var logroTemplate = Handlebars.compile($('#logroTemplate').html());
         var aboutTemplate = Handlebars.compile($('#aboutTemplate').html());
         var videoTemplate = Handlebars.compile($('#videoTemplate').html());
+		var curLogrosOffet = 4;
 		$('#registerDay').html(registerDay.format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a') + '<br><span class="badge badge-success">'+registerDay.fromNow()+'</span>');
 		$('#lastSesion').html(lastSession.fromNow());
 		$('#commentSet').on('click', '.btnEliminar', function(event){
@@ -377,11 +401,18 @@
                 }
                 $user.message = linkifyGlobal(nl2br(htmlEntities($message.val())));
                 $user.created_at = moment().format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a');
+				if($('#commentSet').children().hasClass('alert')){
+					$('#commentSet').children().remove();
+				}
                 $('#commentSet').prepend(messageTemplate($user));
                 window.location.href = '#lastComments';
                 $('#inputMessage').val('');
-                swal("¡Oops!", data.success, "success");
+                swal("¡Yay!", data.success, "success");
 			}, 'json')
+		});
+		$('.logrosMore').on('click', function(event){
+			event.preventDefault();
+			getLogros();
 		});
 
 		$('#charLeft').text($('#inputMessage').val().length + ' / 1000');

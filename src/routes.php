@@ -5,22 +5,31 @@ $app->get('/error', 'App\MainController:error')->setName('main.error');
 $app->get('/login', 'App\MainController:getLogin')->setName('auth.login');
 $app->get('/signup', 'App\MainController:getSignUp')->setName('auth.signup');
 $app->get('/logout', 'App\MainController:getLogout')->setName('auth.logout');
+$app->get('/forgot', 'App\MainController:getForgot')->setName('auth.forgot');
 
 $app->post('/login', 'App\MainController:postLogin');
 $app->post('/signup', 'App\MainController:postSignUp');
+$app->post('/forgot', 'App\MainController:postForgot');
 
 $app->group('/email', function(){
-   $this->get('/subscribe/{token}', 'App\SubscriptionController:getActivation');
+    $this->get('/subscribe/{token}', 'App\SubscriptionController:getActivation');
     $this->get('/unsubscribe/{token}', 'App\SubscriptionController:getUnsubscribe');
+    $this->get('/password/{token}', 'App\SubscriptionController:getPassword')->setName('email.password');
+    $this->post('/password/{token}', 'App\SubscriptionController:postPassword');
+});
+
+$app->group('/private', function(){
+    $this->get('', 'App\PrivadoController:getIndex')->setName('private.main');
+    $this->get('/messages/user/{id}[/{limit}/{offset}]', 'App\PrivadoController:getUserMessage')->setName('private.user.messages');
+    $this->get('/messages[/{limit}/{offset}]', 'App\PrivadoController:getMessageUsers')->setName('private.messages');
 });
 
 $app->group('/perfil', function(){
-    $this->get('/logros.json[/{limit}]', 'App\PerfilController:getLogrosJSON')->setName('perfil.logros.json');
+    $this->get('/logros.json[/{limit}/{offset}]', 'App\PerfilController:getLogrosJSON')->setName('perfil.logros.json');
     $this->get('/user.json/{user}', 'App\PerfilController:getUserInfo')->setName('perfil.userinfo');
+    $this->get('[/{user}]', 'App\PerfilController:getIndex')->setName('perfil.main');
     $this->post('/user.json/{user}', 'App\PerfilController:postComment');
     $this->delete('/user.json/{user}', 'App\PerfilController:deleteComment');
-
-    $this->get('[/{user}]', 'App\PerfilController:getIndex')->setName('perfil.main');
 });
 
 $app->get('/facebook/login', 'App\Api\Facebook:getIndex')->setName('auth.facebook');

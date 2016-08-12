@@ -113,7 +113,7 @@ function handleMessage(message) {
         $chatbox.append($messageTemplate(message));
         $utils.messages++;
     } else {
-        $(".mensaje").last().append($messageChildTemplate(message));
+        $(".contenido").last().append($messageChildTemplate(message));
     }
     if (!$chat.focus) {
         $chat.counter++;
@@ -193,7 +193,7 @@ function chatboxResponsive() {
     $('.chatbox').height($(window).height() - $('#messageBox').height() * 2 + 1);
 }
 
-var socket = io.connect('/');
+var socket = io.connect('/chat');
 var $messageTemplate = Handlebars.compile($('#messageTemplate').html());
 var $messageChildTemplate = Handlebars.compile($('#messageChildTemplate').html());
 var $usersTemplate = Handlebars.compile($('#usersTemplate').html());
@@ -236,6 +236,10 @@ var $chat = {
 socket.on('message', function (user) {
     user.time = getCurrentDate();
     handleMessage(user);
+});
+
+socket.on('privado', function(user){
+    alertify.warning('<strong>'+ user.user + '</strong> te ha envíado un mensaje!<br> ' + user.message);
 });
 
 socket.on('system', function(message){

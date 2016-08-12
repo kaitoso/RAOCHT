@@ -1,0 +1,29 @@
+{% extends 'templates/base-login.twig' %}
+{% block title %}Recuperar contraseña{% endblock %}
+{% block css %}{% endblock %}
+{% block contenido %}
+    <form class="form-signin" id="forgotForm" role="form" method="post">
+        <div class="alert alert-info">
+            <strong>¡Recuerda tu contraseña!</strong>
+
+        </div>
+        <div class="form-group {% if errors.password %} has-error {% endif %}">
+            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Contraseña" required>
+            <span class="help-block">
+                {% if errors.password %}
+                {{ errors.password | first }}
+                {% else %}
+                    Debe contener mínimo 6 caracteres.
+                {% endif %}
+            </span>
+        </div>
+        <div class="form-group {% if errors.rPassword %} has-error {% endif %}">
+            <input type="password" name="rPassword" id="inputPasswordRepeat" class="form-control" placeholder="Confirmar contraseña" required>
+            <span class="help-block">{{ errors.rPassword | first }}</span>
+        </div>
+        {{ csrf.field | raw }}
+        <button class="btn btn-lg btn-danger btn-block" id="btnIngresar" type="submit">Cambiar contraseña</button>
+    </form>
+{% endblock %}
+{% block js %}
+{% endblock %}

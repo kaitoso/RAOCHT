@@ -1,14 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Chat - Login </title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-social/5.0.0/bootstrap-social.min.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.0/sweetalert.min.css">
-    <link href="/assets/css/login.css" rel="stylesheet">
+{% extends 'templates/base-login.twig' %}
+{% block title %}Inicio de sesión{% endblock %}
+{% block css %}
     <style type="text/css">
         .form-control {
             background-color: #ecf2f4;
@@ -54,21 +46,8 @@
         }
 
     </style>
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-    <script src="/assets/js/html5shiv.js"></script>
-    <script src="/assets/js/respond.min.js"></script>
-    <![endif]-->
-</head>
-<body>
-<div class="container">
-    <noscript>
-        <div class="alert alert-danger alert-fixed-top">
-            <strong>¡Javascript desactivado!</strong> Este sitio funciona mejor con javascript activado.
-            Por favor, actívalo para este sitio.
-        </div>
-    </noscript>
-    {% include 'templates/flash.twig' %}
+{% endblock %}
+{% block contenido %}
     {% if errors.general %}
         <div class="alert alert-danger">
             <strong>¡Oops!</strong> {{ errors.general | first }}
@@ -109,7 +88,7 @@
                     {% if errors.user %}
                         {{ errors.password | first }}
                     {% endif %}</span>
-            <div class="help-block text-right"><a href="">¿Olvidaste tu contraseña?</a></div>
+            <div class="help-block text-right"><a href="{{ path_for('auth.forgot') }}">¿Olvidaste tu contraseña?</a></div>
         </div>
         <div class="col-sm-1-offset checkbox">
             <input type="checkbox" name="rememberMe" id="rememberMe"{% if old.rememberMe %} checked {% endif %}>
@@ -118,61 +97,47 @@
         {{ csrf.field | raw }}
         <button class="btn btn-lg btn-danger btn-block" id="btnIngresar" type="submit">Ingresar</button>
         <div class="bottom text-center">
-            ¿No tienes cuenta? <a href="/signup"><b>Regístrate</b></a>
+            ¿No tienes cuenta? <a href="{{ path_for('auth.signup') }}"><b>Regístrate</b></a>
         </div>
     </form>
-</div>
-<script src="//code.jquery.com/jquery.js"></script>
-<script src="{{ base_url() }}/dist/js/moment.min.js"></script>
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.0/sweetalert.min.js"></script>
-{% if ban %}
-    <script>
-        moment.locale('es');
-        var bantime = moment('{{ ban.date_ban }}').format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a');
-        $('#loginForm').prepend('<div class="alert alert-danger">' +
-                '<strong>¡Expulsado!</strong>' +
-                ' Estás expulsado de este chat por <strong>{{ ban.reason }}</strong>. Tu expulsión termina el día <strong>' + bantime +'</strong></div>')
+{% endblock %}
+{% block js %}
+    {% if ban %}
+        <script>
+            moment.locale('es');
+            var bantime = moment('{{ ban.date_ban }}').format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a');
+            $('#loginForm').prepend('<div class="alert alert-danger">' +
+                    '<strong>¡Expulsado!</strong>' +
+                    ' Estás expulsado de este chat por <strong>{{ ban.reason }}</strong>. Tu expulsión termina el día <strong>' + bantime +'</strong></div>')
+        </script>
+    {% endif %}
+    <script type="text/javascript">
+        $('#userLogin').blur(function (event) {
+            var $input = $(this);
+            var $helper = $input.next();
+            var $parent = $input.parent();
+            if (!$input.val()) return;
+            if ($input.val().length < 4) {
+                $helper.text('Ingresa al menos un usuario válido.');
+                $parent.addClass('has-error');
+            } else {
+                $helper.text('');
+                $parent.removeClass('has-error');
+            }
+        });
+
+        $('#passLogin').blur(function (event) {
+            var $input = $(this);
+            var $helper = $input.next();
+            var $parent = $input.parent();
+            if (!$input.val()) return;
+            if ($input.val().length < 4) {
+                $helper.text('Ingresa al menos una contraseña válida.');
+                $parent.addClass('has-error');
+            } else {
+                $helper.text('');
+                $parent.removeClass('has-error');
+            }
+        });
     </script>
-{% endif %}
-<script type="text/javascript">
-    $('#userLogin').blur(function (event) {
-        var $input = $(this);
-        var $helper = $input.next();
-        var $parent = $input.parent();
-        if (!$input.val()) return;
-        if ($input.val().length < 4) {
-            $helper.text('Ingresa al menos un usuario válido.');
-            $parent.addClass('has-error');
-        } else {
-            $helper.text('');
-            $parent.removeClass('has-error');
-        }
-    });
-
-    $('#passLogin').blur(function (event) {
-        var $input = $(this);
-        var $helper = $input.next();
-        var $parent = $input.parent();
-        if (!$input.val()) return;
-        if ($input.val().length < 4) {
-            $helper.text('Ingresa al menos una contraseña válida.');
-            $parent.addClass('has-error');
-        } else {
-            $helper.text('');
-            $parent.removeClass('has-error');
-        }
-    });
-</script>
-<script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-38624952-4', 'auto');
-    ga('send', 'pageview');
-
-</script>
-</body>
-</html>
+{% endblock %}

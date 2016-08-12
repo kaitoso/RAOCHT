@@ -25,7 +25,7 @@ class LogroController extends BaseController
     public function getUpdate(Request $request, Response $response, $args)
     {
         $validation = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         if($validation->failed()){
             $this->flash->addMessage('error', 'No ingresaste una identificación.');

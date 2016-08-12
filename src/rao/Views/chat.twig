@@ -2,7 +2,7 @@
 {% block titulo %}Chat - Inicio{% endblock %}
 {% block css %}
     <link rel="stylesheet" href="{{ base_url() }}/assets/css/chat.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/sweetalert2/4.0.16/sweetalert2.min.css">
+    <link rel="stylesheet" href="{{ base_url() }}/dist/css/sweetalert2.min.css">
     <style>
         #mainContainer{
             height: 100%;
@@ -38,7 +38,7 @@
             <li><a href="{{ path_for('admin.main') }}" target="_blank" id="adminView" class="{% if permissions|length == 0 %}hidden{% endif %}"><i class="fa fa-cogs"></i> Administración</a></li>
             <li><a href="{{ path_for('cuenta.main') }}" target="_blank"><i class="fa fa-cog"></i> Configuración</a></li>
             <li><a href="{{ path_for('perfil.main') }}" target="_blank"><i class="fa fa-user"></i> Perfil</a></li>
-            <li><a href="/privados" target="_blank"><i class="fa fa-envelope" aria-hidden="true"></i> Mensajes privados <span class="label label-default pull-right">0</span></a></li>
+            <li><a href="{{ path_for('private.main') }}" target="_blank"><i class="fa fa-envelope" aria-hidden="true"></i> Mensajes privados <span class="label label-default pull-right">{{ privates }}</span></a></li>
             <li><a href="#" id="openSmilies"><i class="fa fa-smile-o"></i> Smilies</a></li>
             <li><a href="{{ path_for('auth.logout') }}"><i class="fa fa-sign-out"></i> Salir</a></li>
             <li class="dropdown open">
@@ -66,7 +66,7 @@
     			</div>
     			<div class="modal-body">
                     <div align="center" class="embed-responsive embed-responsive-16by9">
-    				    <video src="" id="videoModal" autoplay controls></video>
+    				    <video id="videoModal" autoplay controls></video>
     				</div>
     			</div>
     			<div class="modal-footer">
@@ -135,6 +135,7 @@
         </div>
     </div>
 </script>
+{% endverbatim %}{% verbatim %}
 <script id="messageChildTemplate" type="text/x-handlebars-template">
     <div class="mensaje-child" style="color: #{{chatText}}">{{unescape message}}</div>
 </script>
@@ -145,7 +146,7 @@
 </script>
 <script id="usersTemplate" type="text/x-handlebars-template">
     <li>
-        <a class="onlineUser" href="#">
+        <a class="onlineUser" href="{% endverbatim %}{{ path_for('perfil.main') }}{% verbatim %}/{{ user }}" target="_blank">
             <img src="{{ image }}" alt="{{ user }}" class="img-circle"> {{ user }}
         </a>
     </li>
@@ -169,11 +170,9 @@
 {% endverbatim %}
 {% endblock %}
 {% block js %}
-    <script src="https://cdn.jsdelivr.net/sweetalert2/4.0.16/sweetalert2.js"></script>
-    <script src="{{ base_url() }}/dist/js/promise.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
-    <script src="{{ base_url }}/dist/js/autocomplete.js"></script>
+    <script src="{{ base_url() }}/dist/js/sweetalert2.js"></script>
+    <script src="{{ base_url() }}/dist/js/handlebars.js"></script>
+    <script src="{{ base_url() }}/dist/js/autocomplete.js"></script>
     <script>var $baseUrl = '{{ base_url() }}';</script>
     <script src="{{ base_url() }}/assets/js/app.js"></script>
 {% endblock %}

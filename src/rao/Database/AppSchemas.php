@@ -58,6 +58,7 @@ class AppSchemas
             $table->string('selector', 12)->unique();
             $table->string('token', 64);
             $table->integer('user_id')->unsigned();
+            $table->boolean('activation')->default(0);
             $table->timestamp('expires')->useCurrent();
             $table->timestamp('last_used')->useCurrent();
             $table->string('ip', 45);
@@ -132,6 +133,24 @@ class AppSchemas
                 ->on('users')
                 ->onDelete('cascade');
         });
+
+        Capsule::schema()->create('private_messages', function($table){
+            $table->bigIncrements('id');
+            $table->integer('from_id')->unsigned();
+            $table->integer('to_id')->unsigned();
+            $table->string('message', 255);
+            $table->boolean('seen')->default(0);
+            $table->timestamp('send_date')->useCurrent();
+            $table->foreign('from_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+            $table->foreign('to_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+        });
+
 
     }
 

@@ -130,8 +130,8 @@
 {% block js %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
-    <script src="{{ base_url }}/dist/js/moment.min.js"></script>
-    <script src="{{ base_url }}/dist/js/bootstrap-table.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/moment.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/bootstrap-table.min.js"></script>
     <script>
         var $userTemplate = Handlebars.compile($('#userTemplate').html());
         var eliminar_template = Handlebars.compile($('#eliminar-template').html());
@@ -142,7 +142,7 @@
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             remote: {
                 wildcard: '%QUERY',
-                url: '{{ base_url() }}/admin/search/user/%QUERY'
+                url: '{{ base_url() }}/admin/search/User/%QUERY'
             }
         });
         $user.initialize();
@@ -155,7 +155,7 @@
         $('#inputUser').typeahead({
             minLength: 3
         }, {
-            display: 'user',
+            display: 'User',
             limit: 10,
             source: $user.ttAdapter(),
             templates: {
@@ -199,7 +199,7 @@
                 imageUrl: "{{ base_url() }}/assets/img/loading_spin.gif",
                 showConfirmButton: false
             });
-            $.post('{{ base_url() }}/admin/logro/user',{
+            $.post('{{ base_url() }}/admin/logro/User',{
                 logro_id: {{ logro.id }},
                 user_id: currentUser,
                 raoToken: $('input[name="raoToken"]').val()
@@ -254,7 +254,7 @@
                     function(isConfirm) {
                         if (!isConfirm)
                             return;
-                        $.delete('{{ base_url() }}/admin/logro/user', {
+                        $.delete('{{ base_url() }}/admin/logro/User', {
                             logro_id: {{ logro.id }},
                             user_id: row.id,
                             raoToken: $('input[name="raoToken"]').val()

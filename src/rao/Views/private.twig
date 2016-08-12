@@ -1,0 +1,193 @@
+{% extends 'templates/base.twig' %}
+{% block titulo %}Chat - Mensajes privados{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
+    <style>
+        #sideUsers{
+            margin-left: 0;
+            padding-left: 0;
+            overflow-y: scroll;
+
+        }
+        .sidemenu
+        {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidemenu li a{
+            display: block;
+            padding: 1em;
+        }
+
+        .sidemenu li a:hover,
+        .sidemenu li a:focus{
+            background-color: rgba(0, 0, 0, 0.17) !important;
+            text-decoration: none !important;
+        }
+
+        .sidemenu li a.notseen{
+            background-color: rgba(100, 181, 246, 0.37);
+        }
+
+        .sidemenu li
+        {
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px dotted #B3A9A9;
+        }
+
+        .sidemenu li.left .sidemenu-body
+        {
+            margin-left: 60px;
+        }
+
+        .sidemenu li .sidemenu-body p
+        {
+            margin: 0;
+            color: #777777;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .sidemenu li a img{
+            height: 30px;
+            width: 30px;
+        }
+
+        .chatbox {
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+            word-wrap: break-word;
+        }
+        .comentario {
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+        .contenido{
+            position: relative;
+            margin-left: 35px;
+        }
+        .avatar img{
+            float: left;
+            height: 30px;
+            width: 30px;
+            margin-right: 5px;
+        }
+        .smilie img{
+            vertical-align: text-top;
+            max-height: 120px;
+            max-width: 320px;
+        }
+    </style>
+{% endblock %}
+{% block contenido %}
+    <nav class="navbar navbar-default" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ base_url() }}">Chat Anime Obsesion</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="{{ path_for('perfil.main') }}">Perfil</a></li>
+                <li><a href="{{ path_for('cuenta.main') }}">Cuenta</a></li>
+                <li class="active"><a href="{{ path_for('private.main') }}">Mensajes privados</a></li>
+            </ul>
+            <form class="navbar-form navbar-left" role="search">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Buscar por usuario...">
+                </div>
+                <button type="submit" class="btn btn-default">Buscar</button>
+            </form>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+
+    <div class="contenedor">
+    	<div class="col-xs-12 col-sm-4 col-md-3" id="sideUsers">
+            <ul class="sidemenu" id="contactList">
+                <li>
+                    <div class="alert alert-info text-center">
+                        Aún no envías o recibes mensajes :C
+                    </div>
+                </li>
+            </ul>
+    	</div>
+        <div class="col-xs-12 col-sm-8 col-md-9">
+            <div class="chatbox">
+                <div class="alert alert-info">
+                	Selecciona un contacto del menú de la izquierda para enviarle un mensaje
+                </div>
+            </div>
+            <form class="input-group" id="messageBox">
+                <input class="form-control border no-shadow no-rounded" placeholder="Ingresa tu mensaje aquí..." maxlength="255">
+                <span class="input-group-btn">
+                        <button class="btn btn-success no-rounded" type="submit">Enviar</button>
+                    </span>
+            </form><!-- /input-group -->
+        </div>
+    </div>
+
+    {% verbatim %}
+    <script id="mainContactTemplate" type="text/x-handlebars-template">
+        <li class="left clearfix" id="user-{{ id }}">
+        {{#if seen}}
+            <a href="#{{ id }}">
+        {{else}}
+        <a class="notseen" href="#{{ id }}">
+        {{/if}}
+                <span class="sidemenu-img pull-left">
+                    <img src="{{ image }}" alt="{{ user }}" class="img-circle">
+                </span>
+                <div class="sidemenu-body clearfix">
+                    <div class="header">
+                        <strong class="primary-font">{{ user }}</strong>
+                         <small class="pull-right text-muted">
+                            <i class="fa fa-clock-o"></i>
+                            <span class="timeAgo" data-time="{{ send_date }}">{{ time }}</span>
+                         </small>
+                    </div>
+                    <p>{{ message }}</p>
+                </div>
+            </a>
+        </li>
+    </script>
+    <script id="messageTemplate" type="text/x-handlebars-template">
+        <div class="comentario clearfix">
+            <div class="avatar">
+                <img src="{{image}}" alt="{{user}}" class="img-circle">
+            </div>
+            <div class="contenido">
+                <div class="autor">
+                    <a href="{% endverbatim %}{{ path_for('perfil.main') }}{% verbatim %}/{{ user }}" target="_blank" style="color: #{{ chatColor }}"><strong>{{user}}</strong></a>
+                <span class="info">{{rank}}</span>
+                <small class="pull-right text-muted text-time"><i class="fa fa-clock-o"></i><span class="timeAgo" data-time="{{ originalTime }}"> {{ time }}</span></small>
+            </div>
+            <div class="mensaje clearfix" style="color: #{{chatText}}">{{unescape message}}</div>
+        </div>
+    </div>
+</script>
+{% endverbatim %}{% verbatim %}
+<script id="messageChildTemplate" type="text/x-handlebars-template">
+    <div class="mensaje-child" style="color: #{{chatText}}">{{unescape message}}</div>
+</script>
+{% endverbatim %}
+{% endblock %}
+{% block js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/handlebars.js"></script>
+    <script src="{{ base_url() }}/dist/js/moment.min.js"></script>
+    <script>
+        var $baseUrl = '{{ base_url() }}';
+        var $userID = {{ userid }};
+    </script>
+    <script src="{{ base_url() }}/assets/js/privapp.js"></script>
+{% endblock %}

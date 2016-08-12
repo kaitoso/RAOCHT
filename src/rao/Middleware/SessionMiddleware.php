@@ -73,7 +73,7 @@ class SessionMiddleware extends Middleware{
             );
         }
         $this->container->view->getEnvironment()->addGlobal('csrf', [
-            'field' => '<input class="hidden" name="raoToken" value="' .  $this->container->session->get('token') .'">',
+            'field' => '<input class="hidden" type="hidden" name="raoToken" value="' .  $this->container->session->get('token') .'">',
             'token' => $this->container->session->get('token')
         ]);
         $response = $next($request, $response);

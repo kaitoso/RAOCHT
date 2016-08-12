@@ -5,6 +5,7 @@ use App\Handler\Avatar;
 use App\Handler\Email;
 use App\Model\AuthToken;
 use App\Model\Ban;
+use App\Model\PrivateMessage;
 use App\Model\User;
 use App\Model\UserAchievements;
 use App\Model\UserProfile;
@@ -44,12 +45,17 @@ class MainController extends BaseController
             $profile->user_id = $user->id;
             $profile->save();
         }
+        $pvs = PrivateMessage::where([
+            ['to_id', $user->id],
+            ['seen', 0]
+        ])->count();
         $permissions = json_decode($user->getRank->permissions);
         $chatConfig = json_decode(file_get_contents(__DIR__.'/../Config/Chat.json'));
         return $this->view->render($response, 'chat.twig', [
             'user' => $user,
             'permissions' => $permissions,
-            'config' => $chatConfig
+            'config' => $chatConfig,
+            'privates' => $pvs
         ]);
       }
 
@@ -115,6 +121,26 @@ class MainController extends BaseController
         return $this->withRedirect($response, $this->router->pathFor('auth.login'));
     }
 
+    public function getForgot(Request $request, Response $response, $args)
+    {
+        if ($this->session->get('user_id') !== null) {
+            return $this->withRedirect($response, $this->router->pathFor('main.page'));
+        }
+        $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
+        if($ban){
+            $hoy = date('Y-m-d H:i:s');
+            if(strtotime($hoy) > strtotime($ban->date_ban)) {
+                $ban->delete();
+            }else{
+                $this->session->set('user_ban', true);
+            }
+            $this->session->delete('user_id');
+            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+        }
+
+        $this->view->render($response, 'forgot.twig');
+    }
+
     public function getSignUp(Request $request, Response $response, $args)
     {
         if ($this->session->get('user_id') !== null) {
@@ -137,7 +163,7 @@ class MainController extends BaseController
         }
         $validation = $this->validator->validate($request, [
             'user' => v::noWhitespace()->notEmpty()->alnum('_-')->length(4, 30),
-            'password' => v::noWhitespace()->notEmpty(),
+            'password' => v::noWhitespace()->notEmpty()->stringType(),
             'rememberMe' => v::boolVal(),
             'raoToken' => v::noWhitespace()->notEmpty()
         ]);
@@ -263,8 +289,8 @@ class MainController extends BaseController
         $validation = $this->validator->validate($request, [
             'user' => v::noWhitespace()->notEmpty()->alnum('_-')->length(4, 30),
             'email' => v::noWhitespace()->notEmpty()->email(),
-            'password' => v::noWhitespace()->notEmpty()->length(6),
-            'rPassword' => v::noWhitespace()->notEmpty()->length(6),
+            'password' => v::noWhitespace()->notEmpty()->length(6)->stringType(),
+            'rPassword' => v::noWhitespace()->notEmpty()->length(6)->stringType(),
             'raoToken' => v::noWhitespace()->notEmpty()
         ]);
 
@@ -334,5 +360,42 @@ class MainController extends BaseController
         En unos momentos te estaremos enviando un correo electrónico con los datos de activación.
         Si éste no llega en menos de 10 minutos, revisa tu bandeja de correos no deseados o spam.');
         return $this->withRedirect($response,  $this->router->pathFor('auth.login'));
+    }
+
+    public function postForgot(Request $request, Response $response, $args)
+    {
+        if ($this->session->get('user_id') !== null) {
+            $redirect = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $this->router->pathFor('main.page');
+            return $this->withRedirect($response, $redirect);
+        }
+        $validation = $this->validator->validate($request, [
+            'inputEmail' => v::noWhitespace()->notEmpty()->email(),
+            'raoToken' => v::noWhitespace()->notEmpty()
+        ]);
+
+        if($validation->failed()){
+            if($request->isXhr()){
+                return $response->withJson(['error' => $this->session->get('errors')]);
+            }
+            return $this->withRedirect($response,  $this->router->pathFor('auth.forgot'));
+        }
+
+        $inputEmail = $request->getParam('inputEmail');
+        $inputToken = $request->getParam('raoToken');
+
+        if($this->session->get('token') !== $inputToken){
+            $this->flash->addMessage('error', 'Éste token es inválido.');
+            return $this->withRedirect($response, $this->router->pathFor('auth.forgot'));
+        }
+        $user = User::where('email', $inputEmail)->first();
+        if(!$user){
+            $this->flash->addMessage('error', 'Éste correo electrónico es inválido.');
+            return $this->withRedirect($response, $this->router->pathFor('auth.forgot'));
+        }
+
+        $email = new Email($this->email);
+        $email->sendForgotEmail($this->view->getEnvironment(), $user);
+        $this->flash->addMessage('success', '¡Se ha enviado un correo electrónico con las instrucciones para recuperar tu contraseña! Llegará en unos momentos. Verfica el correo no deseado o de spam.');
+        return $this->withRedirect($response, $this->router->pathFor('auth.login'));
     }
 }

@@ -36,10 +36,6 @@ $container['view'] = function ($c) {
     // Add extensions
     $view->addExtension(new Slim\Views\TwigExtension($c->get('router'), $c->get('request')->getUri()));
     $view->addExtension(new Twig_Extension_Debug());
-    $view->getEnvironment()->addGlobal('csrf', [
-        'field' => '<input class="hidden" name="raoToken" value="' . $c->session->get('token') .'">',
-        'token' => $c->session->get('token')
-    ]);
     $view->getEnvironment()->addGlobal('flash', $c->flash);
     return $view;
 };
@@ -54,9 +50,9 @@ $container['logger'] = function ($c) {
     return $logger;
 };
 
-$container['errorHandler'] = function ($c) {
+/*$container['errorHandler'] = function ($c) {
     return new App\Handler\Error\ErrorHandler($c['logger']);
-};
+};*/
 
 $c['notFoundHandler'] = function ($c) {
     return new App\Handler\Error\NotFound($c['view']);
@@ -121,8 +117,8 @@ $container['App\CuentaController'] = function($c){
     return new App\Controller\CuentaController($c);
 };
 
-$container['App\SearchController'] = function($c){
-    return new App\Controller\SearchController($c);
+$container['App\PrivadoController'] = function ($c){
+    return new App\Controller\PrivadoController($c);
 };
 
 $container['App\AdminController'] = function($c){

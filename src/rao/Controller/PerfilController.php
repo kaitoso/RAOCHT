@@ -74,20 +74,21 @@ class PerfilController extends BaseController
     {
         $validationGet = $this->validator->validateArgs($request, [
             'limit' => v::optional(v::notEmpty()->intVal()->positive()),
+            'offset' => v::optional(v::notEmpty()->intVal()->positive())
         ]);
         if($validationGet->failed()){
             return $response->withJson(['error' => $this->session->get('errors')]);
         }
 
-        $limit = $request->getAttribute('limit') ?: 0;
+        $limit = $request->getAttribute('limit') ?: 4;
+        $offset = $request->getAttribute('offset') ?: 0;
 
         $logros = UserAchievements::select('ach.name', 'ach.description', 'ach.image', 'user_achievements.created_at')
             ->join('achievements as ach', 'user_achievements.achievement_id', '=', 'ach.id')
-            ->where('user_achievements.user_id', $this->session->get('user_id'));
-            if($limit > 0){
-                $logros->take($limit);
-            }
-        $logros = $logros->orderBy('user_achievements.id', 'desc')
+            ->where('user_achievements.user_id', $this->session->get('user_id'))
+            ->take($limit)
+            ->offset($offset)
+            ->orderBy('user_achievements.id', 'desc')
             ->get();
         return $this->showJSONResponse($response, $logros->toArray());
     }

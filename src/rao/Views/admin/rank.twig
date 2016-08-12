@@ -44,7 +44,7 @@
     {% endverbatim %}
 {% endblock %}
 {% block js %}
-    <script src="{{ base_url }}/dist/js/moment.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
     <script>
         moment.locale('es');
@@ -79,7 +79,7 @@
                     imageUrl: "{{ base_url() }}/assets/img/loading_spin.gif",
                     showConfirmButton: false
                 });
-                $.delete('{{ base_url }}/admin/rank/' + $id,
+                $.delete('{{ base_url() }}/admin/rank/' + $id,
                         {token: $('input[name="raoToken"]').val()},
                         function(data) {},
                         'json'
