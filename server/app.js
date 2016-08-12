@@ -171,6 +171,7 @@ subscriber.on('message', (channel, data) => {
         let index = User.getUserIndexBySession(message.id);
         if(index === -1) return;
         let user = User.onlineUsers[index];
+        if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
         if(socket === null) return;
         user.image = message.image;
@@ -193,6 +194,7 @@ subscriber.on('message', (channel, data) => {
         let index = User.getUserIndexBySession(message.id);
         if(index === -1) return;
         let user = User.onlineUsers[index];
+        if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
         if(socket === null) return;
         user.chatName = message.chatName;
@@ -215,6 +217,7 @@ subscriber.on('message', (channel, data) => {
         let index = User.getUserIndexById(message.user_id);
         if(index === null) return;
         let user = User.onlineUsers[index];
+        if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
         if(socket.length === 0) return;
         ChatIO.to(socket).emit('achievement', {
@@ -233,6 +236,7 @@ subscriber.on('message', (channel, data) => {
         let index = User.getUserIndexById(message.id);
         if(index === null) return;
         let user = User.onlineUsers[index];
+        if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
         if(socket.length === 0) return;
         user.image = message.image;
@@ -253,6 +257,7 @@ subscriber.on('message', (channel, data) => {
         let index = User.getUserIndexById(message.id);
         if(index === null) return;
         let user = User.onlineUsers[index];
+        if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
         if(socket.length === 0) return;
         user.user = message.user;
@@ -274,6 +279,7 @@ subscriber.on('message', (channel, data) => {
         let index = User.getUserIndexById(message.id);
         if(index === null) return;
         let user = User.onlineUsers[index];
+        if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
         if(socket.length === 0) return;
         user.chatName = message.chatName;
