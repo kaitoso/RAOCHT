@@ -145,6 +145,7 @@ ChatIO.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         let userId = User.socketUsers[socket.id];
+        if(userId === undefined) return;
         let sockets = User.getUserSockets(userId.id);
         if(sockets.length > 1){
             User.deleteSocket(socket.id);
