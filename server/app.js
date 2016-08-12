@@ -145,11 +145,11 @@ ChatIO.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         let userId = User.socketUsers[socket.id];
-        let sockets = User.getUserSockets(userId);
+        let sockets = User.getUserSockets(userId.id);
         if(sockets.length > 1){
             User.deleteSocket(socket.id);
         }else if(userId != null){
-            User.deleteUser(userId)
+            User.deleteUser(userId.id)
             User.deleteSocket(socket.id);
             ChatIO.emit('online', User.generateOnlineUsers()); // Volvemos a generar los usuarios conectados.
         }
@@ -170,7 +170,7 @@ subscriber.on('message', (channel, data) => {
     if(channel === 'update-image'){
         let index = User.getUserIndexBySession(message.id);
         if(index === -1) return;
-        let user = userData[index];
+        let user = User.onlineUsers[index];
         let socket = User.getUserSocket(user.id);
         if(socket === null) return;
         user.image = message.image;
@@ -192,13 +192,13 @@ subscriber.on('message', (channel, data) => {
     if(channel === 'update-chat'){
         let index = User.getUserIndexBySession(message.id);
         if(index === -1) return;
-        let user = userData[index];
+        let user = User.onlineUsers[index];
         let socket = User.getUserSocket(user.id);
         if(socket === null) return;
         user.chatName = message.chatName;
         user.chatColor = message.chatColor;
         user.chatText = message.chatText;
-        userData[index] = user;
+        User.onlineUsers[index] = user;
         // Emit user change
         let newUser = {
             'user': user.user,
@@ -214,7 +214,7 @@ subscriber.on('message', (channel, data) => {
     if(channel === 'user-achievement'){
         let index = User.getUserIndexById(message.user_id);
         if(index === null) return;
-        let user = userData[index];
+        let user = User.onlineUsers[index];
         let socket = User.getUserSocket(user.id);
         if(socket.length === 0) return;
         ChatIO.to(socket).emit('achievement', {
@@ -232,11 +232,11 @@ subscriber.on('message', (channel, data) => {
     if(channel === 'admin-update-image'){
         let index = User.getUserIndexById(message.id);
         if(index === null) return;
-        let user = userData[index];
+        let user = User.onlineUsers[index];
         let socket = User.getUserSocket(user.id);
         if(socket.length === 0) return;
         user.image = message.image;
-        userData[index] = user;
+        User.onlineUsers[index] = user;
         // Emit user change
         let newUser = {
             'user': user.user,
@@ -252,12 +252,12 @@ subscriber.on('message', (channel, data) => {
     if(channel === 'admin-update-user'){
         let index = User.getUserIndexById(message.id);
         if(index === null) return;
-        let user = userData[index];
+        let user = User.onlineUsers[index];
         let socket = User.getUserSocket(user.id);
         if(socket.length === 0) return;
         user.user = message.user;
         user.rank = message.rank;
-        userData[index] = user;
+        User.onlineUsers[index] = user;
         // Emit user change
         let newUser = {
             'user': user.user,
@@ -273,13 +273,13 @@ subscriber.on('message', (channel, data) => {
     if(channel === 'admin-update-chat'){
         let index = User.getUserIndexById(message.id);
         if(index === null) return;
-        let user = userData[index];
+        let user = User.onlineUsers[index];
         let socket = User.getUserSocket(user.id);
         if(socket.length === 0) return;
         user.chatName = message.chatName;
         user.chatColor = message.chatColor;
         user.chatText = message.chatText;
-        userData[index] = user;
+        User.onlineUsers[index] = user;
         // Emit user change
         let newUser = {
             'user': user.user,
