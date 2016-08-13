@@ -172,7 +172,6 @@ subscriber.on('message', (channel, data) => {
         let user = User.onlineUsers[index];
         if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
-        console.log('Socket: ', socket, user);
         if(socket === null) return;
         user.image = message.image;
         User.onlineUsers[index] = user;
@@ -185,7 +184,7 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        ChatIO.to(socket).emit('update', newUser);
+        ChatIO.to(socket.id).emit('update', newUser);
     }
     if(channel == 'update-client'){
         ChatIO.emit('client-update', message);
@@ -211,7 +210,7 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        ChatIO.to(socket).emit('update', newUser);
+        ChatIO.to(socket.id).emit('update', newUser);
     }
 
     if(channel === 'user-achievement'){
@@ -220,8 +219,8 @@ subscriber.on('message', (channel, data) => {
         let user = User.onlineUsers[index];
         if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
-        if(socket.length === 0) return;
-        ChatIO.to(socket).emit('achievement', {
+        if(socket === null) return;
+        ChatIO.to(socket.id).emit('achievement', {
             achievement: true
         });
     }
@@ -239,7 +238,7 @@ subscriber.on('message', (channel, data) => {
         let user = User.onlineUsers[index];
         if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
-        if(socket.length === 0) return;
+        if(socket === null) return;
         user.image = message.image;
         User.onlineUsers[index] = user;
         // Emit user change
@@ -251,7 +250,7 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        ChatIO.to(socket).emit('update', newUser);
+        ChatIO.to(socket.id).emit('update', newUser);
     }
 
     if(channel === 'admin-update-user'){
@@ -260,7 +259,7 @@ subscriber.on('message', (channel, data) => {
         let user = User.onlineUsers[index];
         if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
-        if(socket.length === 0) return;
+        if(socket === null) return;
         user.user = message.user;
         user.rank = message.rank;
         User.onlineUsers[index] = user;
@@ -273,7 +272,7 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        ChatIO.to(socket).emit('update', newUser);
+        ChatIO.to(socket.id).emit('update', newUser);
     }
 
     if(channel === 'admin-update-chat'){
@@ -282,7 +281,7 @@ subscriber.on('message', (channel, data) => {
         let user = User.onlineUsers[index];
         if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
-        if(socket.length === 0) return;
+        if(socket === null) return;
         user.chatName = message.chatName;
         user.chatColor = message.chatColor;
         user.chatText = message.chatText;
@@ -296,7 +295,7 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        ChatIO.to(socket).emit('update', newUser);
+        ChatIO.to(socket.id).emit('update', newUser);
     }
 
     if(channel === 'admin-update-welcome'){
