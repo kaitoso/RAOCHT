@@ -170,9 +170,9 @@ subscriber.on('message', (channel, data) => {
         let index = User.getUserIndexBySession(message.id);
         if(index === -1) return;
         let user = User.onlineUsers[index];
-        console.log('Index: ', index, user);
         if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
+        console.log('Socket: ', socket, user);
         if(socket === null) return;
         user.image = message.image;
         User.onlineUsers[index] = user;
