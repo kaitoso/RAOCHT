@@ -160,7 +160,7 @@ class UserController extends BaseController
         try{
             $file->upload();
             $oldfile = $user->image;
-            $user->image = $file->getName().'png';
+            $user->image = $file->getName().'.png';
             $user->save();
             Avatar::generateAvatar($avatarPath.'/'.$data['fullName'], $data['name']);
             $resp['error'] = false;

@@ -170,6 +170,7 @@ subscriber.on('message', (channel, data) => {
         let index = User.getUserIndexBySession(message.id);
         if(index === -1) return;
         let user = User.onlineUsers[index];
+        console.log('Index: ', index, user);
         if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
         if(socket === null) return;
@@ -193,6 +194,7 @@ subscriber.on('message', (channel, data) => {
         let index = User.getUserIndexBySession(message.id);
         if(index === -1) return;
         let user = User.onlineUsers[index];
+        console.log('Index: ', index, user);
         if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
         if(socket === null) return;
