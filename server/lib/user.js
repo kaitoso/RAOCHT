@@ -40,10 +40,11 @@ User.pushData = function(u){
         this.onlineUsers.push(u);
         return true;
     }
-    if(!u.private){
+    if(u.private){
         this.onlineUsers[index].private = u.private;
         return true;
     }
+
     return false;
 }
 
@@ -78,21 +79,18 @@ User.getUserIndexBySession = function(session){
 
 User.getUserById = function(id){
     let index = _.findIndex(this.onlineUsers, (u) => {return u.id == id});
-    return users[index];
+    return onlineUsers[index];
 }
 
 User.generateOnlineUsers = function() {
     var online = [];
-    this.onlineUsers.forEach(function(val, index){
-        if(val.private){
-            return true;
-        }
+    let notPrivates = _.filter(this.onlineUsers, (o) => { return o.private !== true });
+    notPrivates.forEach(function(val, index){
         online.push({
             id: val.id,
             user: val.user,
             image: val.image
         });
-
     });
     online.sort((a, b) => {
         if (a.user > b.user)

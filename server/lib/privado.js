@@ -40,7 +40,7 @@ function Privado(io, ChatIO) {
             json.ready = false;
             currentUser = json;
             if(User.pushData(json)){
-                console.log(`Added user ${json.user}`, json);
+                console.log(`Added user private ${json.user}`);
             }
             User.pushSocket(socket.id, json.id, true);
         });
@@ -113,14 +113,23 @@ function Privado(io, ChatIO) {
         });
 
         socket.on('disconnect', () => {
-            let userId = User.socketUsers[socket.id];
-            let sockets = User.getUserSockets(userId);
+            let socketUser = User.socketUsers[socket.id];
+            if(socketUser === undefined) return;
+            let sockets = User.getUserSockets(socketUser.id);
+            let userIndex = User.getUserIndexById(socketUser.id);
+            let user = User.onlineUsers[userIndex];
             if(sockets.length > 1){
+                if(socketUser.private){
+                    User.onlineUsers[userIndex].private = false;
+                }
                 User.deleteSocket(socket.id);
-            }else if(userId != null){
-                User.deleteUser(userId)
+            }else{
+                User.deleteUser(user.id)
                 User.deleteSocket(socket.id);
+                ChatIO.emit('online', User.generateOnlineUsers()); // Volvemos a generar los usuarios conectados.
+                console.log(`Disconnection user ${currentUser.user}`);
             }
+            console.log(User.socketUsers, User.onlineUsers);
         });
     });
 }

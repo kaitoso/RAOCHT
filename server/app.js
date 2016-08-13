@@ -66,6 +66,7 @@ ChatIO.on('connection', (socket) => {
     redisClient.get(sessid, (err, data) => {
         if(err){
             console.log(err);
+            ChatIO.to(socket.id).emit('restart');
             socket.disconnect();
             return;
         }
@@ -86,7 +87,7 @@ ChatIO.on('connection', (socket) => {
         if(User.pushData(json)){
             let online = User.generateOnlineUsers();
             ChatIO.emit('online', online); // Volvemos a generar los usuarios conectados.
-            console.log(online);
+            console.log('Online users ',online);
         }
         User.pushSocket(socket.id, json.id, false);
     });
@@ -143,20 +144,27 @@ ChatIO.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        let userId = User.socketUsers[socket.id];
-        if(userId === undefined) return;
-        let sockets = User.getUserSockets(userId.id);
+        let socketUser = User.socketUsers[socket.id];
+        if(socketUser === undefined) return;
+        let sockets = User.getUserSockets(socketUser.id);
+        let userIndex = User.getUserIndexById(socketUser.id);
+        let user = User.onlineUsers[userIndex];
         if(sockets.length > 1){
+            if(socketUser.private){
+                User.onlineUsers[userIndex].private = false;
+            }
             User.deleteSocket(socket.id);
-        }else if(userId != null){
-            User.deleteUser(userId.id)
+        }else{
+            User.deleteUser(user.id)
             User.deleteSocket(socket.id);
             ChatIO.emit('online', User.generateOnlineUsers()); // Volvemos a generar los usuarios conectados.
+            console.log(`Disconnection user ${currentUser.user}`);
         }
         if(currentUser !== null){
             currentUser.logTime = _.now() - currentUser.logTime;
             User.updateData(currentUser);
         }
+        console.log(User.socketUsers, User.onlineUsers);
     });
 });
 
@@ -195,7 +203,6 @@ subscriber.on('message', (channel, data) => {
         let index = User.getUserIndexBySession(message.id);
         if(index === -1) return;
         let user = User.onlineUsers[index];
-        console.log('Index: ', index, user);
         if(user === undefined) return;
         let socket = User.getUserSocket(user.id);
         if(socket === null) return;
