@@ -256,15 +256,25 @@ socket.on('message', function (user) {
         user.originalTime = moment().unix();
         user.time = moment().fromNow();
         handleMessage(user);
-        return;
+    }else{
+        $('#user-'+ user.id).insertBefore($('.sidemenu .left').first());
+        user.send_date = moment().unix();
+        user.time = moment().fromNow();
+        user.seen = 0;
+        $('#user-'+user.id).remove();
+        $('#contactList').prepend($mainContactTemplate(user));
     }
-    $('#user-'+ user.id).insertBefore($('.sidemenu .left').first());
-    user.send_date = moment().unix();
-    user.time = moment().fromNow();
-    user.seen = 0;
-    $('#user-'+user.id).remove();
-    $('#contactList').prepend($mainContactTemplate(user));
-
+    if (!$chat.focus) {
+        $chat.counter++;
+        if (!($chat.interval instanceof Interval)) {
+            $chat.interval = new Interval(function () {
+                $("title").text(($("title").text() === $chat.title) ? "Nuevo mensaje (" + $chat.counter + ")" : $chat.title);
+            }, 2000);
+        }
+        if (!$chat.interval.isRunning()) {
+            $chat.interval.start();
+        }
+    }
 });
 socket.on('restart', function () {
     console.log('Go restart');
@@ -296,6 +306,17 @@ $('#messageBox').submit(function (e) {
         sendReady = true;
     }, 1000);
     $msgInput.val('');
+});
+$(window).focus(function () {
+    if ($chat.interval instanceof Interval) {
+        $chat.interval.stop();
+    }
+    $chat.focus = true;
+    $chat.counter = 0;
+    $("title").text($chat.title);
+});
+$(window).blur(function () {
+    $chat.focus = false;
 });
 $(window).on('hashchange', function() {
     $('#user-'+currentLocation+' a').removeClass('cursor');

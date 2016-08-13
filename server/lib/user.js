@@ -85,7 +85,6 @@ User.generateOnlineUsers = function() {
     var online = [];
     this.onlineUsers.forEach(function(val, index){
         if(val.private){
-            console.log('Online user private', val.user);
             return true;
         }
         online.push({
