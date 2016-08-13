@@ -86,7 +86,7 @@ function Privado(io, ChatIO) {
             }
             let sendToMain = true;
             let privates = _.find(remoteSockets, (o) => { o.private === true });
-            console.log(privates);
+            console.log(remoteSockets, privates);
             if(privates !== undefined){
                 _.each(privates, function(val, index){
                     PrivIO.to(val.id).emit('message', message);
@@ -94,7 +94,7 @@ function Privado(io, ChatIO) {
                 });
             }else{
                 _.each(remoteSockets, function(val, index){
-                    PrivIO.to(val.id).emit('message', message);
+                    ChatIO.to(val.id).emit('message', message);
                 });
             }
         });
