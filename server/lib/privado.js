@@ -86,13 +86,14 @@ function Privado(io, ChatIO) {
             }
             let sendToMain = true;
             let privates = _.filter(remoteSockets, (o) => { return o.private === true });
-            console.log(remoteSockets, privates);
+            console.log('Privates lenght' + privates.length);
             if(privates.length > 0){
                 _.each(privates, function(val, index){
                     PrivIO.to(val.id).emit('message', message);
                     sendToMain = false;
                 });
             }else{
+                console.log('Sending to main chat');
                 _.each(remoteSockets, function(val, index){
                     ChatIO.to(val.id).emit('message', message);
                 });
