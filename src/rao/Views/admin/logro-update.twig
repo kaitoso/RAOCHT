@@ -199,7 +199,7 @@
                 imageUrl: "{{ base_url() }}/assets/img/loading_spin.gif",
                 showConfirmButton: false
             });
-            $.post('{{ base_url() }}/admin/logro/User',{
+            $.post('{{ base_url() }}/admin/logro/user',{
                 logro_id: {{ logro.id }},
                 user_id: currentUser,
                 raoToken: $('input[name="raoToken"]').val()
@@ -254,7 +254,7 @@
                     function(isConfirm) {
                         if (!isConfirm)
                             return;
-                        $.delete('{{ base_url() }}/admin/logro/User', {
+                        $.delete('{{ base_url() }}/admin/logro/user', {
                             logro_id: {{ logro.id }},
                             user_id: row.id,
                             raoToken: $('input[name="raoToken"]').val()
