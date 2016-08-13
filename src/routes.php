@@ -43,7 +43,7 @@ $app->get('/google/callback', 'App\Api\Google:getCallback')->setName('auth.googl
 
 $app->group('/cuenta', function(){
     $this->get('[/]', 'App\CuentaController:index')->setName('cuenta.main');
-    $this->get('/logros.json', 'App\CuentaController:getLogros')->setName('cuenta.logros');
+    $this->get('/logros.json[/{id}]', 'App\CuentaController:getLogros')->setName('cuenta.logros');
     $this->get('/facebook/login', 'App\Api\Facebook:getCuentaLogin')->setName('cuenta.facebook.login');
     $this->get('/facebook/callback', 'App\Api\Facebook:getFacebookCallbackLink')->setName('cuenta.facebook.callback');
     $this->get('/facebook/unlink', 'App\Api\Facebook:getUnlink')->setName('cuenta.facebook.logout');
