@@ -104,7 +104,6 @@ function chatBottom() {
 function handleMessage(message) {
     if (!$config.ready) return;
     var rank = getRank(message.rank);
-    console.log(message.rank, rank, rank.permission);
     message.message = linkifyChat(message.message, rank.permission);
     message.message = smilies(message.message);
     if (message.user != $config.lastUser) {
@@ -230,6 +229,7 @@ var $chat = {
     focus: true,
     counter: 0,
     interval: null,
+    privates: 0,
     seed: Math.floor(Math.random() * (20 - 30 + 1)) + 20
 };
 /* Chat Events */
@@ -240,6 +240,8 @@ socket.on('message', function (user) {
 
 socket.on('privado', function(user){
     alertify.log('<strong>'+ user.user + '</strong> te ha envíado un mensaje!<br> ' + user.message, "", 0);
+    $chat.privates++;
+    $('#pvNumber').text($chat.privates);
 });
 
 socket.on('system', function(message){
@@ -387,6 +389,10 @@ $("#modal-smilies").scroll(function(e) {
         $("#bodySmilies").append(smilies_template($config.smilies[b]));
     }
     $utils.smiliesShown += f;
+});
+$('#btnPrivate').on('click', function(){
+    $chat.privates = 0;
+    $('#pvNumber').text($chat.privates);
 });
 $("#bodySmilies").on("click", ".smilieTemplate", function(event) {
     cancelEvent(event);

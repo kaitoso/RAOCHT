@@ -24,4 +24,9 @@ class Ban extends Model
     {
         return \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('U');
     }
+
+    public function getDateBanAttribute($date)
+    {
+        return \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('U');
+    }
 }

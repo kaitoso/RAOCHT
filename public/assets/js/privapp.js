@@ -1,3 +1,29 @@
+var $userTemplate = Handlebars.compile($('#userTemplate').html());
+var $user = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
+        wildcard: '%QUERY',
+        url: $baseUrl+'/perfil/search/%QUERY'
+    }
+});
+$user.initialize();
+
+$('#inputUser').typeahead({
+    minLength: 3
+}, {
+    display: 'user',
+    limit: 10,
+    source: $user.ttAdapter(),
+    templates: {
+        empty: [
+            '<div class="empty-message">',
+            'No se encontró a ningún grupo con este nombre o clave.',
+            '</div>'
+        ].join('\n'),
+        suggestion: $userTemplate
+    }
+});
 Handlebars.registerHelper("unescape", function (a) {
     return new Handlebars.SafeString(a);
 });
@@ -42,7 +68,6 @@ function chatboxResponsive() {
 
 function getMessageUsers(){
     $.getJSON($baseUrl+'/private/messages', function(data){
-        console.log(data);
         if(!data.length){
             return;
         }
@@ -65,7 +90,6 @@ function getMessageUsers(){
                 fromUser = v;
                 fromUser.time = moment.unix(v.send_date).fromNow();
                 fromUser.image = $baseUrl + '/avatar/s/' + v.image;
-                console.log(fromUser);
             }
             $('#contactList').append($mainContactTemplate(fromUser));
         });
@@ -121,21 +145,21 @@ function getCache() {
         }
     });
 }
-function linkifyChat(str, permissions) {
+
+function linkifyChat(str) {
     var urlRegex = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
     var imageRegex = /\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/;
     var audioRegex = /\b(https?:\/\/\S+(?:mp3|ogg)\S*)\b/;
     var videoRegex = /\b(https?:\/\/\S+(?:mp4|webm|ogv)\S*)\b/;
-    var perms = array_flip(permissions);
     return str.replace(urlRegex, function (match) {
-        if (imageRegex.test(match) && perms.images != null) {
+        if (imageRegex.test(match)) {
             return '<a href="' + match + '" target="_blank"><span class="smilie"><img src="' + match + '"/></span></a>';
         }
-        if (audioRegex.test(match) && perms.audio != null) {
+        if (audioRegex.test(match)) {
             return '<audio controls><source src="' + match + '">Tu navegador no soporta la etiqueta "Audio"</audio>';
         }
-        if (videoRegex.test(match) && perms.videos != null) {
-            return '<a data-toggle="modal" href="#modalvideo" class="openVideo" data-video="' + match + '">' + match + '</a>'
+        if (videoRegex.test(match)) {
+            return '<video class="srcVideo" src="' + match + '" preload controls></video>'
         }
 
         return '<a href="' + match + '" target="_blank">' + match + '</a>';
@@ -171,10 +195,12 @@ function handleMessage(message) {
     var rank = getRank(message.rank);
     if(message.id !== $userID){
         $('#user-'+message.id+' .timeAgo').text(' ' +moment.unix(message.originalTime).fromNow())
-        $('#user-'+ message.id +' p').text(message.message);
+        $('#user-'+message.id+' .timeAgo').data('time', message.originalTime)
+        $('#user-'+ message.id +' p').html(message.message);
     }else{
         $('#user-'+currentLocation+' .timeAgo').text(' ' +moment.unix(message.originalTime).fromNow())
-        $('#user-'+ currentLocation +' p').text('Tu: ' + message.message);
+        $('#user-'+currentLocation+' .timeAgo').data('time', message.originalTime)
+        $('#user-'+ currentLocation +' p').html('Tu: ' + message.message);
     }
     message.message = linkifyChat(message.message, rank.permission);
     message.message = smilies(message.message);
@@ -232,12 +258,17 @@ socket.on('message', function (user) {
         handleMessage(user);
         return;
     }
+    $('#user-'+ user.id).insertBefore($('.sidemenu .left').first());
     user.send_date = moment().unix();
     user.time = moment().fromNow();
     user.seen = 0;
     $('#user-'+user.id).remove();
     $('#contactList').prepend($mainContactTemplate(user));
 
+});
+socket.on('restart', function () {
+    console.log('Go restart');
+    setTimeout(function() { window.location.reload(); }, 1000);
 });
 socket.on('client-update', function (message) {
     getCache();
@@ -267,8 +298,10 @@ $('#messageBox').submit(function (e) {
     $msgInput.val('');
 });
 $(window).on('hashchange', function() {
+    $('#user-'+currentLocation+' a').removeClass('cursor');
     currentLocation = location.hash.slice(1);
     getUserMessages(currentLocation);
+    $('#user-'+currentLocation+' a').addClass('cursor');
 });
 $(window).on("resize", function () {
     chatboxResponsive();
@@ -278,6 +311,7 @@ $(document).ready(function(){
    if(currentLocation !== ""){
        getUserMessages(currentLocation);
    }
+    $('#messageBox input').tabComplete($config.autocomplete);
 });
 setInterval(function(){
     $('.timeAgo').each(function(i, v){

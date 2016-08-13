@@ -22,15 +22,16 @@ $app->group('/private', function(){
     $this->get('', 'App\PrivadoController:getIndex')->setName('private.main');
     $this->get('/messages/user/{id}[/{limit}/{offset}]', 'App\PrivadoController:getUserMessage')->setName('private.user.messages');
     $this->get('/messages[/{limit}/{offset}]', 'App\PrivadoController:getMessageUsers')->setName('private.messages');
-});
+})->add(new \App\Middleware\AuthMiddleware($app->getContainer()));
 
 $app->group('/perfil', function(){
     $this->get('/logros.json[/{limit}/{offset}]', 'App\PerfilController:getLogrosJSON')->setName('perfil.logros.json');
     $this->get('/user.json/{user}', 'App\PerfilController:getUserInfo')->setName('perfil.userinfo');
+    $this->get('/search/{user}', 'App\PerfilController:getUser')->setName('perfil.search.user');
     $this->get('[/{user}]', 'App\PerfilController:getIndex')->setName('perfil.main');
     $this->post('/user.json/{user}', 'App\PerfilController:postComment');
     $this->delete('/user.json/{user}', 'App\PerfilController:deleteComment');
-});
+})->add(new \App\Middleware\AuthMiddleware($app->getContainer()));
 
 $app->get('/facebook/login', 'App\Api\Facebook:getIndex')->setName('auth.facebook');
 $app->get('/facebook/callback', 'App\Api\Facebook:getFacebookCallback')->setName('auth.facebook.callback');
@@ -62,7 +63,7 @@ $app->group('/cuenta', function(){
     $this->put('/chatinfo', 'App\CuentaController:putChatInfo');
     $this->put('/password', 'App\CuentaController:putPassword');
     $this->put('/email', 'App\CuentaController:putEmail');
-});
+})->add(new \App\Middleware\AuthMiddleware($app->getContainer()));
 
 $app->group('/admin', function () {
     $this->get('[/]', 'App\AdminController:index')->setName('admin.main');

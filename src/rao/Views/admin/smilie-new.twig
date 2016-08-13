@@ -1,7 +1,7 @@
 {% extends 'templates/admin.twig' %}
 {% block titulo %}Nuevo Smilie{% endblock %}
 {% block css %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
+    <link rel="stylesheet" href="{{ base_url() }}/dist/css/sweetalert.min.css">
     <style>
         small{
             color: rgba(0,0,0, 0.54);
@@ -79,7 +79,7 @@
     </div>
 {% endblock %}
 {% block js %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/sweetalert.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.3/holder.min.js"></script>
     <script>
         var validated = false;

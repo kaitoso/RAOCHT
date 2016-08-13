@@ -70,6 +70,23 @@ class PerfilController extends BaseController
         ]);
     }
 
+    public function getUser(Request $request, Response $response, $args)
+    {
+        $validationGet = $this->validator->validateArgs($request, [
+            'user' => v::noWhitespace()->notEmpty()->alnum('_-')->length(3, 30)
+        ]);
+        if($validationGet->failed()){
+            return $response->withJson(['error' => $this->session->get('errors')]);
+        }
+        $inputUser = $request->getAttribute('user');
+        $userLike = User::select('users.id', 'users.user', 'users.image', 'ranks.name')
+            ->leftJoin('ranks', 'ranks.id', '=', 'users.rank')
+            ->where('user', 'LIKE', "%{$inputUser}%")
+            ->take(4)
+            ->get();
+        return $this->showJSONResponse($response, $userLike->toArray());
+    }
+
     public function getLogrosJSON(Request $request, Response $response, $args)
     {
         $validationGet = $this->validator->validateArgs($request, [

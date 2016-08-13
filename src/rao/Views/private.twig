@@ -1,7 +1,8 @@
 {% extends 'templates/base.twig' %}
 {% block titulo %}Chat - Mensajes privados{% endblock %}
 {% block css %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
+    <link rel="stylesheet" href="{{ base_url() }}/dist/css/sweetalert.min.css">
+    <link rel="stylesheet" href="{{ base_url() }}/assets/css/admin.css">
     <style>
         #sideUsers{
             margin-left: 0;
@@ -29,6 +30,10 @@
 
         .sidemenu li a.notseen{
             background-color: rgba(100, 181, 246, 0.37);
+        }
+
+        .cursor{
+            background-color: rgba(0, 0, 0, 0.17);
         }
 
         .sidemenu li
@@ -80,6 +85,11 @@
             max-height: 120px;
             max-width: 320px;
         }
+        .srcVideo{
+            max-height: 320px;
+            max-width: 320px;
+            vertical-align: text-top;
+        }
     </style>
 {% endblock %}
 {% block contenido %}
@@ -104,9 +114,8 @@
             </ul>
             <form class="navbar-form navbar-left" role="search">
                 <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Buscar por usuario...">
+                    <input type="text" name="inputName" id="inputUser" class="form-control typeahead" placeholder="Buscar por usuario..." required="required"  autocomplete="off" maxlength="50">
                 </div>
-                <button type="submit" class="btn btn-default">Buscar</button>
             </form>
         </div><!-- /.navbar-collapse -->
     </nav>
@@ -149,13 +158,13 @@
                 </span>
                 <div class="sidemenu-body clearfix">
                     <div class="header">
-                        <strong class="primary-font">{{ user }}</strong>
+                        <strong class="primary-font" style="color: #{{chatColor}}">{{ user }}</strong>
                          <small class="pull-right text-muted">
                             <i class="fa fa-clock-o"></i>
                             <span class="timeAgo" data-time="{{ send_date }}">{{ time }}</span>
                          </small>
                     </div>
-                    <p>{{ message }}</p>
+                    <p style="color: #{{chatText}}">{{unescape message }}</p>
                 </div>
             </a>
         </li>
@@ -180,11 +189,22 @@
     <div class="mensaje-child" style="color: #{{chatText}}">{{unescape message}}</div>
 </script>
 {% endverbatim %}
+    {% verbatim %}
+    <script id="userTemplate" type="text/x-handlebars-template">
+        <a href="{% endverbatim %}{{ base_url() }}/perfil/{% verbatim %}{{ user }}">
+            <small class="typeahead-image"><img src="{% endverbatim %}{{ base_url() }}/avatar/s/{% verbatim %}{{image}}"></small>
+            <strong>{{user}}</strong>
+            <small class="text-muted"> - {{name}}</small>
+        </a>
+    </script>
+    {% endverbatim %}
 {% endblock %}
 {% block js %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/sweetalert.js"></script>
     <script src="{{ base_url() }}/dist/js/handlebars.js"></script>
     <script src="{{ base_url() }}/dist/js/moment.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/typeahead.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/autocomplete.js"></script>
     <script>
         var $baseUrl = '{{ base_url() }}';
         var $userID = {{ userid }};

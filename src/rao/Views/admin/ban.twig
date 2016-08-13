@@ -106,7 +106,7 @@
     {% endverbatim %}
 {% endblock %}
 {% block js %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/typeahead.min.js"></script>
     <script>
         var $userTemplate = Handlebars.compile($('#userTemplate').html());
         var $user = new Bloodhound({

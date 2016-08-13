@@ -1,9 +1,9 @@
 {% extends 'templates/base.twig' %}
 {% block titulo %}Chat - Cuenta{% endblock %}
 {% block css %}
+    <link rel="stylesheet" href="{{ base_url() }}/assets/css/admin.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-social/5.0.0/bootstrap-social.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.0/sweetalert.min.css">
-    <link rel="stylesheet" href="{{ base_url() }}/dist/css/minicolors.min.css">
     <style>
         .preview-img img {
             max-height: 480px;
@@ -47,9 +47,8 @@
             </ul>
             <form class="navbar-form navbar-left" role="search">
                 <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Buscar por usuario...">
+                    <input type="text" name="inputName" id="inputUser" class="form-control typeahead" placeholder="Buscar por usuario..." required="required"  autocomplete="off" maxlength="50">
                 </div>
-                <button type="submit" class="btn btn-default">Buscar</button>
             </form>
         </div><!-- /.navbar-collapse -->
     </nav>
@@ -360,11 +359,48 @@
         </div>
         </div>
     </div>
+    {% verbatim %}
+    <script id="userTemplate" type="text/x-handlebars-template">
+        <a href="{% endverbatim %}{{ base_url() }}/perfil/{% verbatim %}{{ user }}">
+            <small class="typeahead-image"><img src="{% endverbatim %}{{ base_url() }}/avatar/s/{% verbatim %}{{image}}"></small>
+            <strong>{{user}}</strong>
+            <small class="text-muted"> - {{name}}</small>
+        </a>
+    </script>
+    {% endverbatim %}
 {% endblock %}
 {% block js %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.0/sweetalert.min.js"></script>
     <script src="{{ base_url() }}/dist/js/minicolors.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/handlebars.js"></script>
+    <script src="{{ base_url() }}/dist/js/typeahead.min.js"></script>
     <script>
+        var $userTemplate = Handlebars.compile($('#userTemplate').html());
+        var $user = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            remote: {
+                wildcard: '%QUERY',
+                url: '{{ base_url() }}/perfil/search/%QUERY'
+            }
+        });
+        $user.initialize();
+
+        $('#inputUser').typeahead({
+            minLength: 3
+        }, {
+            display: 'user',
+            limit: 10,
+            source: $user.ttAdapter(),
+            templates: {
+                empty: [
+                    '<div class="empty-message">',
+                    'No se encontró a ningún grupo con este nombre o clave.',
+                    '</div>'
+                ].join('\n'),
+                suggestion: $userTemplate
+            }
+        });
         function is_hex(string) {
             var hex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
             return hex.test(string);

@@ -27,6 +27,7 @@ function Privado(io, ChatIO) {
             }
             if(data == null){
                 console.error('Null value. Sessid: ', sessid, cookies);
+                PrivIO.to(socket).emit('restart');
                 socket.disconnect();
                 return;
             }

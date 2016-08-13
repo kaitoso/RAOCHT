@@ -1,8 +1,8 @@
 {% extends 'templates/admin.twig' %}
 {% block titulo %}Gestión de logros{% endblock %}
 {% block css %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+    <link rel="stylesheet" href="{{ base_url() }}/dist/css/sweetalert.min.css">
+    <link rel="stylesheet" href="{{ base_url() }}/dist/css/bootstrap-table.min.css">
     <style>
         .imgTable{
             margin: 0 auto;
@@ -65,7 +65,7 @@
     </script>
 {% endblock %}
 {% block js %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/sweetalert.js"></script>
     <script src="{{ base_url() }}/dist/js/moment.min.js"></script>
     <script src="{{ base_url() }}/dist/js/bootstrap-table.min.js"></script>
     <script>

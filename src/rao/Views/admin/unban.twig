@@ -1,8 +1,8 @@
 {% extends 'templates/admin.twig' %}
 {% block titulo %}Admisión de usuarios{% endblock %}
 {% block css %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+    <link rel="stylesheet" href="{{ base_url() }}/dist/css/sweetalert.min.css">
+    <link rel="stylesheet" href="{{ base_url() }}/dist/css/bootstrap-table.min.css">
 {% endblock %}
 {% block contenido %}
     <legend>Expulsiones</legend>
@@ -40,7 +40,7 @@
     </script>
 {% endblock %}
 {% block js %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/sweetalert.js"></script>
     <script src="{{ base_url() }}/dist/js/moment.min.js"></script>
     <script src="{{ base_url() }}/dist/js/bootstrap-table.min.js"></script>
     <script type="text/javascript">

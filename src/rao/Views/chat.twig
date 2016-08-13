@@ -38,7 +38,7 @@
             <li><a href="{{ path_for('admin.main') }}" target="_blank" id="adminView" class="{% if permissions|length == 0 %}hidden{% endif %}"><i class="fa fa-cogs"></i> Administración</a></li>
             <li><a href="{{ path_for('cuenta.main') }}" target="_blank"><i class="fa fa-cog"></i> Configuración</a></li>
             <li><a href="{{ path_for('perfil.main') }}" target="_blank"><i class="fa fa-user"></i> Perfil</a></li>
-            <li><a href="{{ path_for('private.main') }}" target="_blank"><i class="fa fa-envelope" aria-hidden="true"></i> Mensajes privados <span class="label label-default pull-right">{{ privates }}</span></a></li>
+            <li><a id="btnPrivate" href="{{ path_for('private.main') }}" target="_blank"><i class="fa fa-envelope" aria-hidden="true"></i> Mensajes privados <span class="label label-default pull-right" id="pvNumber">{{ privates }}</span></a></li>
             <li><a href="#" id="openSmilies"><i class="fa fa-smile-o"></i> Smilies</a></li>
             <li><a href="{{ path_for('auth.logout') }}"><i class="fa fa-sign-out"></i> Salir</a></li>
             <li class="dropdown open">

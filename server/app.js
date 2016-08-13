@@ -57,7 +57,7 @@ ChatIO.on('connection', (socket) => {
     let cookies = cookie.parse(socket.handshake.headers.cookie);
     if(cookies.rao_session === undefined){
         console.error('Undefined session', socket.handshake.headers.cookie);
-        ChatIO.to(socket).emit('restart');
+        ChatIO.to(socket.id).emit('restart');
         socket.disconnect();
         return;
     }
@@ -71,6 +71,7 @@ ChatIO.on('connection', (socket) => {
         }
         if(data == null){
             console.error('Null value. Sessid: ', sessid, cookies);
+            ChatIO.to(socket.id).emit('restart');
             socket.disconnect();
             return;
         }

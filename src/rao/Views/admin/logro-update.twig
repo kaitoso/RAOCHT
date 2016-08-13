@@ -1,8 +1,8 @@
 {% extends 'templates/admin.twig' %}
 {% block titulo %}Gestion del logro: {{ logro.name }}{% endblock %}
 {% block css %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+    <link rel="stylesheet" href="{{ base_url() }}/dist/css/sweetalert.min.css">
+    <link rel="stylesheet" href="{{ base_url() }}/dist/css/bootstrap-table.min.css">
     <style>
         small{
             color: rgba(0,0,0, 0.54);
@@ -128,7 +128,7 @@
     </script>
 {% endblock %}
 {% block js %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+    <script src="{{ base_url() }}/dist/js/sweetalert.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
     <script src="{{ base_url() }}/dist/js/moment.min.js"></script>
     <script src="{{ base_url() }}/dist/js/bootstrap-table.min.js"></script>
@@ -155,7 +155,7 @@
         $('#inputUser').typeahead({
             minLength: 3
         }, {
-            display: 'User',
+            display: 'user',
             limit: 10,
             source: $user.ttAdapter(),
             templates: {
@@ -168,6 +168,7 @@
             }
         });
         $('.typeahead').bind('typeahead:select', function(ev, user) {
+            ev.preventDefault();
             currentUser = user.id;
         });
         $('#fileImage').change(function(event) {

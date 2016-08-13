@@ -1,7 +1,8 @@
 {% extends 'templates/base.twig' %}
 {% block titulo %}Perfil de {{ user.user }}{% endblock %}
 {% block css %}
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
+	<link rel="stylesheet" href="{{ base_url() }}/assets/css/admin.css">
+	<link rel="stylesheet" href="{{ base_url() }}/dist/css/sweetalert.min.css">
 	<style>
         body{
         {% if config.background %}
@@ -87,9 +88,8 @@
     		</ul>
     		<form class="navbar-form navbar-left" role="search">
     			<div class="form-group">
-    				<input type="text" class="form-control" placeholder="Buscar por usuario...">
+					<input type="text" name="inputName" id="inputUser" class="form-control typeahead" placeholder="Buscar por usuario..." required="required"  autocomplete="off" maxlength="50">
     			</div>
-    			<button type="submit" class="btn btn-default">Buscar</button>
     		</form>
     	</div><!-- /.navbar-collapse -->
     </nav>
@@ -209,11 +209,21 @@
         {{/if}}
 </script>
 	{% endverbatim %}
+	{% verbatim %}
+    <script id="userTemplate" type="text/x-handlebars-template">
+        <a href="{% endverbatim %}{{ base_url() }}/perfil/{% verbatim %}{{ user }}">
+            <small class="typeahead-image"><img src="{% endverbatim %}{{ base_url() }}/avatar/s/{% verbatim %}{{image}}"></small>
+            <strong>{{user}}</strong>
+            <small class="text-muted"> - {{name}}</small>
+        </a>
+    </script>
+    {% endverbatim %}
 {% endblock %}
 {% block js %}
 	<script src="{{ base_url() }}/dist/js/moment.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+	<script src="{{ base_url() }}/dist/js/sweetalert.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+	<script src="{{ base_url() }}/dist/js/typeahead.min.js"></script>
 	<script>
 		var $userUrl = '{{ path_for('perfil.userinfo', {'user': user.user}) }}';
 		var registerDay = moment.unix({{ user.created_at }});
@@ -225,6 +235,31 @@
             chatColor: '{{ who.chatColor }}',
             chatText: '{{ who.chatText }}'
         }
+		var $userTemplate = Handlebars.compile($('#userTemplate').html());
+		var $user = new Bloodhound({
+			datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+			queryTokenizer: Bloodhound.tokenizers.whitespace,
+			remote: {
+				wildcard: '%QUERY',
+				url: '{{ base_url() }}/perfil/search/%QUERY'
+			}
+		});
+		$user.initialize();
+		$('#inputUser').typeahead({
+			minLength: 3
+		}, {
+			display: 'user',
+			limit: 10,
+			source: $user.ttAdapter(),
+			templates: {
+				empty: [
+					'<div class="empty-message">',
+					'No se encontró a ningún grupo con este nombre o clave.',
+					'</div>'
+				].join('\n'),
+				suggestion: $userTemplate
+			}
+		});
 	</script>
 	<script>
 		jQuery.each(["put", "delete"], function(i, method) {
