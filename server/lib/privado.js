@@ -85,15 +85,18 @@ function Privado(io, ChatIO) {
                 return;
             }
             let sendToMain = true;
-            _.each(remoteSockets, function(val, index){
-                if(val.private){
+            let privates = _.find(remoteSockets, (o) => { o.private === true });
+            console.log(privates);
+            if(privates !== undefined){
+                _.each(privates, function(val, index){
                     PrivIO.to(val.id).emit('message', message);
                     sendToMain = false;
-                }
-                if(sendToMain){
-                    ChatIO.to(val.id).emit('privado', message);
-                }
-            });
+                });
+            }else{
+                _.each(remoteSockets, function(val, index){
+                    PrivIO.to(val.id).emit('message', message);
+                });
+            }
         });
 
         socket.on('ready', () => {
