@@ -185,6 +185,7 @@ subscriber.on('message', (channel, data) => {
             'rank': user.rank,
         }
         ChatIO.to(socket.id).emit('update', newUser);
+        ChatIO.emit('online', User.generateOnlineUsers());
     }
     if(channel == 'update-client'){
         ChatIO.emit('client-update', message);
@@ -251,6 +252,7 @@ subscriber.on('message', (channel, data) => {
             'rank': user.rank,
         }
         ChatIO.to(socket.id).emit('update', newUser);
+        ChatIO.emit('online', User.generateOnlineUsers());
     }
 
     if(channel === 'admin-update-user'){

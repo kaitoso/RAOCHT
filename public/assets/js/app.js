@@ -239,7 +239,7 @@ socket.on('message', function (user) {
 });
 
 socket.on('privado', function(user){
-    alertify.warning('<strong>'+ user.user + '</strong> te ha envíado un mensaje!<br> ' + user.message);
+    alertify.log('<strong>'+ user.user + '</strong> te ha envíado un mensaje!<br> ' + user.message, "", 0);
 });
 
 socket.on('system', function(message){
