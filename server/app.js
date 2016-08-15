@@ -191,7 +191,7 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        ChatIO.to(socket.id).emit('update', newUser);
+        ChatIO.to(socket).emit('update', newUser);
         ChatIO.emit('online', User.generateOnlineUsers());
     }
     if(channel == 'update-client'){
@@ -217,7 +217,7 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        ChatIO.to(socket.id).emit('update', newUser);
+        ChatIO.to(socket).emit('update', newUser);
     }
 
     if(channel === 'user-achievement'){
@@ -227,7 +227,7 @@ subscriber.on('message', (channel, data) => {
         if(user === undefined) return;
         let socket = User.getPubSocketById(user.id);
         if(socket === null) return;
-        ChatIO.to(socket.id).emit('achievement', {
+        ChatIO.to(socket).emit('achievement', {
             achievement: true
         });
     }
@@ -257,7 +257,7 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        ChatIO.to(socket.id).emit('update', newUser);
+        ChatIO.to(socket).emit('update', newUser);
         ChatIO.emit('online', User.generateOnlineUsers());
     }
 
@@ -280,7 +280,7 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        ChatIO.to(socket.id).emit('update', newUser);
+        ChatIO.to(socket).emit('update', newUser);
     }
 
     if(channel === 'admin-update-chat'){
@@ -303,7 +303,7 @@ subscriber.on('message', (channel, data) => {
             'image': user.image,
             'rank': user.rank,
         }
-        ChatIO.to(socket.id).emit('update', newUser);
+        ChatIO.to(socket).emit('update', newUser);
     }
 
     if(channel === 'admin-update-welcome'){
@@ -314,13 +314,13 @@ subscriber.on('message', (channel, data) => {
         let socket = User.getPubSocketsById(message.id);
         if(socket.length === 0) return;
         socket.forEach(function(val, index){
-            ChatIO.to(val.id).emit('offline');
-            ChatIO.sockets.connected[val.id].disconnect();
-            Privado.disconnect(val.id);
+            ChatIO.to(val).emit('offline');
+            ChatIO.sockets.connected[val].disconnect();
+            Privado.disconnect(val);
         });
     }
 
-    if(channel == 'admin-global'){
+    if(channel === 'admin-global'){
         ChatIO.emit('global', {
             user: message.user,
             message: message.message
