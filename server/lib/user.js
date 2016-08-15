@@ -5,7 +5,7 @@ var pool  = mysql.createPool(config.db);
 var _ = require('lodash');
 var User = {};
 User.onlineUsers = [];
-User.socketUsers = [];
+User.currentOnline = [];
 User.privateSockets = [];
 User.publicSockets = [];
 
@@ -137,8 +137,8 @@ User.getUserById = function(id){
 User.generateOnlineUsers = function() {
     var online = [];
     let usedIds = [];
-    this.publicSockets.forEach(function(val, index){
-        if(usedIds[val] !== undefined){
+    _.forOwn(this.publicSockets, (val, key) => {
+        if(usedIds[val] === undefined){
             let user = this.getUserById(val);
             online.push({
                 id: user.id,
@@ -147,14 +147,15 @@ User.generateOnlineUsers = function() {
             });
             usedIds[val] = true;
         }
-    });
+    })
     online.sort((a, b) => {
         if (a.user > b.user)
             return 1;
         if (a.user < b.user)
             return -1;
         return 0;
-    })
+    });
+    this.currentOnline = online;
     return online;
 }
 /**
@@ -166,7 +167,7 @@ User.getPubSocketById = function(id) {
     if(id === undefined) return null;
     let socketid = null;
     _.forOwn(this.publicSockets, (val, key) => {
-        if(id === val.id){
+        if(id === val){
             socketid = key;
             return false;
         }
@@ -183,7 +184,7 @@ User.getPubSocketsById = function(id) {
     if(id === undefined) return [];
     let socketid = [];
     _.forOwn(this.publicSockets, (val, key) => {
-        if(id === val.id){
+        if(id === val){
             socketid.push(key);
         }
     });
@@ -198,8 +199,8 @@ User.getPubSocketsById = function(id) {
 User.getPrivSocketById = function(id) {
     if(id === undefined) return null;
     let socketid = null;
-    _.forOwn(this.publicSockets, (val, key) => {
-        if(id === val.id){
+    _.forOwn(this.privateSockets, (val, key) => {
+        if(id === val){
             socketid = key;
             return false;
         }
@@ -215,29 +216,12 @@ User.getPrivSocketById = function(id) {
 User.getPrivSocketsById = function(id) {
     if(id === undefined) return [];
     let socketid = [];
-    _.forOwn(this.publicSockets, (val, key) => {
-        if(id === val.id){
+    _.forOwn(this.privateSockets, (val, key) => {
+        if(id === val){
             socketid.push(key);
         }
     });
     return socketid;
-}
-
-User.getIndexSocket = function(id) {
-    if(id === undefined) return -1;
-    let index = -1;
-    var found = false;
-    _.forOwn(this.socketUsers, (val, key) => {
-        index++;
-        if(id === val.id){
-            found = true;
-            return false;
-        }
-    });
-    if(found)
-        return index;
-    else
-        return -1;
 }
 
 

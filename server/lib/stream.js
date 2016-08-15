@@ -7,25 +7,28 @@ var stream  = {
 };
 
 stream.getStreamData = function(io) {
-    radio.getStationInfo('http://animeobsesion.net:8000', (error, station) => {
-        if(error){
-            console.error('Error on station: ', error);
-            return;
-        }
-        let oldData = {
-            title: this.title,
-            announcer: this.announcer,
-            url: this.url
-        };
-        this.title = station.title;
-        this.announcer = station.headers['icy-name'];
-        this.url = station.headers['icy-url'];
-        if(this.announcer !== oldData.announcer){
-            io.emit('system', {
-                message: '¡Ahora locuta ' + this.announcer + '!'
-            });
-        }
-    }, radio.StreamSource.STREAM);
+    let that = this;
+    process.nextTick(function() {
+        radio.getStationInfo('http://animeobsesion.net:8000', (error, station) => {
+            if(error){
+                console.error('Error on station: ', error);
+                return;
+            }
+            let oldData = {
+                title: that.title,
+                announcer: that.announcer,
+                url: that.url
+            };
+            that.title = station.title;
+            that.announcer = station.headers['icy-name'];
+            that.url = station.headers['icy-url'];
+            if(that.announcer !== oldData.announcer){
+                io.emit('system', {
+                    message: '¡Ahora locuta ' + that.announcer + '!'
+                });
+            }
+        }, radio.StreamSource.STREAM);
+    });
 }
 
 stream.getData = function(){

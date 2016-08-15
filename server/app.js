@@ -81,15 +81,16 @@ ChatIO.on('connection', (socket) => {
         json.last = _.now();
         json.messages = 0;
         json.logTime = _.now();
-        json.private = false;
         json.ready = false;
         currentUser = json;
-        if(User.pushData(json)){
-            let online = User.generateOnlineUsers();
-            ChatIO.emit('online', online); // Volvemos a generar los usuarios conectados.
-            console.log('Online users ',online);
-        }
         User.pushSocket(socket.id, json.id, false);
+        if(User.pushData(json)){
+            console.log(`Added user public ${json.user}`);
+            User.generateOnlineUsers();
+            ChatIO.emit('online', User.currentOnline); // Volvemos a generar los usuarios conectados.
+        }else{
+            ChatIO.to(socket.id).emit('online', User.currentOnline);
+        }
     });
     socket.on('message', (data) => {
         if (typeof(data.message) !== 'string') return;
@@ -144,25 +145,24 @@ ChatIO.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        let socketUser = User.publicSockets[socket.id];
-        let privSocket = User.privateSockets[socket.id];
-        if(socketUser === undefined) return;
-        let sockets = User.getPrivSocketsById(socketUser.id);
-        let userIndex = User.getUserIndexById(socketUser.id);
+        let socketUserId = User.publicSockets[socket.id];
+        if(socketUserId === undefined) return;
+        let sockets = User.getPubSocketsById(socketUserId);
+        let userIndex = User.getUserIndexById(socketUserId);
         let user = User.onlineUsers[userIndex];
         if(sockets.length > 1){
             User.deletePublicSocket(socket.id);
         }else{
+            let privSocket = User.getPrivSocketsById(user.id);
             if(privSocket !== undefined && privSocket.length > 0){
                 User.deletePublicSocket(socket.id);
             }else{
                 User.deleteUser(user.id)
                 User.deletePublicSocket(socket.id);
-                ChatIO.emit('online', User.generateOnlineUsers()); // Volvemos a generar los usuarios conectados.
-                console.log(`Disconnection user ${currentUser.user} [Public]`);
             }
+            ChatIO.emit('online', User.generateOnlineUsers()); // Volvemos a generar los usuarios conectados.
         }
-        console.log(User.onlineUsers);
+        console.log(`Disconnection user ${currentUser.user} [Public]`);
     });
 });
 

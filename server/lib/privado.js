@@ -36,7 +36,6 @@ function Privado(io, ChatIO) {
             json.last = _.now();
             json.messages = 0;
             json.logTime = _.now();
-            json.private = true;
             json.ready = false;
             currentUser = json;
             if(User.pushData(json)){
@@ -114,24 +113,22 @@ function Privado(io, ChatIO) {
 
         socket.on('disconnect', () => {
             let socketUser = User.privateSockets[socket.id];
-            let pubSocket = User.publicSockets[socket.id];
             if(socketUser === undefined) return;
-            let sockets = User.getPrivSocketsById(socketUser.id);
-            let userIndex = User.getUserIndexById(socketUser.id);
+            let sockets = User.getPrivSocketsById(socketUser);
+            let userIndex = User.getUserIndexById(socketUser);
             let user = User.onlineUsers[userIndex];
             if(sockets.length > 1){
                 User.deletePrivateSocket(socket.id);
             }else{
+                let pubSocket = User.getPubSocketsById(user.id);
                 if(pubSocket !== undefined && pubSocket.length > 0){
                     User.deletePrivateSocket(socket.id);
                 }else{
                     User.deleteUser(user.id)
                     User.deletePrivateSocket(socket.id);
                     ChatIO.emit('online', User.generateOnlineUsers()); // Volvemos a generar los usuarios conectados.
-                    console.log(`Disconnection user ${currentUser.user} [Private]`);
                 }
             }
-            console.log(User.onlineUsers);
         });
     });
 }
