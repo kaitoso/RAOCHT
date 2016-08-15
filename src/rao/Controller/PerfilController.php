@@ -38,6 +38,7 @@ class PerfilController extends BaseController
         return $this->view->render($response, 'perfil.twig', [
             'who' => $who,
             'whoRank' => $whoRank,
+            'whoPerm' => (object) $perm,
             'user' => $user,
             'delete' => $delete,
             'config' => $chatConfig

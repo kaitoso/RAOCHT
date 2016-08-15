@@ -50,9 +50,9 @@ $container['logger'] = function ($c) {
     return $logger;
 };
 
-/*$container['errorHandler'] = function ($c) {
+$container['errorHandler'] = function ($c) {
     return new App\Handler\Error\ErrorHandler($c['logger']);
-};*/
+};
 
 $c['notFoundHandler'] = function ($c) {
     return new App\Handler\Error\NotFound($c['view']);
