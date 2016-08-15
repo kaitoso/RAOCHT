@@ -67,7 +67,7 @@ function Privado(io, ChatIO) {
                 });
                 return;
             }
-            let remoteSockets = User.getUserSockets(data.to);
+            let remoteSockets = User.getPubSocketsById(data.to);
             let message = {
                 'id': currentUser.id,
                 'user': currentUser.user,
@@ -113,23 +113,25 @@ function Privado(io, ChatIO) {
         });
 
         socket.on('disconnect', () => {
-            let socketUser = User.socketUsers[socket.id];
+            let socketUser = User.privateSockets[socket.id];
+            let pubSocket = User.publicSockets[socket.id];
             if(socketUser === undefined) return;
-            let sockets = User.getUserSockets(socketUser.id);
+            let sockets = User.getPrivSocketsById(socketUser.id);
             let userIndex = User.getUserIndexById(socketUser.id);
             let user = User.onlineUsers[userIndex];
             if(sockets.length > 1){
-                if(socketUser.private){
-                    User.onlineUsers[userIndex].private = false;
-                }
-                User.deleteSocket(socket.id);
+                User.deletePrivateSocket(socket.id);
             }else{
-                User.deleteUser(user.id)
-                User.deleteSocket(socket.id);
-                ChatIO.emit('online', User.generateOnlineUsers()); // Volvemos a generar los usuarios conectados.
-                console.log(`Disconnection user ${currentUser.user}`);
+                if(pubSocket.length > 0){
+                    User.deletePrivateSocket(socket.id);
+                }else{
+                    User.deleteUser(user.id)
+                    User.deletePrivateSocket(socket.id);
+                    ChatIO.emit('online', User.generateOnlineUsers()); // Volvemos a generar los usuarios conectados.
+                    console.log(`Disconnection user ${currentUser.user} [Private]`);
+                }
             }
-            console.log(User.socketUsers, User.onlineUsers);
+            console.log(User.onlineUsers);
         });
     });
 }

@@ -144,27 +144,25 @@ ChatIO.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        let socketUser = User.socketUsers[socket.id];
+        let socketUser = User.publicSockets[socket.id];
+        let privSocket = User.privateSockets[socket.id];
         if(socketUser === undefined) return;
-        let sockets = User.getUserSockets(socketUser.id);
+        let sockets = User.getPrivSocketsById(socketUser.id);
         let userIndex = User.getUserIndexById(socketUser.id);
         let user = User.onlineUsers[userIndex];
         if(sockets.length > 1){
-            if(socketUser.private){
-                User.onlineUsers[userIndex].private = false;
-            }
-            User.deleteSocket(socket.id);
+            User.deletePublicSocket(socket.id);
         }else{
-            User.deleteUser(user.id)
-            User.deleteSocket(socket.id);
-            ChatIO.emit('online', User.generateOnlineUsers()); // Volvemos a generar los usuarios conectados.
-            console.log(`Disconnection user ${currentUser.user}`);
+            if(privSocket.length > 0){
+                User.deletePublicSocket(socket.id);
+            }else{
+                User.deleteUser(user.id)
+                User.deletePublicSocket(socket.id);
+                ChatIO.emit('online', User.generateOnlineUsers()); // Volvemos a generar los usuarios conectados.
+                console.log(`Disconnection user ${currentUser.user} [Public]`);
+            }
         }
-        if(currentUser !== null){
-            currentUser.logTime = _.now() - currentUser.logTime;
-            User.updateData(currentUser);
-        }
-        console.log(User.socketUsers, User.onlineUsers);
+        console.log(User.onlineUsers);
     });
 });
 
@@ -180,7 +178,7 @@ subscriber.on('message', (channel, data) => {
         if(index === -1) return;
         let user = User.onlineUsers[index];
         if(user === undefined) return;
-        let socket = User.getUserSocket(user.id);
+        let socket = User.getPubSocketById(user.id);
         if(socket === null) return;
         user.image = message.image;
         User.onlineUsers[index] = user;
@@ -204,7 +202,7 @@ subscriber.on('message', (channel, data) => {
         if(index === -1) return;
         let user = User.onlineUsers[index];
         if(user === undefined) return;
-        let socket = User.getUserSocket(user.id);
+        let socket = User.getPubSocketById(user.id);
         if(socket === null) return;
         user.chatName = message.chatName;
         user.chatColor = message.chatColor;
@@ -227,7 +225,7 @@ subscriber.on('message', (channel, data) => {
         if(index === null) return;
         let user = User.onlineUsers[index];
         if(user === undefined) return;
-        let socket = User.getUserSocket(user.id);
+        let socket = User.getPubSocketById(user.id);
         if(socket === null) return;
         ChatIO.to(socket.id).emit('achievement', {
             achievement: true
@@ -246,7 +244,7 @@ subscriber.on('message', (channel, data) => {
         if(index === null) return;
         let user = User.onlineUsers[index];
         if(user === undefined) return;
-        let socket = User.getUserSocket(user.id);
+        let socket = User.getPubSocketById(user.id);
         if(socket === null) return;
         user.image = message.image;
         User.onlineUsers[index] = user;
@@ -268,7 +266,7 @@ subscriber.on('message', (channel, data) => {
         if(index === null) return;
         let user = User.onlineUsers[index];
         if(user === undefined) return;
-        let socket = User.getUserSocket(user.id);
+        let socket = User.getPubSocketById(user.id);
         if(socket === null) return;
         user.user = message.user;
         user.rank = message.rank;
@@ -290,7 +288,7 @@ subscriber.on('message', (channel, data) => {
         if(index === null) return;
         let user = User.onlineUsers[index];
         if(user === undefined) return;
-        let socket = User.getUserSocket(user.id);
+        let socket = User.getPubSocketById(user.id);
         if(socket === null) return;
         user.chatName = message.chatName;
         user.chatColor = message.chatColor;
@@ -313,7 +311,7 @@ subscriber.on('message', (channel, data) => {
     }
 
     if(channel === 'ban-chat'){
-        let socket = User.getUserSockets(message.id);
+        let socket = User.getPubSocketsById(message.id);
         if(socket.length === 0) return;
         socket.forEach(function(val, index){
             ChatIO.to(val.id).emit('offline');
