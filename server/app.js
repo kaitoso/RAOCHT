@@ -153,7 +153,7 @@ ChatIO.on('connection', (socket) => {
         if(sockets.length > 1){
             User.deletePublicSocket(socket.id);
         }else{
-            if(privSocket.length > 0){
+            if(privSocket !== undefined && privSocket.length > 0){
                 User.deletePublicSocket(socket.id);
             }else{
                 User.deleteUser(user.id)

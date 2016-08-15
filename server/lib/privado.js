@@ -122,7 +122,7 @@ function Privado(io, ChatIO) {
             if(sockets.length > 1){
                 User.deletePrivateSocket(socket.id);
             }else{
-                if(pubSocket.length > 0){
+                if(pubSocket !== undefined && pubSocket.length > 0){
                     User.deletePrivateSocket(socket.id);
                 }else{
                     User.deleteUser(user.id)
