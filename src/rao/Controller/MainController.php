@@ -96,13 +96,17 @@ class MainController extends BaseController
         }else{
             $this->session->delete('user_ban');
         }
-        return $this->view->render($response, 'login.twig', ['ban' => $ban]);
+        $chatConfig = json_decode(file_get_contents(__DIR__.'/../Config/Chat.json'));
+        return $this->view->render($response, 'login.twig', [
+            'ban' => $ban,
+            'config' => $chatConfig
+        ]);
     }
 
     public function getLogout(Request $request, Response $response, $args)
     {
         if ($this->session->get('user_id') === null) {
-            return $this->redirectTo($response, $this->router->pathFor('auth.login'));
+            return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
         }
         $cookie = FigRequestCookies::get($request, 'raoRemember');
         if(!empty($cookie->getValue())){
@@ -118,7 +122,7 @@ class MainController extends BaseController
         $this->redis->delete($this->container->session->getSessionId());
         /* Borramos datos del usuario */
         $this->session->destroySession();
-        return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+        return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
     }
 
     public function getForgot(Request $request, Response $response, $args)
@@ -135,7 +139,7 @@ class MainController extends BaseController
                 $this->session->set('user_ban', true);
             }
             $this->session->delete('user_id');
-            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+            return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
         }
 
         $this->view->render($response, 'forgot.twig');
@@ -150,9 +154,26 @@ class MainController extends BaseController
         $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
         if(!empty($this->session->get('user_ban')) || $ban){
             $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
-            return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+            return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
         }
         return $this->view->render($response, 'registro.twig');
+    }
+
+    public function getSignUpSocial(Request $request, Response $response, $args)
+    {
+        if ($this->session->get('user_id') !== null) {
+            $redirect = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $this->router->pathFor('main.page');
+            return $this->withRedirect($response, $redirect);
+        }
+        if(empty($this->session->get('socialEmail'))){
+            return $this->withRedirectWithout($response, $this->router->pathFor('auth.signup'));
+        }
+        $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
+        if(!empty($this->session->get('user_ban')) || $ban){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
+        }
+        return $this->view->render($response, 'registro-social.twig', ['socialEmail' => $this->session->get('socialEmail')]);
     }
 
     public function postLogin(Request $request, Response $response, $args)
@@ -213,9 +234,6 @@ class MainController extends BaseController
             $this->session->set('user', $user->user);
             $this->session->set('rank', $user->rank);
             /* Actualizar el ultimo inicio de sesión */
-            if(!empty($this->session->get('fb_id'))){
-                $user->facebookId = $this->session->get('fb_id');
-            }
             $user->ip = $request->getAttribute('ip_address');
             $user->lastLogin = date('Y-m-d H:i:s');
             $user->save();
@@ -269,6 +287,7 @@ class MainController extends BaseController
                     'message' => '',
                 ), 200);
             } else {
+                $this->session->delete('socialEmail');
                 return $this->withRedirect($response, $redir);
             }
         } else {
@@ -293,12 +312,12 @@ class MainController extends BaseController
             'rPassword' => v::noWhitespace()->notEmpty()->length(6)->stringType(),
             'raoToken' => v::noWhitespace()->notEmpty()
         ]);
-
+        $pathFor = empty($this->session->get('socialEmail')) ? 'auth.signup' : 'auth.signup.social';
         if($validation->failed()){
             if($request->isXhr()){
                 return $response->withJson(['error' => $this->session->get('errors')]);
             }
-            return $this->withRedirect($response,  $this->router->pathFor('auth.signup'));
+            return $this->withRedirect($response,  $this->router->pathFor($pathFor));
         }
 
         $inputUser = $request->getParam('user');
@@ -309,18 +328,22 @@ class MainController extends BaseController
 
         if($this->session->get('token') !== $inputToken){
             $this->flash->addMessage('error', 'Éste token es inválido.');
-            return $this->withRedirect($response, $this->router->pathFor('auth.signup'));
+            return $this->withRedirect($response, $this->router->pathFor($pathFor));
         }
         if($password !== $rPassword){
             $this->flash->addMessage('error', 'Las contraseñas escritas son diferentes. Verifica por favor los campos.');
-            return $this->withRedirect($response,  $this->router->pathFor('auth.signup'));
+            return $this->withRedirect($response,  $this->router->pathFor($pathFor));
         }
         $user = User::where('user', $inputUser)
             ->orWhere('email', $inputEmail)
             ->first();
         if($user){
-            $this->flash->addMessage('error', 'Este usuario/correo electrónico ya se encuentra registrado. Intente con otros.');
-            return $this->withRedirect($response,  $this->router->pathFor('auth.signup'));
+            if(empty($this->session->get('socialEmail'))){
+                $this->flash->addMessage('error', 'Este usuario/correo electrónico ya se encuentra registrado. Intente con otros.');
+            }else{
+                $this->flash->addMessage('error', 'Este usuario ya se encuentra registrado. Intente con otros.');
+            }
+            return $this->withRedirect($response,  $this->router->pathFor($pathFor));
         }
         /* Crear imagen del usuario */
         $image = $inputUser. hash('sha256', time());
@@ -339,6 +362,7 @@ class MainController extends BaseController
         $newUser->chatName = $inputUser;
         $newUser->image = $image.'.png';
         $newUser->ip = $request->getAttribute('ip_address');
+        $newUser->activated = empty($this->session->get('socialEmail')) ? 0 : 1;
         $newUser->lastLogin = date('Y-m-d H:i:s');
         if(!empty($this->session->get('fb_id'))){
             $newUser->facebookId = $this->session->get('fb_id');
@@ -353,13 +377,21 @@ class MainController extends BaseController
         $profile = new UserProfile();
         $profile->user_id = $newUser->id;
         $profile->save();
-
-        $email = new Email($this->email);
-        $email->sendActivationEmail($this->view->getEnvironment(), $newUser);
-        $this->flash->addMessage('success', '¡Te has registrado correctamente en el chat!
-        En unos momentos te estaremos enviando un correo electrónico con los datos de activación.
-        Si éste no llega en menos de 10 minutos, revisa tu bandeja de correos no deseados o spam.');
-        return $this->withRedirect($response,  $this->router->pathFor('auth.login'));
+        if(empty($this->session->get('socialEmail'))){
+            $email = new Email($this->email);
+            $email->sendActivationEmail($this->view->getEnvironment(), $newUser);
+            $this->flash->addMessage('success', '¡Te has registrado correctamente en el chat!
+            En unos momentos te estaremos enviando un correo electrónico con los datos de activación.
+            Si éste no llega en menos de 10 minutos, revisa tu bandeja de correos no deseados o spam.');
+            return $this->withRedirect($response,  $this->router->pathFor('auth.login'));
+        }else{
+            // Iniciamos sesión
+            $this->session->set('user_id', $newUser->id);
+            $this->session->set('user', $newUser->user);
+            $this->session->set('rank', $newUser->rank);
+            $this->session->delete('socialEmail');
+            return $this->withRedirect($response, $this->router->pathFor('main.page'));
+        }
     }
 
     public function postForgot(Request $request, Response $response, $args)

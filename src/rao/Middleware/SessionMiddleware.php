@@ -48,7 +48,10 @@ class SessionMiddleware extends Middleware{
                     )));
                 }
             }
-        }else if(!empty($this->container->session->get('user_id'))){
+        }
+        $pathMain = $request->getUri()->getPath() === $this->container->router->pathFor('main.page');
+        $pathPriv = $request->getUri()->getPath() === $this->container->router->pathFor('private.main');
+        if(!empty($this->container->session->get('user_id')) && ($pathMain || $pathPriv)){
             $this->container->redis->delete($this->container->session->getSessionId());
             $user = User::find($this->container->session->get('user_id'));
             $this->container->redis->setex($this->container->session->getSessionId(), 3600, json_encode(array(

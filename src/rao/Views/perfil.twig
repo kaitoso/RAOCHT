@@ -121,12 +121,12 @@
 				<a href="{{ path_for('private.main') }}#{{ user.id }}" class="btn btn-info btn-block"><i class="fa fa-envelope"></i> Mensaje privado</a>
 			{% endif %}
             {% if not (user.id in [1, 2]) %}
-            {% if whoPerm.ban is defined %}
-                <a href="{{ path_for('admin.ban', {name: user.user}) }}" class="btn btn-danger btn-block"><i class="fa fa-ban"></i> Expulsar</a>
-            {% endif %}
-            {% if whoPerm.user is defined %}
-                <a href="{{ path_for('admin.user.update', {id: user.id}) }}" class="btn btn-warning btn-block"><i class="fa fa-pencil-square-o"></i> Modificar</a>
-            {% endif %}
+				{% if whoPerm.ban is defined %}
+					<a href="{{ path_for('admin.ban', {name: user.user}) }}" class="btn btn-danger btn-block"><i class="fa fa-ban"></i> Expulsar</a>
+				{% endif %}
+				{% if whoPerm.user is defined %}
+					<a href="{{ path_for('admin.user.update', {id: user.id}) }}" class="btn btn-warning btn-block"><i class="fa fa-pencil-square-o"></i> Modificar</a>
+				{% endif %}
             {% endif %}
 		</div>
 		<div class="col-xs-12 col-sm-9">

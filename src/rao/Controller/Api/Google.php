@@ -56,15 +56,19 @@ class Google extends BaseController
         $token_data = $client->verifyIdToken();
         $user_id = $token_data['sub'];
         $user_email = $token_data['email'];
+        $this->session->set('google_id', $user_id);
         $user = User::where('googleId', $user_id)->first();
         if(!$user){
-            $this->session->set('social_email', $user_email);
-            $this->session->set('google_id', $user_id);
-            $this->flash->addMessage(
-                'error',
-                'Aún no has ligado esta cuenta de Google+ a una cuenta del chat. Ingresa con tus credenciales. '.$user_id
-            );
-            return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
+            $email = User::where('email', $user_email)->first();
+            if(!empty($email)){
+                $this->container->flash->addMessage(
+                    'error',
+                    "¡Error! Al parecer el correo electrónico \"{$user_email}\" ya se encuentra registrado en la base de datos. Intenta iniciar sesión con tus datos."
+                );
+                return $this->withRedirectWithout($response, $this->container->router->pathFor('auth.login'));
+            }
+            $this->session->set('socialEmail', $user_email);
+            return $this->withRedirectWithout($response, $this->container->router->pathFor('auth.signup.social'));
         }
         $this->session->set('user_id', $user->id);
         $this->session->set('user', $user->user);

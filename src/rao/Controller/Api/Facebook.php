@@ -70,7 +70,7 @@ class Facebook extends BaseController
             }
         }
         try {
-            $fbResp = $this->fb->get('/me', $accessToken->getValue() );
+            $fbResp = $this->fb->get('/me?fields=name,email', $accessToken->getValue() );
             $userNode = $fbResp->getGraphUser();
         } catch(FacebookResponseException $e) {
             $this->logger->critical("FB-Error [{$e->getLine()}]: ". $e->getMessage());
@@ -82,12 +82,16 @@ class Facebook extends BaseController
         $this->session->set('fb_id', $userNode->getId());
         $user = User::where('facebookId', '=', $userNode->getId())->first();
         if(empty($user)){
-            $this->container->flash->addMessage(
-                'error',
-                '¡Error! Al parecer no has ligado tu cuenta del chat con Facebook. 
-                Intenta iniciar sesión con tus datos.'
-            );
-            return $this->withRedirectWithout($response, $this->container->router->pathFor('auth.login'));
+            $email = User::where('email', $userNode['email'])->first();
+            if(!empty($email)){
+                $this->container->flash->addMessage(
+                    'error',
+                    "¡Error! Al parecer el correo electrónico \"{$userNode['email']}\" ya se encuentra registrado en la base de datos. Intenta iniciar sesión con tus datos."
+                );
+                return $this->withRedirectWithout($response, $this->container->router->pathFor('auth.login'));
+            }
+            $this->session->set('socialEmail', $userNode['email']);
+            return $this->withRedirectWithout($response, $this->container->router->pathFor('auth.signup.social'));
         }
         // Guardar sesión
         $this->session->set('user_id', $user->id);

@@ -1,0 +1,110 @@
+{% extends 'templates/base-login.twig' %}
+{% block title %}Registro{% endblock %}
+{% block css %}
+    <style type="text/css">
+        .form-control {
+            background-color: #ecf2f4;
+            /*border: medium none;*/
+            border-radius: 0.2rem;
+            padding: 1rem;
+            width: 100%;
+            box-shadow: none;
+        }
+        .form-group{
+            margin-bottom: 1.4rem;
+        }
+    </style>
+{% endblock %}
+{% block contenido %}
+    <div class="alert alert-info">
+    	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    	<strong>¡Sólo un paso más!</strong> Rellena los datos faltantes para que puedas ingresar al chat.
+    </div>
+    <form class="form-signin" id="loginForm" role="form" method="post" action="/signup">
+        <legend><i class="fa fa-user-plus"></i> Registro</legend>
+        <div class="form-group {% if errors.email %} has-error {% endif %}">
+            <input type="email" name="email" id="inputEmail" class="form-control" required maxlength="255" value="{{ socialEmail }}" readonly>
+            <span class="help-block">
+                    {% if errors.email %}
+                        {{ errors.email | first }}
+                    {% endif %}
+                </span>
+        </div>
+        <div class="form-group {% if errors.user %} has-error {% endif %}">
+            <input type="text" name="user" id="inputUsuario" class="form-control" placeholder="Usuario..." required maxlength="30" value="{{ old.user }}">
+            <span class="help-block">
+                    {% if errors.user %}
+                        {{ errors.user | first }}
+                    {% endif %}
+                </span>
+        </div>
+        <div class="form-group {% if errors.password %} has-error {% endif %}">
+            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Contraseña" required>
+            <span class="help-block">
+                    {% if errors.password %}
+                        {{ errors.password | first }}
+                    {% endif %}
+                </span>
+        </div>
+        <div class="form-group {% if errors.rPassword %} has-error {% endif %}">
+            <input type="password" name="rPassword" id="inputPasswordRepeat" class="form-control" placeholder="Confirmar contraseña" required>
+            <span class="help-block">
+                    {% if errors.rPassword %}
+                        {{ errors.rPassword | first }}
+                    {% endif %}
+                </span>
+        </div>
+        {{ csrf.field | raw }}
+        <button class="btn btn-lg btn-danger btn-block" id="btnIngresar" type="submit">Registrarme</button>
+        <div class="bottom text-center">
+            ¿Ya tienes cuenta? <a href="{{ path_for('auth.login') }}"><b>Inicia sesión</b></a>
+        </div>
+    </form>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        function isEmail(email) {
+            return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email);
+        }
+        $('#inputEmail').blur(function(event) {
+            var $input = $(this);
+            var $helper = $input.next();
+            var $parent = $input.parent();
+            if(!$input.val()) return;
+            if (!isEmail($input.val())) {
+                $helper.text('Este correo electrónico no es valido.');
+                $parent.addClass('has-error');
+            } else {
+                $helper.text('');
+                $parent.removeClass('has-error');
+            }
+        });
+
+        $('#inputPassword').blur(function(event) {
+            var $input = $(this);
+            var $helper = $input.next();
+            var $parent = $input.parent();
+            if(!$input.val()) return;
+            if ($input.val().length < 4) {
+                $helper.text('Ingresa al menos una contraseña válida.');
+                $parent.addClass('has-error');
+            } else {
+                $helper.text('');
+                $parent.removeClass('has-error');
+            }
+        });
+        $('#inputPasswordRepeat').blur(function(event) {
+            var $input = $(this);
+            var $helper = $input.next();
+            var $parent = $input.parent();
+            if(!$input.val()) return;
+            if ($input.val().length < 4) {
+                $helper.text('Ingresa al menos una contraseña válida.');
+                $parent.addClass('has-error');
+            } else {
+                $helper.text('');
+                $parent.removeClass('has-error');
+            }
+        });
+    </script>
+{% endblock %}

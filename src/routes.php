@@ -4,6 +4,7 @@ $app->get('/', 'App\MainController:index')->setName('main.page');
 $app->get('/error', 'App\MainController:error')->setName('main.error');
 $app->get('/login', 'App\MainController:getLogin')->setName('auth.login');
 $app->get('/signup', 'App\MainController:getSignUp')->setName('auth.signup');
+$app->get('/signup-social', 'App\MainController:getSignUpSocial')->setName('auth.signup.social');
 $app->get('/logout', 'App\MainController:getLogout')->setName('auth.logout');
 $app->get('/forgot', 'App\MainController:getForgot')->setName('auth.forgot');
 
