@@ -89,5 +89,21 @@ class Email
         $mailer->send($message);
     }
 
+    public function sendWelcomeEmail(\Twig_Environment $twig, User $user)
+    {
+        $mailer = Swift_Mailer::newInstance($this->connection);
+        $message = Swift_Message::newInstance()
+            ->setSubject("¡Bienvenido al chat {$user->user}!")
+            ->setFrom(array('contacto@asner.xyz' => 'Bienvenida - Chat Anime Obsesión'))
+            ->setTo($user->email)
+            ->setBody(
+                $twig->render(
+                    'email/welcome.twig', [
+                        'user' => $user
+                    ]
+                ), 'text/html');
+        $mailer->send($message);
+    }
+
 
 }

@@ -366,25 +366,29 @@ class MainController extends BaseController
         $newUser->lastLogin = date('Y-m-d H:i:s');
         if(!empty($this->session->get('fb_id'))){
             $newUser->facebookId = $this->session->get('fb_id');
+            $newUser->activated = 1;
         }
         if(!empty($this->session->get('twitter_id'))){
             $newUser->twitterId = $this->session->get('twitter_id');
+            $newUser->activated = 1;
         }
         if(!empty($this->session->get('google_id'))){
             $newUser->googleId = $this->session->get('google_id');
+            $newUser->activated = 1;
         }
         $newUser->save();
         $profile = new UserProfile();
         $profile->user_id = $newUser->id;
         $profile->save();
+        $email = new Email($this->email);
         if(empty($this->session->get('socialEmail'))){
-            $email = new Email($this->email);
             $email->sendActivationEmail($this->view->getEnvironment(), $newUser);
             $this->flash->addMessage('success', '¡Te has registrado correctamente en el chat!
             En unos momentos te estaremos enviando un correo electrónico con los datos de activación.
             Si éste no llega en menos de 10 minutos, revisa tu bandeja de correos no deseados o spam.');
             return $this->withRedirect($response,  $this->router->pathFor('auth.login'));
         }else{
+            $email->sendWelcomeEmail($this->view->getEnvironment(), $newUser);
             // Iniciamos sesión
             $this->session->set('user_id', $newUser->id);
             $this->session->set('user', $newUser->user);

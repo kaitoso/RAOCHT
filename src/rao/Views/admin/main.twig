@@ -17,11 +17,11 @@
             <h1 id="onlineUsers">Cargando...</h1>
             <h3>Usuarios conectados</h3>
         </div>
-        <div class="col-sm-3 text-center">
+        <div class="col-sm-3 text-center" style="border-right: 1px solid lightgray; border-left: 1px solid lightgray;">
             <h1 id="banUsers">Cargando...</h1>
             <h3>Expulsados de hoy</h3>
         </div>
-        <div class="col-sm-3 text-center">
+        <div class="col-sm-3 text-center" style="border-right:1px lightgray solid;">
             <h1 id="logrosToday">Cargando...</h1>
             <h3>Logros entregados el día de hoy</h3>
         </div>
@@ -34,6 +34,17 @@
 {% block js %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
     <script>
+        function updateCounter(classname, new_value){
+            var CurrentValue = $(classname).text();
+            $({someValue: CurrentValue}).animate({someValue: new_value}, {
+                duration: 3000,
+                easing:'swing',
+                step: function() {
+                    $(classname).text(Math.round(this.someValue));
+                }
+            });
+        }
+
         var meses = [
             'Enero',
             'Febrero',
@@ -54,8 +65,8 @@
 
         function getUserData(){
             $.getJSON('{{ path_for('admin.main.stats') }}', function (data) {
-                $('#banUsers').text(data.bans);
-                $('#logrosToday').text(data.logros);
+                updateCounter('#banUsers', data.bans);
+                updateCounter('#logrosToday', data.logros);
                 var ctx = document.getElementById("chartUsers").getContext("2d");
                 var lineChart = new Chart(ctx, {
                     type: 'line',
@@ -74,11 +85,10 @@
         }
         function getServerData(){
             $.getJSON('/socket.io', function (data) {
-                $('#onlineUsers').text(data.users);
+                updateCounter('#onlineUsers', data.users);
                 var currentTime = new Date().getTime();
                 var diff = ((currentTime - data.messages.start)/1000)/60;
-                console.log(diff);
-                $('#messagesMinute').text((data.messages.count/diff).toFixed(2));
+                updateCounter('#messagesMinute', (data.messages.count/diff).toFixed(2));
             });
         }
         setInterval(function() {
