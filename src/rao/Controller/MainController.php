@@ -141,8 +141,8 @@ class MainController extends BaseController
             $this->session->delete('user_id');
             return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
         }
-
-        $this->view->render($response, 'forgot.twig');
+        $chatConfig = json_decode(file_get_contents(__DIR__.'/../Config/Chat.json'));
+        $this->view->render($response, 'forgot.twig', ['config' => $chatConfig]);
     }
 
     public function getSignUp(Request $request, Response $response, $args)
@@ -156,7 +156,8 @@ class MainController extends BaseController
             $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
             return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
         }
-        return $this->view->render($response, 'registro.twig');
+        $chatConfig = json_decode(file_get_contents(__DIR__.'/../Config/Chat.json'));
+        return $this->view->render($response, 'registro.twig', ['config' => $chatConfig]);
     }
 
     public function getSignUpSocial(Request $request, Response $response, $args)
@@ -173,7 +174,11 @@ class MainController extends BaseController
             $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
             return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
         }
-        return $this->view->render($response, 'registro-social.twig', ['socialEmail' => $this->session->get('socialEmail')]);
+        $chatConfig = json_decode(file_get_contents(__DIR__.'/../Config/Chat.json'));
+        return $this->view->render($response, 'registro-social.twig', [
+            'socialEmail' => $this->session->get('socialEmail'),
+            'config' => $chatConfig
+        ]);
     }
 
     public function postLogin(Request $request, Response $response, $args)

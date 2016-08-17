@@ -2,6 +2,12 @@
 {% block title %}Registro{% endblock %}
 {% block css %}
     <style type="text/css">
+        body{
+        {% if config.background %}
+            background: url("{{ base_url() }}/assets/img/{{ config.background }}") no-repeat fixed left center / cover ;
+        {% endif %}
+            background-size: cover;
+        }
         .form-control {
             background-color: #ecf2f4;
             /*border: medium none;*/
