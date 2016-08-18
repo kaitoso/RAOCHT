@@ -161,6 +161,7 @@ function getCache() {
                 }
                 var currentTime = new Date().getTime();
                 if (currentTime > $chat.last + ($chat.seed * 1000 * 60)) {
+                    $chat.check.stop();
                     socket.disconnect();
                     $.getJSON($baseUrl+'/logout', function(data){
                         console.log(data);
@@ -177,7 +178,7 @@ function getCache() {
                         window.location.href=$baseUrl+'/login';
                     });
                 }
-            }, 5000);
+            }, 30000);
             $chat.check.start();
         }
     });
@@ -329,11 +330,13 @@ socket.on('restart', function () {
 });
 
 socket.on('offline', function () {
+    $chat.check.stop();
     socket.disconnect();
     window.location.href=$baseUrl+'/login';
 });
 
 socket.on('kick', function (message) {
+    $chat.check.stop();
     socket.disconnect();
     $.getJSON($baseUrl+'/logout', function(data){
        console.log(data);
