@@ -130,6 +130,47 @@
         </div>
     </div>
 </form>
+    {% verbatim %}
+<script id="logroTemplate" type="text/x-handlebars-template">
+    <a href="#inputLogro">
+        <small class="typeahead-image"><img src="{% endverbatim %}{{ base_url() }}/achievements/{% verbatim %}{{image}}"></small>
+        <strong>{{name}}</strong>
+    </a>
+</script>
+{% endverbatim %}
 {% endblock %}
 {% block js %}
+    <script src="{{ base_url() }}/dist/js/handlebars.js"></script>
+    <script src="{{ base_url() }}/dist/js/typeahead.min.js"></script>
+    <script>
+        var $logroTemplate = Handlebars.compile($('#logroTemplate').html());
+        var $logro = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            remote: {
+                wildcard: '%QUERY',
+                url: '{{ base_url() }}/admin/search/logro/%QUERY'
+            }
+        });
+        $logro.initialize();
+        $('#inputLogro').typeahead({
+            minLength: 3
+        }, {
+            display: 'name',
+            limit: 10,
+            source: $logro.ttAdapter(),
+            templates: {
+                empty: [
+                    '<div class="empty-message">',
+                    'No se encontró a ningún logro con este nombre.',
+                    '</div>'
+                ].join('\n'),
+                suggestion: $logroTemplate
+            }
+        });
+        $('.typeahead').bind('typeahead:select', function(ev, logro) {
+            ev.preventDefault();
+            $('input[name=inputLogro]').val(logro.id)
+        });
+    </script>
 {% endblock %}
