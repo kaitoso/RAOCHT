@@ -67,6 +67,7 @@ function Privado(io, ChatIO) {
                 return;
             }
             let remoteSockets = User.getPubSocketsById(data.to);
+            let mySockets = User.getPubSocketsById(currentUser.id);
             let message = {
                 'id': currentUser.id,
                 'user': currentUser.user,
@@ -84,16 +85,21 @@ function Privado(io, ChatIO) {
                 return;
             }
             let sendToMain = true;
-            let privates = _.filter(remoteSockets, (o) => { return o.private === true });
+            let privates = User.getPrivSocketsById(data.to);
             if(privates.length > 0){
                 _.each(privates, function(val, index){
-                    PrivIO.to(val.id).emit('message', message);
+                    PrivIO.to(val).emit('message', message);
                     sendToMain = false;
                 });
             }else{
                 _.each(remoteSockets, function(val, index){
-                    ChatIO.to(val.id).emit('privado', message);
+                    ChatIO.to(val).emit('privado', message);
                 });
+            }
+            if(mySockets.length > 0){
+                _.each(mySockets, function (val, index) {
+                    ChatIO.to(val).emit('activity');
+                })
             }
         });
 

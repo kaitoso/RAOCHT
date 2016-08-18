@@ -158,7 +158,7 @@ class AppSchemas
         $rol = new \App\Model\Rank();
         $rol->name = 'Administrador';
         $rol->permissions = '["ban", "unban", "rank", "user", "logro", "chat", "smilie, "global"]';
-        $rol->chatPermissions = '["images","videos","audio"]';
+        $rol->chatPermissions = '["images","videos","audio", "nokick"]';
         $rol->immunity = 1;
         $rol->save();
         $rol = new \App\Model\Rank();

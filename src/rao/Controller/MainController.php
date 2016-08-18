@@ -106,6 +106,9 @@ class MainController extends BaseController
     public function getLogout(Request $request, Response $response, $args)
     {
         if ($this->session->get('user_id') === null) {
+            if($request->isXhr()){
+                return $this->showJSONResponse($response, ['error' => 'No has iniciado sesión.']);
+            }
             return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
         }
         $cookie = FigRequestCookies::get($request, 'raoRemember');
@@ -122,6 +125,9 @@ class MainController extends BaseController
         $this->redis->delete($this->container->session->getSessionId());
         /* Borramos datos del usuario */
         $this->session->destroySession();
+        if($request->isXhr()){
+            return $this->showJSONResponse($response, ['success' => 'Se ha desconectado con éxito.']);
+        }
         return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
     }
 

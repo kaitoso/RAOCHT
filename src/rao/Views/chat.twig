@@ -28,7 +28,7 @@
             <img id="controlImage" src="{{ base_url() }}/avatar/b/{{ user.image }}">
             <div class="userControl">
                 <h3 id="controlUser">{{ user.user }}</h3>
-                <h4 id="controlRank">{{ user.getRank.name }}</h4>
+                <h4 id="controlRank" data-rank="{{ user.rank }}">{{ user.getRank.name }}</h4>
             </div>
             <div id="userData"></div>
         </div>

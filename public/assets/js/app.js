@@ -152,6 +152,33 @@ function getCache() {
         if(!$config.ready){
             socket.emit('ready', {ready: true});
             $config.ready = true;
+            $chat.check = new Interval(function() {
+                var rankid = $('#controlRank').data('rank');
+                var perms = array_flip(getRank(rankid).permission);
+                if(perms.nokick != null){
+                    $chat.check.stop();
+                    return;
+                }
+                var currentTime = new Date().getTime();
+                if (currentTime > $chat.last + ($chat.seed * 1000 * 60)) {
+                    socket.disconnect();
+                    $.getJSON($baseUrl+'/logout', function(data){
+                        console.log(data);
+                    });
+                    swal({
+                        title: '¡Te han pateado!',
+                        text: "Por la razón de: estuviste más de " + $chat.seed + " minutos sin enviar ningún mensaje",
+                        type: 'warning',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: '¡Ya que!'
+                    }).then(function() {
+                        window.location.href=$baseUrl+'/login';
+                    });
+                }
+            }, 5000);
+            $chat.check.start();
         }
     });
 }
@@ -219,7 +246,8 @@ var $chat = {
     counter: 0,
     interval: null,
     privates: 0,
-    seed: Math.floor(Math.random() * (20 - 30 + 1)) + 20
+    seed: Math.floor(Math.random()*(25-20+1)+20),
+    check: null
 };
 /* Chat Events */
 socket.on('message', function (user) {
@@ -242,13 +270,18 @@ socket.on('system', function(message){
 
 socket.on('update', function (user) {
     var userRank = getRank(user.rank);
+    var perms = array_flip(userRank.permission);
     $('#controlUser').text(user.user);
     $('#controlRank').text(userRank.name);
+    $('#controlRank').data('rank', user.rank);
     $('#controlImage').attr('src', user.image);
     if(userRank.permission.length > 0){
         $('#adminView').show();
     }else{
         $('#adminView').hide();
+    }
+    if(perms.nokick === undefined) {
+        $chat.check.start();
     }
 });
 
@@ -296,11 +329,15 @@ socket.on('restart', function () {
 });
 
 socket.on('offline', function () {
-    window.location.href = 'logout';
+    socket.disconnect();
+    window.location.href=$baseUrl+'/login';
 });
 
 socket.on('kick', function (message) {
-    window.location.href='logout';
+    socket.disconnect();
+    $.getJSON($baseUrl+'/logout', function(data){
+       console.log(data);
+    });
     swal({
         title: '¡Te han pateado!',
         text: "Por la razón de: " + message.reason,
@@ -310,8 +347,12 @@ socket.on('kick', function (message) {
         cancelButtonColor: '#d33',
         confirmButtonText: '¡Ya que!'
     }).then(function() {
-        window.location.href='logout';
-    })
+        window.location.href=$baseUrl+'/login';
+    });
+});
+
+socket.on('activity', function(){
+    $chat.last = new Date().getTime();
 });
 
 socket.on("disconnect", function () {
@@ -333,6 +374,7 @@ $('#messageBox').submit(function (e) {
     setTimeout(function () {
         sendReady = true;
     }, 1000);
+    $chat.last = new Date().getTime();
     $msgInput.val('');
 });
 $('.chatbox').on('click', '.openVideo', function (event) {
