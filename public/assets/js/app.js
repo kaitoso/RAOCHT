@@ -330,13 +330,17 @@ socket.on('restart', function () {
 });
 
 socket.on('offline', function () {
-    $chat.check.stop();
+    if ($chat.check instanceof Interval) {
+        $chat.check.stop();
+    }
     socket.disconnect();
     window.location.href=$baseUrl+'/login';
 });
 
 socket.on('kick', function (message) {
-    $chat.check.stop();
+    if ($chat.check instanceof Interval) {
+        $chat.check.stop();
+    }
     socket.disconnect();
     $.getJSON($baseUrl+'/logout', function(data){
        console.log(data);
