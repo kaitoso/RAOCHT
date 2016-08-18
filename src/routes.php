@@ -123,6 +123,7 @@ $app->group('/admin', function () {
     $this->delete('/chat/side','App\Admin\ChatController:deleteSide');
 
     $this->get('/search/user/{user}', 'App\Admin\SearchController:getUser');
+    $this->get('/search/logro/{name}', 'App\Admin\SearchController:getLogro')->setName('admin.search.logro');
     $this->get('/search/users', 'App\Admin\SearchController:getUsers');
     //$this->get('/search/bans[/{offset}[/{limit}[/{order}]]]', 'App\Admin\SearchController:getBans');
     $this->get('/search/bans', 'App\Admin\SearchController:getBans');

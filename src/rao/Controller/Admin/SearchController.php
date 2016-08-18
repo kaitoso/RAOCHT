@@ -26,6 +26,22 @@ class SearchController extends BaseController
         return $this->showJSONResponse($response, $userLike->toArray());
     }
 
+    public function getLogro(Request $request, Response $response, $args)
+    {
+        $validation = $this->validator->validateArgs($request, [
+            'name' => v::notEmpty()->alnum(',;.:-_^*+-/¡!¿?()áéíóúÁÉÍÓÚñÑ')->length(1, 50)
+        ]);
+        if($validation->failed()){
+            return $this->showJSONResponse($response, ['error' => $this->session->get('errors')]);
+        }
+        $inputLogro = $request->getAttribute('name');
+        $logroLike = Achievement::select('id', 'name', 'image')
+            ->where('name', 'LIKE', "%{$inputLogro}%")
+            ->take(4)
+            ->get();
+        return $this->showJSONResponse($response, $logroLike->toArray());
+    }
+
     public function getUsers(Request $request, Response $response, $args)
     {
         $query = $request->getQueryParams();
@@ -73,7 +89,7 @@ class SearchController extends BaseController
 
     public function getRanks(Request $request, Response $response, $args)
     {
-        $rangos = Rank::select('id', 'name', 'created_at')->where('id','>', 2)->get();
+        $rangos = Rank::select('id', 'name', 'created_at')->where('id','>', 1)->get();
         $count = $rangos->count();
         return $this->showJSONResponse($response, [
             'ranks' => $rangos->toArray(),
@@ -122,7 +138,7 @@ class SearchController extends BaseController
     public function getAchievementUsers(Request $request, Response $response, $args)
     {
         $validation = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         if($validation->failed()){
             $return = array(

@@ -109,8 +109,8 @@ class LogroController extends BaseController
     public function postUser(Request $request, Response $response, $args)
     {
         $validation = $this->validator->validate($request, [
-            'logro_id' => v::notEmpty()->notEmpty()->intVal()->positive(),
-            'user_id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'logro_id' => v::notEmpty()->intVal()->positive(),
+            'user_id' => v::notEmpty()->intVal()->positive(),
             'raoToken' => v::noWhitespace()->notEmpty()
         ]);
         if($validation->failed()){
@@ -154,7 +154,7 @@ class LogroController extends BaseController
     public function postGlobal(Request $request, Response $response, $args)
     {
         $validation = $this->validator->validate($request, [
-            'logro_id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'logro_id' => v::notEmpty()->intVal()->positive(),
             'raoToken' => v::noWhitespace()->notEmpty()
         ]);
         if($validation->failed()){
@@ -191,7 +191,7 @@ class LogroController extends BaseController
     public function putUpdate(Request $request, Response $response, $args)
     {
         $validationGet = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
             'inputName' => v::notEmpty()->alnum(',;.:-_^*+-/¡!¿?()áéíóúñ')->length(1, 50),
@@ -273,8 +273,8 @@ class LogroController extends BaseController
     public function deleteUser(Request $request, Response $response, $args)
     {
         $validation = $this->validator->validate($request, [
-            'logro_id' => v::notEmpty()->notEmpty()->intVal()->positive(),
-            'user_id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'logro_id' => v::notEmpty()->intVal()->positive(),
+            'user_id' => v::notEmpty()->intVal()->positive(),
             'raoToken' => v::noWhitespace()->notEmpty()
         ]);
         if($validation->failed()){
@@ -311,7 +311,7 @@ class LogroController extends BaseController
     {
 
         $validationGet = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
             'raoToken' => v::noWhitespace()->notEmpty()

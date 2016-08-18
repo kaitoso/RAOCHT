@@ -87,7 +87,7 @@ class BanController extends BaseController
     public function deleteUnban(Request $request, Response $response, $args)
     {
         $validation = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         $token = $request->getParam('token');
         if($validation->failed()){

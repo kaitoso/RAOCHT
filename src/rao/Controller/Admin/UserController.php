@@ -27,7 +27,7 @@ class UserController extends BaseController
     public function getUpdate(Request $request, Response $response, $args)
     {
         $validation = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         if($validation->failed()){
             $this->flash->addMessage('error', 'No ingresaste una identificación.');
@@ -107,7 +107,7 @@ class UserController extends BaseController
     public function postImage(Request $request, Response $response, $args)
     {
         $validationGet = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
             'raoToken' => v::noWhitespace()->notEmpty()
@@ -188,7 +188,7 @@ class UserController extends BaseController
     public function putGeneral(Request $request, Response $response, $args)
     {
         $validationGet = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
             'inputName' => v::noWhitespace()->notEmpty()->alnum('_')->length(4, 30),
@@ -268,7 +268,7 @@ class UserController extends BaseController
     public function putPefilInfo(Request $request, Response $response, $args)
     {
         $validationGet = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
             'inputAbout' => v::stringType()->length(null, 1000),
@@ -299,7 +299,7 @@ class UserController extends BaseController
 
     public function putChatInfo(Request $request, Response $response, $args){
         $validationGet = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
             'chatName' => v::stringType()->notEmpty()->length(4, 50),
@@ -346,7 +346,7 @@ class UserController extends BaseController
     public function putPassword(Request $request, Response $response, $args)
     {
         $validationGet = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
             'newPassword' => v::noWhitespace()->notEmpty()->length(6),
@@ -390,7 +390,7 @@ class UserController extends BaseController
     public function putEmail(Request $request, Response $response, $args)
     {
         $validationGet = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
             'newEmail' => v::noWhitespace()->notEmpty()->email(),
@@ -434,7 +434,7 @@ class UserController extends BaseController
     public function deleteUser(Request $request, Response $response, $args)
     {
         $validationGet = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
             'raoToken' => v::noWhitespace()->notEmpty()

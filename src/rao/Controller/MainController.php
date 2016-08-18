@@ -6,6 +6,7 @@ use App\Handler\Email;
 use App\Model\AuthToken;
 use App\Model\Ban;
 use App\Model\PrivateMessage;
+use App\Model\Rank;
 use App\Model\User;
 use App\Model\UserAchievements;
 use App\Model\UserProfile;
@@ -40,19 +41,43 @@ class MainController extends BaseController
             return $this->withRedirect($response, $this->router->pathFor('auth.login'));
         }
         $user = User::find($this->session->get('user_id'));
-        if(empty($user->getProfile)){
-            $profile = new UserProfile();
-            $profile->user_id = $user->id;
-            $profile->save();
+        $userRank = $user->getRank;
+        $userPro = $user->getProfile;
+        if(empty($userPro)){
+            $userPro = new UserProfile();
+            $userPro->user_id = $user->id;
+            $userPro->save();
+        }
+        if(!empty($userRank->nextRank)){
+            $nextTime = $userRank->nextTime ?: 0;
+            $nextMessage = $userRank->nextMessage ?: 0;
+            if($userPro->online_time >= $nextTime && $userPro->messages >= $nextMessage){
+                $user->rank = $userRank->nextRank;
+                $user->save();
+                if(!empty($userRank->nextAchievement)){
+                    $hasLogro = UserAchievements::where([
+                        ['achievement_id', $userRank->nextAchievement],
+                        ['user_id', $this->session->get('user_id')]
+                    ])->first();
+                    if(!$hasLogro){
+                        $newLogro = new UserAchievements();
+                        $newLogro->user_id = $this->session->get('user_id');
+                        $newLogro->achievement_id = $userRank->nextAchievement;
+                        $newLogro->save();
+                    }
+                }
+                $userRank = Rank::find($userRank->nextRank);
+            }
         }
         $pvs = PrivateMessage::where([
             ['to_id', $user->id],
             ['seen', 0]
         ])->count();
-        $permissions = json_decode($user->getRank->permissions);
+        $permissions = json_decode($userRank->permissions);
         $chatConfig = json_decode(file_get_contents(__DIR__.'/../Config/Chat.json'));
         return $this->view->render($response, 'chat.twig', [
             'user' => $user,
+            'rank' => $userRank,
             'permissions' => $permissions,
             'config' => $chatConfig,
             'privates' => $pvs

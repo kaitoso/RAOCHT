@@ -234,7 +234,7 @@
 {% block js %}
 	<script src="{{ base_url() }}/dist/js/moment.min.js"></script>
 	<script src="{{ base_url() }}/dist/js/sweetalert.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+	<script src="{{ base_url() }}/dist/js/handlebars.js"></script>
 	<script src="{{ base_url() }}/dist/js/typeahead.min.js"></script>
 	<script>
 		var $userUrl = '{{ path_for('perfil.userinfo', {'user': user.user}) }}';
@@ -266,7 +266,7 @@
 			templates: {
 				empty: [
 					'<div class="empty-message">',
-					'No se encontró a ningún grupo con este nombre o clave.',
+					'No se encontró a ningún usuario con este nombre.',
 					'</div>'
 				].join('\n'),
 				suggestion: $userTemplate

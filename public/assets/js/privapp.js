@@ -18,7 +18,7 @@ $('#inputUser').typeahead({
     templates: {
         empty: [
             '<div class="empty-message">',
-            'No se encontró a ningún grupo con este nombre o clave.',
+            'No se encontró a ningún usuario con este nombre.',
             '</div>'
         ].join('\n'),
         suggestion: $userTemplate

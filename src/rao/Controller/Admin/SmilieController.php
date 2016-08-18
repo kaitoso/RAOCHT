@@ -22,7 +22,7 @@ class SmilieController extends BaseController
     public function getUpdate(Request $request, Response $response, $args)
     {
         $validation = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         if($validation->failed()){
             $this->flash->addMessage('error', 'No ingresaste una identificación.');
@@ -237,7 +237,7 @@ class SmilieController extends BaseController
     public function deleteSmilie(Request $request, Response $response, $args)
     {
         $validationGet = $this->validator->validateArgs($request, [
-            'id' => v::notEmpty()->notEmpty()->intVal()->positive(),
+            'id' => v::notEmpty()->intVal()->positive(),
         ]);
         $validation = $this->validator->validate($request, [
             'raoToken' => v::noWhitespace()->notEmpty()

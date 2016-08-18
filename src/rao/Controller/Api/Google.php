@@ -63,7 +63,7 @@ class Google extends BaseController
             if(!empty($email)){
                 $this->container->flash->addMessage(
                     'error',
-                    "¡Error! Al parecer el correo electrónico \"{$user_email}\" ya se encuentra registrado en la base de datos. Intenta iniciar sesión con tus datos."
+                    "¡Error! Al parecer el correo electrónico \"{$user_email}\" ya se encuentra registrado. Intenta iniciar sesión con tus datos."
                 );
                 return $this->withRedirectWithout($response, $this->container->router->pathFor('auth.login'));
             }

@@ -8,6 +8,13 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 class AppSchemas
 {
     function up(){
+        Capsule::schema()->create('achievements', function($table){
+            $table->increments('id');
+            $table->string('name', 50);
+            $table->string('description', 100);
+            $table->string('image', 255);
+            $table->timestamps();
+        });
 
         Capsule::schema()->create('ranks', function($table){
             $table->increments('id');
@@ -15,9 +22,20 @@ class AppSchemas
             $table->boolean('immunity')->unsigned()->default(0);
             $table->string('permissions')->nullable()->default('[]');
             $table->string('chatPermissions')->nullable()->default('[]');
+            $table->integer('nextRank')->unsigned()->nullable();
+            $table->bigInteger('nextTime')->unsigned()->nullable();
+            $table->integer('nextMessages')->unsigned()->nullable();
+            $table->integer('nextAchievement')->unsigned()->nullable();
             $table->timestamps();
+            $table->foreign('nextRank')
+                ->references('id')
+                ->on('ranks')
+                ->onDelete('set null');
+            $table->foreign('nextAchievement')
+                ->references('id')
+                ->on('achievements')
+                ->onDelete('set null');
         });
-
         Capsule::schema()->create('users', function($table){
             $table->increments('id');
             $table->string('email')->unique();
@@ -94,14 +112,6 @@ class AppSchemas
             $table->timestamps();
         });
 
-        Capsule::schema()->create('achievements', function($table){
-            $table->increments('id');
-            $table->string('name', 50);
-            $table->string('description', 100);
-            $table->string('image', 255);
-            $table->timestamps();
-        });
-
         Capsule::schema()->create('user_achievements', function($table){
             $table->increments('id');
             $table->integer('user_id')->unsigned();
@@ -150,14 +160,12 @@ class AppSchemas
                 ->on('users')
                 ->onDelete('cascade');
         });
-
-
     }
 
     function createRanks(){
         $rol = new \App\Model\Rank();
         $rol->name = 'Administrador';
-        $rol->permissions = '["ban", "unban", "rank", "user", "logro", "chat", "smilie, "global"]';
+        $rol->permissions = '["ban", "unban", "rank", "user", "logro", "chat", "smilie", "global"]';
         $rol->chatPermissions = '["images","videos","audio", "nokick"]';
         $rol->immunity = 1;
         $rol->save();
@@ -220,15 +228,18 @@ class AppSchemas
     }
 
     function down(){
+        //Capsule::connection()->select('SET foreign_key_checks = 0;');
         Capsule::schema()->dropIfExists('smilies');
+        Capsule::schema()->dropIfExists('private_messages');
         Capsule::schema()->dropIfExists('profile_comments');
         Capsule::schema()->dropIfExists('user_profiles');
         Capsule::schema()->dropIfExists('user_achievements');
-        Capsule::schema()->dropIfExists('achievements');
         Capsule::schema()->dropIfExists('bans');
         Capsule::schema()->dropIfExists('permissions');
         Capsule::schema()->dropIfExists('auth_token');
         Capsule::schema()->dropIfExists('users');
         Capsule::schema()->dropIfExists('ranks');
+        Capsule::schema()->dropIfExists('achievements');
+        //Capsule::connection()->select('SET foreign_key_checks = 1;');
     }
 }

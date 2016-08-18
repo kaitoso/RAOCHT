@@ -78,6 +78,49 @@
             <input class="hidden" name="inputChatPerm[hidden]" value="false">
         </div>
     </div>
+    <div class="form-group {% if errors.inputNext %}has-error{% endif %}">
+        <label class="col-sm-3 col-lg-2 control-label">Siguiente rango:</label>
+        <div class="col-sm-9 col-lg-10">
+            <select name="inputNext" id="inputNext" class="form-control">
+                <option value="0">Ninguno</option>
+                {% for r in selectRank %}
+                    <option value="{{ r.id }}" {% if r.id == rank.nextRank %}selected{% endif %}>{{ r.name }}</option>
+                {% endfor %}
+            </select>
+            {{ errors.inputNext | first }}
+        </div>
+    </div>
+
+    <div class="form-group {% if errors.inputDays %}has-error{% endif %}">
+        <label class="col-sm-3 col-lg-2 control-label">Número de días (0 - 7300 días):</label>
+        <div class="col-sm-9 col-lg-10">
+            <input type="number" name="inputDays" id="inputDays" class="form-control" min="0" max="7300" value="{{ time.days }}">
+            <span class="help-block">{{ errors.inputDays | first }}</span>
+        </div>
+    </div>
+    <div class="form-group {% if errors.inputHours %}has-error{% endif %}">
+        <label class="col-sm-3 col-lg-2 control-label">Número de horas (0 - 23):</label>
+        <div class="col-sm-9 col-lg-10">
+            <input type="number" name="inputHours" id="inputHours" class="form-control" min="0" max="23" value="{{ time.hours }}">
+            <span class="help-block">{{ errors.inputHours | first }}</span>
+        </div>
+    </div>
+    <div class="form-group {% if errors.inputMessages %}has-error{% endif %}">
+        <label class="col-sm-3 col-lg-2 control-label">Número de mensajes:</label>
+        <div class="col-sm-9 col-lg-10">
+            <input type="number" name="inputMessages" id="inputMessages" class="form-control" min="0" max="4294967295" value="{{ rank.nextMessages }}">
+            <span class="help-block">{{ errors.inputMessages | first }}</span>
+        </div>
+    </div>
+    <div class="form-group {% if errors.inputLogro %}has-error{% endif %}">
+        <label class="col-sm-3 col-lg-2 control-label">Logro recibido:</label>
+        <div class="col-sm-9 col-lg-10">
+            <input type="text" id="inputLogro" class="form-control typeahead" placeholder="Buscar logro" autocomplete="off" maxlength="50" value="{{ logro.name }}">
+            <input type="hidden" name="inputLogro" value="{{ logro.id }}">
+            <span class="help-block">{{ errors.inputLogro | first }}</span>
+        </div>
+    </div>
+
     <div class="form-group">
         <div class="col-sm-9 col-lg-10 col-sm-offset-3 col-lg-offset-2">
             <input type="hidden" name="_METHOD" value="PUT">
