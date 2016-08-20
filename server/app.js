@@ -15,6 +15,7 @@ var _ = require('lodash');
 var cookie = require('cookie');
 var escape = require('escape-html');
 var User = require('./lib/user');
+var Commands = require('./lib/comandos')(ChatIO);
 var subscriber = redis.createClient(config.redis);
 var redisClient = redis.createClient(config.redis);
 var chatConfig = {
@@ -53,6 +54,7 @@ function httpHandler (req, res) {
     }));
 }
 
+User.getRankData();
 ChatIO.on('connection', (socket) => {
     let cookies = cookie.parse(socket.handshake.headers.cookie);
     if(cookies.rao_session === undefined){
@@ -108,17 +110,8 @@ ChatIO.on('connection', (socket) => {
         if(_.now() - currentUser.last < 250){
             return;
         }
-        let message = {
-            'user': currentUser.user,
-            'chatName': currentUser.chatName,
-            'chatColor': currentUser.chatColor,
-            'chatText': currentUser.chatText,
-            'image': currentUser.image,
-            'rank': currentUser.rank,
-            'message': escape(data.message)
-        }
-        console.log('[Message]', message.user, ':', message.message);
-        ChatIO.emit('message', message);
+        console.log('[Message]', currentUser.user, ':', data.message);
+        Commands.parse(socket, currentUser, data.message);
         currentUser.last = _.now();
         currentUser.messages++;
         chatConfig.sessionMessages++;
@@ -157,6 +150,7 @@ ChatIO.on('connection', (socket) => {
             if(privSocket !== undefined && privSocket.length > 0){
                 User.deletePublicSocket(socket.id);
             }else{
+                User.updateData(user);
                 User.deleteUser(user.id)
                 User.deletePublicSocket(socket.id);
             }
@@ -196,6 +190,7 @@ subscriber.on('message', (channel, data) => {
     }
     if(channel == 'update-client'){
         ChatIO.emit('client-update', message);
+        User.getRankData();
     }
     if(channel === 'update-chat'){
         let index = User.getUserIndexBySession(message.id);
@@ -323,7 +318,7 @@ subscriber.on('message', (channel, data) => {
     if(channel === 'admin-global'){
         ChatIO.emit('global', {
             user: message.user,
-            message: message.message
+            message: escape(message.message)
         });
     }
 

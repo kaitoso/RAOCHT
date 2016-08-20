@@ -1,4 +1,13 @@
 "use strict";
+function array_flip(trans) {
+    var key, tmp_ar = {};
+    for (key in trans) {
+        if (trans.hasOwnProperty(key)) {
+            tmp_ar[trans[key]] = key;
+        }
+    }
+    return tmp_ar;
+}
 var config = require('./config');
 var mysql = require('mysql');
 var pool  = mysql.createPool(config.db);
@@ -8,16 +17,34 @@ User.onlineUsers = [];
 User.currentOnline = [];
 User.privateSockets = [];
 User.publicSockets = [];
+User.rankPermissions = {};
 
 User.updateData = function(u){
-    pool.query(`UPDATE user_profiles SET online_time = online_time + ${u.logTime}, messages = messages + ${u.messages} WHERE user_id = ${u.id}` , function(err, result) {
+    let currentTime = _.now() - u.logTime;
+    pool.query(`UPDATE user_profiles SET online_time = online_time + ${currentTime}, messages = messages + ${u.messages} WHERE user_id = ${u.id}`, (err, result) => {
         if (err){
-            console.error(err);
+            console.error('updateDate ',err);
             return;
         };
-        console.log(`Updating user ${u.user}. Set Logtime ${u.logTime}; Messages ${u.messages}`);
+        console.log(`Updating user ${u.user}. Set Logtime ${currentTime}; Messages ${u.messages}`);
     });
 };
+
+User.getRankData = function () {
+    pool.query('SELECT id, immunity, permissions, chatPermissions FROM ranks;', (err, rows, fields) => {
+       if(err) {
+           console.error('getRankPermissions ', err);
+           return;
+       }
+       for(let i in rows){
+           this.rankPermissions[rows[i].id] = {
+               immunity: rows[i].immunity,
+               permission: array_flip(JSON.parse(rows[i].permissions)),
+               chatPermission: array_flip(JSON.parse(rows[i].chatPermissions))
+           }
+       }
+    });
+}
 
 /**
  * Agrega el mensaje privado a la base de datos.
@@ -128,6 +155,28 @@ User.getUserIndexBySession = function(session){
 User.getUserById = function(id){
     let index = _.findIndex(this.onlineUsers, (u) => {return u.id == id});
     return this.onlineUsers[index];
+}
+
+User.getUserIndexByName = function(name){
+    return _.findIndex(this.onlineUsers, (u) => {return u.user.toLowerCase() === name.toLowerCase()});
+}
+
+User.getUserByName = function(name){
+    let index = this.getUserIndexByName(name);
+    if(index === -1){
+        return null;
+    }
+    return this.onlineUsers[index];
+}
+
+User.getRanksWithImmunity = function(){
+    let ranks = [];
+    _.forOwn(this.rankPermissions, (r, key) => {
+        if(r.immunity){
+            ranks.push(parseInt(key));
+        }
+    });
+    return ranks;
 }
 
 /**

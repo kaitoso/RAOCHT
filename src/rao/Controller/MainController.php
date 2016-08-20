@@ -273,19 +273,6 @@ class MainController extends BaseController
             $user->ip = $request->getAttribute('ip_address');
             $user->lastLogin = date('Y-m-d H:i:s');
             $user->save();
-            /* Publicar la sesión al servidor */
-            //$this->redis->publish('login', $this->session->getSessionId());
-            $this->redis->setEx($this->session->getSessionId(), 3600, json_encode(array(
-                'id' => $user->id,
-                'user' => $user->user,
-                'chatName' => $user->chatName,
-                'chatColor' => $user->chatColor,
-                'chatText' => $user->chatText,
-                'image' =>
-                    $request->getUri()->getBaseUrl().'/avatar/s/'.$user->image,
-                'rank' => $user->rank,
-            )));
-
             /* Guardar cookie */
             if ($remember === 'on') {
                 $selector = base64_encode(Token::generateRandom(9));

@@ -138,6 +138,13 @@ function getCache() {
         $config.rangos = [];
         $config.smilies = data.smilies;
         $config.autocomplete[0] = [];
+        $config.autocomplete[2] = [
+            '/kick',
+            '/reiniciar',
+            '/global',
+            '/clean',
+            '/stat'
+        ];
         $.each(data.ranks, function (i, v) {
             $config.autocomplete[0].push(v.name);
             $config.rangos.push({

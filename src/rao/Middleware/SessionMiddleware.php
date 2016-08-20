@@ -54,6 +54,7 @@ class SessionMiddleware extends Middleware{
         if(!empty($this->container->session->get('user_id')) && ($pathMain || $pathPriv)){
             $this->container->redis->delete($this->container->session->getSessionId());
             $user = User::find($this->container->session->get('user_id'));
+            $userPro =  $user->getProfile;
             $this->container->redis->setex($this->container->session->getSessionId(), 3600, json_encode(array(
                 'id' => $user->id,
                 'user' => $user->user,
@@ -63,6 +64,10 @@ class SessionMiddleware extends Middleware{
                 'image' =>
                     $request->getUri()->getBaseUrl().'/avatar/s/'.$user->image,
                 'rank' => $user->rank,
+                'profile' => [
+                    'time' => $userPro->online_time,
+                    'messages' => $userPro->messages
+                ]
             )));
         }
         if(empty($this->container->session->get('token'))){
