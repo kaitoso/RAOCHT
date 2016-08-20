@@ -86,7 +86,7 @@ function linkifyGlobal(str) {
     var videoRegex = /\b(https?:\/\/\S+(?:mp4|webm|ogv)\S*)\b/;
     return str.replace(urlRegex, function (match) {
         if (imageRegex.test(match)) {
-            return '<a href="' + match + '" target="_blank"><img src="' + match + '" title="' + match + '" class="img-responsive"></a>';
+            return '<a href="' + match + '" target="_blank"><img src="' + match + '" title="' + match + '" class="img-responsive img-center"></a>';
         }
         if (audioRegex.test(match)) {
             return '<audio autoplay controls><source src="' + match + '">Tu navegador no soporta la etiqueta "Audio"</audio>';

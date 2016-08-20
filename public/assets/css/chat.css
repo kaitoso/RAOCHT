@@ -138,6 +138,11 @@ ul.nav.navmenu-nav{
     width: 20px;
 }
 
+.img-center{
+    margin-right: auto;
+    margin-left: auto;
+}
+
 .fa-separator {
     border-right: 1px solid #e3f2fd;
     padding-right: 5px;
