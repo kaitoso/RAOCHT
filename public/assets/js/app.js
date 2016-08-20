@@ -114,6 +114,17 @@ function handleMessage(message) {
     } else {
         $(".contenido").last().append($messageChildTemplate(message));
     }
+    if (!$chat.focus) {
+        $chat.counter++;
+        if (!($chat.interval instanceof Interval)) {
+            $chat.interval = new Interval(function () {
+                $("title").text(($("title").text() === $chat.title) ? "Nuevo mensaje (" + $chat.counter + ")" : $chat.title);
+            }, 2000);
+        }
+        if (!$chat.interval.isRunning()) {
+            $chat.interval.start();
+        }
+    }
     if (($chatbox.scrollTop() + $(document).height()) >= $chatbox[0].scrollHeight - 480) {
         chatBottom();
     }
