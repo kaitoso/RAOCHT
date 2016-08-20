@@ -93,6 +93,11 @@ module.exports = function (ChatIO) {
             return;
         }
         var dest = comando.shift();
+        if(dest.toUpperCase() === user.user.toUpperCase()){
+            ChatIO.emit('system', {
+                message: `El usuario ${user.user} se intentó patear a sí mismo. ¡Que tristeza!`
+            });
+        }
         var razon = comando.join(" ");
         if (dest === "all" && user.rank === 1) {
             _.forEach(User.onlineUsers, (u, key) => {
@@ -136,7 +141,7 @@ module.exports = function (ChatIO) {
                 reason: razon
             });
         });
-        ChatIO.to(socket.id).emit('system', {
+        ChatIO.emit('system', {
             message: `El usuario ${userKickData.user} ha sido pateado por el usuario ${user.user} por la razón de: ${razon}`
         });
     };
