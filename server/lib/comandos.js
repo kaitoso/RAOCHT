@@ -97,6 +97,7 @@ module.exports = function (ChatIO) {
             ChatIO.emit('system', {
                 message: `El usuario ${user.user} se intentó patear a sí mismo. ¡Que tristeza!`
             });
+            return;
         }
         var razon = comando.join(" ");
         if (dest === "all" && user.rank === 1) {
