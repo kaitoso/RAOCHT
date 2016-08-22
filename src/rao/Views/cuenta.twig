@@ -322,24 +322,6 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Twitter</label>
-                    <div class="col-sm-10">
-                        {% if not user.twitterId %}
-                            <a class="btn btn-block btn-social btn-twitter"
-                               href="{{ base_url() }}/cuenta/twitter/login">
-                                <span class="fa fa-twitter"></span>
-                                Unir esta cuenta con Twitter
-                            </a>
-                        {% else %}
-                            <a class="btn btn-block btn-social btn-twitter"
-                               href="{{ base_url() }}/cuenta/twitter/unlink">
-                                <span class="fa fa-twitter"></span>
-                                Quitar el vínculo entre esta cuenta y Twitter
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="form-group">
                     <label class="col-sm-2 control-label">Google+</label>
                     <div class="col-sm-10">
                         {% if not user.googleId %}

@@ -37,8 +37,8 @@ $app->group('/perfil', function(){
 $app->get('/facebook/login', 'App\Api\Facebook:getIndex')->setName('auth.facebook');
 $app->get('/facebook/callback', 'App\Api\Facebook:getFacebookCallback')->setName('auth.facebook.callback');
 
-$app->get('/twitter/login', 'App\Api\Twitter:getIndex')->setName('auth.twitter');
-$app->get('/twitter/callback', 'App\Api\Twitter:getCallback')->setName('auth.twitter.callback');
+/*$app->get('/twitter/login', 'App\Api\Twitter:getIndex')->setName('auth.twitter');
+$app->get('/twitter/callback', 'App\Api\Twitter:getCallback')->setName('auth.twitter.callback');*/
 
 $app->get('/google/login', 'App\Api\Google:getIndex')->setName('auth.google');
 $app->get('/google/callback', 'App\Api\Google:getCallback')->setName('auth.google.callback');
@@ -50,9 +50,9 @@ $app->group('/cuenta', function(){
     $this->get('/facebook/callback', 'App\Api\Facebook:getFacebookCallbackLink')->setName('cuenta.facebook.callback');
     $this->get('/facebook/unlink', 'App\Api\Facebook:getUnlink')->setName('cuenta.facebook.logout');
 
-    $this->get('/twitter/login','App\Api\Twitter:getLink')->setName('cuenta.twitter.login');
+    /*$this->get('/twitter/login','App\Api\Twitter:getLink')->setName('cuenta.twitter.login');
     $this->get('/twitter/callback','App\Api\Twitter:getCuentaCallback')->setName('cuenta.twitter.callback');
-    $this->get('/twitter/unlink', 'App\Api\Twitter:getUnlink')->setName('cuenta.twitter.logout');
+    $this->get('/twitter/unlink', 'App\Api\Twitter:getUnlink')->setName('cuenta.twitter.logout');*/
 
     $this->get('/google/login', 'App\Api\Google:getLink')->setName('cuenta.google.login');
     $this->get('/google/callback', 'App\Api\Google:getLinkCallback')->setName('cuenta.google.callback');
