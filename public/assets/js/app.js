@@ -442,7 +442,7 @@ $("#modal-smilies").scroll(function(e) {
     var c = d - $utils.smiliesShown;
     var f = c >= 20 ? 20 : c;
     for (var b = $utils.smiliesShown, a = f; a > 0; b++, a--) {
-        $("#bodySmilies").append(smilies_template($config.smilies[b]));
+        $("#bodySmilies").append($smiliesTemplate($config.smilies[b]));
     }
     $utils.smiliesShown += f;
 });
