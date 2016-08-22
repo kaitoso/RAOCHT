@@ -430,7 +430,7 @@ $("#modalSmilies").on("show.bs.modal", function(event) {
         $("#bodySmilies").append($smiliesTemplate($config.smilies[a]));
     }
 });
-$("#modal-smilies").scroll(function(e) {
+$("#modalSmilies").scroll(function(e) {
     if ($("#modalSmilies .modal-dialog").height() >= $("#modalSmilies").scrollTop() + $(document).height() || $utils.smiliesLock) {
         return;
     }
