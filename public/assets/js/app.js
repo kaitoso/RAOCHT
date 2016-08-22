@@ -52,7 +52,7 @@ function smilies(str) {
             if (currentSmilie.local) {
                 url = $baseUrl + '/smilies/' + currentSmilie.url;
             }
-            return '<span class="smilie"><img src="' + url + '" title="' + currentSmilie.code + '"/></span>';
+            return '<span class="smilie"><img src="' + url + '" title=":' + currentSmilie.code + ':"/></span>';
         });
     });
     return str;
