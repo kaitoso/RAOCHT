@@ -243,7 +243,7 @@ var $chat = {
     interval: null,
     seed: Math.floor(Math.random() * (20 - 30 + 1)) + 20
 };
-var socket = io.connect('/privado');
+var socket = io.connect('http://chat.animeobsesion.net:8080/privado');
 var $mainContactTemplate = Handlebars.compile($('#mainContactTemplate').html());
 var $messageTemplate = Handlebars.compile($('#messageTemplate').html());
 var $messageChildTemplate = Handlebars.compile($('#messageChildTemplate').html());

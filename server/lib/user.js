@@ -61,7 +61,7 @@ User.addPrivateMessage = function(u, to, message){
     if(this.getPrivSocketById(to) !== null){
         insert.seen = 1;
     }
-    pool.query("INSERT INTO `rao_chat`.`private_messages` SET ?", insert, function(err, result){
+    pool.query("INSERT INTO `private_messages` SET ?", insert, function(err, result){
         if (err){
             console.error(`Error on sending private message from ${u.user}. to_id ${to}; message ${message}; Error`, err);
             return;

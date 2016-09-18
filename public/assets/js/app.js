@@ -227,7 +227,7 @@ function chatboxResponsive() {
     $('.chatbox').height($(window).height() - $('#messageBox').height() * 2 + 1);
 }
 
-var socket = io.connect('/chat');
+var socket = io.connect('http://chat.animeobsesion.net:8080/chat');
 var $messageTemplate = Handlebars.compile($('#messageTemplate').html());
 var $messageChildTemplate = Handlebars.compile($('#messageChildTemplate').html());
 var $usersTemplate = Handlebars.compile($('#usersTemplate').html());

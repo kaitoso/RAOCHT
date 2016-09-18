@@ -24,7 +24,7 @@
             <th class="col-sm-2" data-field="user">Usuario</th>
             <th class="col-sm-2" data-field="who">Expulsado por</th>
             <th class="col-sm-2" data-formatter="localHour" data-field="created_at">Fecha de expulsión</th>
-            <th class="col-sm-2" data-formatter="localHour" data-field="date_ban">Fecha de terminación</th>
+            <th class="col-sm-2" data-formatter="formatDate" data-field="date_ban">Fecha de terminación</th>
             <th class="col-sm-2" data-field="reason">Razon</th>
             <th class="col-sm-1 rowEliminar" data-formatter="formatoElimitar" data-events="eliminar">Acción</th>
         </tr>
@@ -47,6 +47,10 @@
         moment.locale('es');
         var button_template = Handlebars.compile($("#button-template").html());
         function localHour(value, row, index){
+            return moment.unix(value).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a')
+        }
+
+        function formatDate(value, row, index){
             return moment(value).format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a')
         }
 

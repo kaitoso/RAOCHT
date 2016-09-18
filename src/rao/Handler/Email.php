@@ -47,7 +47,7 @@ class Email
         $mailer = Swift_Mailer::newInstance($this->connection);
         $message = Swift_Message::newInstance()
             ->setSubject('Activación para el usuario ' . $user->user)
-            ->setFrom(array('contacto@asner.xyz' => 'Activaciones - Chat Anime Obsesión'))
+            ->setFrom(array('chat@animeobsesion.net' => 'Activaciones - Chat Anime Obsesión'))
             ->setTo($user->email)
             ->setBody(
                 $twig->render(
@@ -77,7 +77,7 @@ class Email
         $mailer = Swift_Mailer::newInstance($this->connection);
         $message = Swift_Message::newInstance()
             ->setSubject('Recuperación del usuario ' . $user->user)
-            ->setFrom(array('contacto@asner.xyz' => 'Activaciones - Chat Anime Obsesión'))
+            ->setFrom(array('chat@animeobsesion.net' => 'Activaciones - Chat Anime Obsesión'))
             ->setTo($user->email)
             ->setBody(
                 $twig->render(

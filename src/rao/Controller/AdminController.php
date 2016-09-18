@@ -32,7 +32,7 @@ class AdminController extends BaseController
         $userAch = UserAchievements::where($db::raw('DAY(created_at)'), '=', $db::raw('DAY(CURDATE())'))->count();
         $maxDays = date('t');
         $current =date('j');
-        $data = $users->lists('cantidad','dia')->all();
+        $data = $users->pluck('cantidad','dia');
         for ($i=1; $i <= $maxDays; $i++) {
             if(!empty($data[$i])) continue;
             $data[$i] = 0;

@@ -19,7 +19,7 @@ final class ErrorHandler Extends Error{
 
     public function __invoke(Request $request, Response $response, \Exception $exception)
     {
-        $this->logger->critical($exception->getFile()."[{$exception->getLine()}]: {$exception->getMessage()}");
+        $this->logger->critical($exception->getFile()."[{$exception->getLine()}]: {$exception->getMessage()}\nFull Exception: {$exception->getTraceAsString()}");
         if($request->isXHR()){
             $response->getBody()
                 ->write(json_encode(['error' => 'Hubo un error interno al procesar la solicitud.']));

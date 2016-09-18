@@ -19,18 +19,18 @@ return [
         'database' => [
             'driver'    => 'mysql',
             'host'      => 'localhost',
-            'database'  => 'rao_chat',
-            'username'  => 'rao',
+            'database'  => 'animeobs_chat',
+            'username'  => 'animeobs_chat',
             'password'  => 'Xu2iXI7i14RA',
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => ''
         ],
         'smtp' => [
-            'smtp_user' => 'azure_2d727fa0aef6d9383c5b41da9e552494@azure.com',
-            'smtp_password' => 'mMnb4R8ZFtO5t3M3jsljiYWd7zJa',
-            'smtp_server' => 'smtp.sendgrid.net',
-            'smtp_port' => 587
+            'smtp_user' => 'chat@animeobsesion.net',
+            'smtp_password' => '$l(^Sd+xKQVT',
+            'smtp_server' => '127.0.0.1',
+            'smtp_port' => 25
         ],
         'facebook' => [
             'app_id' => '1659916867664250',

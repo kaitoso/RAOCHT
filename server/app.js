@@ -309,10 +309,14 @@ subscriber.on('message', (channel, data) => {
         let socket = User.getPubSocketsById(message.id);
         if(socket.length === 0) return;
         socket.forEach(function(val, index){
-            ChatIO.to(val).emit('offline');
-            ChatIO.sockets.connected[val].disconnect();
-            Privado.disconnect(val);
+            try{
+                ChatIO.to(val).emit('offline');
+                ChatIO.sockets.connected[val].disconnect();
+            }catch(e){
+                console.error('Exception Ban-Chat', e);
+            }
         });
+        // Add private ban
     }
 
     if(channel === 'admin-global'){

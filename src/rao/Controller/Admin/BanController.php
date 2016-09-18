@@ -26,7 +26,7 @@ class BanController extends BaseController
     public function postBan(Request $request, Response $response, $args)
     {
         $validation = $this->validator->validate($request, [
-            'inputName' => v::noWhitespace()->notEmpty()->alnum('_')->length(4, 50),
+            'inputName' => v::noWhitespace()->notEmpty()->alnum('_-')->length(4, 50),
             'banTime' => v::notEmpty()->intVal()->positive(),
             'inputRazon' => v::notEmpty()->alnum(',;.:-_^*+-/¡!¿?()áéíóúÁÉÍÓÚñÑ')->length(4, 255),
             'raoToken' => v::noWhitespace()->notEmpty()
@@ -63,7 +63,7 @@ class BanController extends BaseController
         /* Saber si existe la expulsión */
         $ban = Ban::where('user', $user->id)->first();
         if(!$ban){
-            $dateBan = date('Y-m-d H:i:s', time() + $inputTime);
+            $dateBan = date('Y-m-d H:i:s', time() + ($inputTime * 60));
             $newBan = new Ban();
             $newBan->user = $user->id;
             $newBan->who = $this->session->get('user_id');

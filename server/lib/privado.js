@@ -148,8 +148,12 @@ Privado.prototype.sendMessage = function(socket, event, message){
 }
 
 Privado.prototype.disconnect = function(socket){
-    PrivIO.to(socket).emit('offline');
-    PrivIO.sockets.connected[socket].disconnect();
+    try{
+        PrivIO.to(socket).emit('offline');
+        PrivIO.sockets.connected[socket].disconnect();
+    }catch(e){
+        console.error('Exception Privado.disconnect', e);
+    }
 }
 
 

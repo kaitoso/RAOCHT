@@ -51,9 +51,11 @@ class Facebook extends BaseController
             $accessToken = $fbHelper->getAccessToken();
         } catch(FacebookResponseException $e) {
             $this->flash->addMessage('error', 'Error al obtener el token: ' . $e->getMessage());
+            $this->logger->critical("FB-Error [{$e->getLine()}]: ". $e->getMessage());
             return $this->withRedirect($response, $this->router->pathFor('main.error'));
         } catch(FacebookSDKException $e) {
             $this->flash->addMessage('error', 'Error al obtener el token: ' . $e->getMessage());
+            $this->logger->critical("FB-Error [{$e->getLine()}]: ". $e->getMessage());
             return $this->withRedirect($response, $this->router->pathFor('main.error'));
         }
         if(empty($accessToken)){
@@ -66,6 +68,7 @@ class Facebook extends BaseController
                 $accessToken = $oAuth2Client->getLongLivedAccessToken($accessToken);
             } catch (FacebookSDKException $e) {
                 $this->flash->addMessage('error', 'Lo sentimos. Hubo un error al obtener el token de Facebook.');
+                $this->logger->critical("FB-Error [{$e->getLine()}]: ". $e->getMessage());
                 return $this->withRedirect($response, $this->router->pathFor('main.error'));
             }
         }
@@ -111,9 +114,11 @@ class Facebook extends BaseController
             $accessToken = $fbHelper->getAccessToken();
         } catch(FacebookResponseException $e) {
             $this->flash->addMessage('social-error', 'Error al obtener el token: ' . $e->getMessage());
+            $this->logger->critical("FB-Error [{$e->getLine()}]: ". $e->getMessage());
             return $this->withRedirect($response, $this->router->pathFor('cuenta.main').'#formSocial');
         } catch(FacebookSDKException $e) {
             $this->flash->addMessage('social-error', 'Error al obtener el token: ' . $e->getMessage());
+            $this->logger->critical("FB-Error [{$e->getLine()}]: ". $e->getMessage());
             return $this->withRedirect($response, $this->router->pathFor('cuenta.main').'#formSocial');
         }
         if(empty($accessToken)){
