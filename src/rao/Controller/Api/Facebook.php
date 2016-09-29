@@ -59,8 +59,8 @@ class Facebook extends BaseController
             return $this->withRedirect($response, $this->router->pathFor('main.error'));
         }
         if(empty($accessToken)){
-            $this->logger->critical("FB-"
-                ."Error: " . $fbHelper->getError().
+            $this->logger->critical("FB-Access token: " . $accessToken
+                ." - Error: " . $fbHelper->getError().
                 " Error Code: " . $fbHelper->getErrorCode().
                 " Error Reason: " . $fbHelper->getErrorReason().
                 " Error Description: " . $fbHelper->getErrorDescription());
