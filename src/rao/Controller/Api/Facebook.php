@@ -31,6 +31,7 @@ class Facebook extends BaseController
             $request->getUri()->getBaseUrl().$this->router->pathFor('auth.facebook.callback'),
             ['email']
         );
+        $this->logger->info("FB-LoginRedirect: " . $url);
         return $this->withRedirect($response, $url);
     }
 
