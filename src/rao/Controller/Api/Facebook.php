@@ -60,13 +60,15 @@ class Facebook extends BaseController
             return $this->withRedirect($response, $this->router->pathFor('main.error'));
         }
         if(empty($accessToken)){
+            var_dump($accessToken);
+            var_dump($fbHelper);
             $this->logger->critical("FB-Access token: " . $accessToken
                 ." - Error: " . $fbHelper->getError().
                 " Error Code: " . $fbHelper->getErrorCode().
                 " Error Reason: " . $fbHelper->getErrorReason().
                 " Error Description: " . $fbHelper->getErrorDescription());
-            $this->flash->addMessage('error', 'Hubo un error al obtener el acceso a la cuenta de Facebook. Error: ' . $fbHelper->getError());
-            return $this->withRedirect($response, $this->router->pathFor('main.error'));
+            //$this->flash->addMessage('error', 'Hubo un error al obtener el acceso a la cuenta de Facebook. Error: ' . $fbHelper->getError());
+            //return $this->withRedirect($response, $this->router->pathFor('main.error'));
         }
         if(!$accessToken->isLongLived()){
             $oAuth2Client = $this->fb->getOAuth2Client();
