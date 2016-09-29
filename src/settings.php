@@ -29,7 +29,7 @@ return [
         'smtp' => [
             'smtp_user' => 'chat@animeobsesion.net',
             'smtp_password' => '$l(^Sd+xKQVT',
-            'smtp_server' => '127.0.0.1',
+            'smtp_server' => 'animeobsesion.net:25',
             'smtp_port' => 25
         ],
         'facebook' => [

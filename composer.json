@@ -24,7 +24,6 @@
     "eventviva/php-image-resize": "1.5.*",
     "akrabat/rka-ip-address-middleware": "^0.4.0",
     "slim/flash": "^0.1.0",
-    "facebook/php-sdk-v4": "^5.2",
     "abraham/twitteroauth": "^0.6.4",
     "google/apiclient": "^2.0",
     "erusev/parsedown": "^1.6"

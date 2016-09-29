@@ -11,10 +11,7 @@ composer.lock
 !/public/avatar/b/.gitkeep
 /public/avatar/s/
 !/public/avatar/s/.gitkeep
-/public/smilies/
-!/public/smilies/.gitkeep
-/public/achievements/
-!/public/achievements/.gitkeep
+
 .idea
 /server/.idea
 /server/node_modules
