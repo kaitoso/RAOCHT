@@ -128,7 +128,12 @@ class Facebook extends BaseController
             return $this->withRedirect($response, $this->router->pathFor('cuenta.main').'#formSocial');
         }
         if(empty($accessToken)){
-            $this->flash->addMessage('social-error', $fbHelper->getErrorReason);
+            $this->logger->critical("FB-Access token: " . $accessToken
+                ." - Error: " . $fbHelper->getError().
+                " Error Code: " . $fbHelper->getErrorCode().
+                " Error Reason: " . $fbHelper->getErrorReason().
+                " Error Description: " . $fbHelper->getErrorDescription());
+            $this->flash->addMessage('social-error', $fbHelper->getError());
             return $this->withRedirect($response, $this->router->pathFor('cuenta.main').'#formSocial');
         }
         if(!$accessToken->isLongLived()){

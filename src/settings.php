@@ -34,7 +34,7 @@ return [
         ],
         'facebook' => [
             'app_id' => '1659916867664250',
-            'app_secret' => '48d76e9e12e98fe17ccbc4b435deca0c',
+            'app_secret' => 'af92a9c8d94e28750f58806402be6759',
             'default_graph_version' => 'v2.7',
         ],
         'twitter' => [
