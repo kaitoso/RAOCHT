@@ -65,7 +65,7 @@
         </div>
     {% endif %}
     <form class="form-signin" id="loginForm" role="form" method="post" action="/login">
-        <a class="btn btn-block btn-social btn-facebook" href="/facebook/login">
+        <!--<a class="btn btn-block btn-social btn-facebook" href="/facebook/login">
             <span class="fa fa-facebook"></span>
             Iniciar sesión con Facebook
         </a>
@@ -73,7 +73,7 @@
             <span class="fa fa-google"></span>
             Iniciar sesión con Google
         </a>
-        <div class="separador">o</div>
+        <div class="separador">o</div>-->
         <div class="form-group{% if errors.user %} has-error {% endif %}">
             <input type="text" name="user" id="userLogin" class="form-control" placeholder="Usuario"
                    value="{{ old.user }}" maxlength="30" required autofocus>
