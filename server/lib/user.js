@@ -198,9 +198,9 @@ User.generateOnlineUsers = function() {
         }
     })
     online.sort((a, b) => {
-        if (a.user > b.user)
+        if (a.user.toLocaleLowerCase() > b.user.toLocaleLowerCase())
             return 1;
-        if (a.user < b.user)
+        if (a.user.toLocaleLowerCase() < b.user.toLocaleLowerCase())
             return -1;
         return 0;
     });
