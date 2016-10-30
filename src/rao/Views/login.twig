@@ -74,6 +74,9 @@
             Iniciar sesión con Google
         </a>
         <div class="separador">o</div>-->
+        <div class="text-center hidden-phone">
+            <img src="{{ base_url() }}/assets/img/logo-chat.png" class="img-responsive center-img">
+        </div>
         <div class="form-group{% if errors.user %} has-error {% endif %}">
             <input type="text" name="user" id="userLogin" class="form-control" placeholder="Usuario"
                    value="{{ old.user }}" maxlength="30" required autofocus>
