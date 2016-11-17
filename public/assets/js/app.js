@@ -352,7 +352,9 @@ socket.on('offline', function () {
         $chat.check.stop();
     }
     socket.disconnect();
-    window.location.href=$baseUrl+'/login';
+    $.getJSON($baseUrl+'/logout', function(data){
+       window.location.href=$baseUrl+'/login';
+    });
 });
 
 socket.on('kick', function (message) {

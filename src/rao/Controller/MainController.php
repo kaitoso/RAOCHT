@@ -32,6 +32,7 @@ class MainController extends BaseController
         $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
         if($ban){
             $hoy = date('Y-m-d H:i:s');
+            $this->logger->info("Comprobando baneo: {$hoy} {$ban->date_ban} " . strtotime($hoy) . " " . strtotime($ban->date_ban));
             if(strtotime($hoy) > strtotime($ban->date_ban)) {
                 $ban->delete();
             }else{
@@ -259,7 +260,7 @@ class MainController extends BaseController
             return $this->withRedirect($response, $this->router->pathFor('auth.login'));
         }
         if(!$user->activated){
-            $this->flash->addMessage('error', '¡Aún no has activado tu cuenta! Revisa tu correo. 
+            $this->flash->addMessage('error', '¡Aún no has activado tu cuenta! Revisa tu correo.
                 El correo de activación puede estar en correos no deseados.');
             return $this->withRedirect($response, $this->router->pathFor('auth.login'));
         }
