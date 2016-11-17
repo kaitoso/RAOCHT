@@ -32,8 +32,7 @@ class MainController extends BaseController
         $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
         if($ban){
             $hoy = date('Y-m-d H:i:s');
-            $this->logger->info("Comprobando baneo: {$hoy} {$ban->date_ban} " . strtotime($hoy) . " " . strtotime($ban->date_ban));
-            if(strtotime($hoy) > strtotime($ban->date_ban)) {
+            if(strtotime($hoy) > $ban->date_ban) {
                 $ban->delete();
             }else{
                 $this->session->set('user_ban', true);
@@ -110,7 +109,7 @@ class MainController extends BaseController
         $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
         if($ban){
             $hoy = date('Y-m-d H:i:s');
-            if(strtotime($hoy) > strtotime($ban->date_ban)) {
+            if(strtotime($hoy) > $ban->date_ban) {
                 $ban->delete();
                 if(!empty($this->session->get('user_ban'))){
                     $this->session->delete('user_ban');
