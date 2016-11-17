@@ -103,7 +103,6 @@ module.exports = function (ChatIO) {
         if (dest === "all" && user.rank === 1) {
             _.forEach(User.onlineUsers, (u, key) => {
                 let currentRank = User.rankPermissions[u.rank];
-                console.log(currentRank);
                 if(currentRank.immunity){
                     return;
                 }

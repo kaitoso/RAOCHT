@@ -311,7 +311,9 @@ subscriber.on('message', (channel, data) => {
         socket.forEach(function(val, index){
             try{
                 ChatIO.to(val).emit('offline');
-                ChatIO.sockets.connected[val].disconnect();
+                if(ChatIO.sockets.connected[val]){
+                    ChatIO.sockets.connected[val].disconnect();
+                }
             }catch(e){
                 console.error('Exception Ban-Chat', e);
             }
