@@ -71,7 +71,7 @@ class BanController extends BaseController
             $newBan->date_ban = $dateBan;
             $newBan->ip = $user->ip;
             $newBan->save();
-            $this->logger->info("Baneando al usuario ${$user->id} - ${$inputName} por " . $date_ban);
+            $this->logger->info("Baneando al usuario {$user->id} - {$user->user} por " . $date_ban);
             /* Publicar usuario al servidor del chat para kikearlo */
             $this->redis->publish('ban-chat', json_encode([
                 'id' => $user->id,
