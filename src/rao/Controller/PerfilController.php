@@ -91,19 +91,20 @@ class PerfilController extends BaseController
     public function getLogrosJSON(Request $request, Response $response, $args)
     {
         $validationGet = $this->validator->validateArgs($request, [
+            'id' => v::notEmpty()->intVal()->positive(),
             'limit' => v::optional(v::notEmpty()->intVal()->positive()),
             'offset' => v::optional(v::notEmpty()->intVal()->positive())
         ]);
         if($validationGet->failed()){
             return $response->withJson(['error' => $this->session->get('errors')]);
         }
-
+        $id = $request->getAttribute('id');
         $limit = $request->getAttribute('limit') ?: 4;
         $offset = $request->getAttribute('offset') ?: 0;
 
         $logros = UserAchievements::select('ach.name', 'ach.description', 'ach.image', 'user_achievements.created_at')
             ->join('achievements as ach', 'user_achievements.achievement_id', '=', 'ach.id')
-            ->where('user_achievements.user_id', $this->session->get('user_id'))
+            ->where('user_achievements.user_id', $id)
             ->take($limit)
             ->offset($offset)
             ->orderBy('user_achievements.id', 'desc')
@@ -202,5 +203,5 @@ class PerfilController extends BaseController
             ->get()
             ->toArray();
     }
-    
+
 }

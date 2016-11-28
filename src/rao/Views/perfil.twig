@@ -82,7 +82,7 @@
     		</button>
     		<a class="navbar-brand" href="{{ base_url() }}">Chat Anime Obsesion</a>
     	</div>
-    
+
     	<!-- Collect the nav links, forms, and other content for toggling -->
     	<div class="collapse navbar-collapse navbar-ex1-collapse">
     		<ul class="nav navbar-nav">
@@ -240,6 +240,7 @@
 		var registerDay = moment.unix({{ user.created_at }});
 		var lastSession = moment.unix({{ user.lastLogin }});
         var $user = {
+			id: {{ user.user }},
             image: '{{ who.image }}',
             user: '{{ who.user }}',
             rank: '{{ whoRank.name }}',
@@ -372,7 +373,7 @@
         function getLogros(){
         	if(curLogrosOffet == -1)
         		return;
-        	$.getJSON('{{ path_for('perfil.logros.json') }}/30/'+curLogrosOffet, function(data){
+        	$.getJSON('{{ path_for('perfil.logros.json', {id: user.id}) }}/30/'+curLogrosOffet, function(data){
         		if(!data.length || !data.length < 30){
 					$('.logrosMore').remove();
 					curLogrosOffet = -1;
