@@ -56,8 +56,9 @@ function httpHandler (req, res) {
 
 User.getRankData();
 ChatIO.on('connection', (socket) => {
+    let cookies;
     try{
-        let cookies = cookie.parse(socket.handshake.headers.cookie);
+        cookies = cookie.parse(socket.handshake.headers.cookie);
     }catch(err){
         console.error('Undefined cookie', socket.handshake.headers.cookie);
         ChatIO.to(socket.id).emit('restart');
