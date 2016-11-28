@@ -26,7 +26,7 @@ $app->group('/private', function(){
 })->add(new \App\Middleware\AuthMiddleware($app->getContainer()));
 
 $app->group('/perfil', function(){
-    $this->get('/logros.json[/{id}/{limit}/{offset}]', 'App\PerfilController:getLogrosJSON')->setName('perfil.logros.json');
+    $this->get('/logros.json/{id}[/{limit}/{offset}]', 'App\PerfilController:getLogrosJSON')->setName('perfil.logros.json');
     $this->get('/user.json/{user}', 'App\PerfilController:getUserInfo')->setName('perfil.userinfo');
     $this->get('/search/{user}', 'App\PerfilController:getUser')->setName('perfil.search.user');
     $this->get('[/{user}]', 'App\PerfilController:getIndex')->setName('perfil.main');

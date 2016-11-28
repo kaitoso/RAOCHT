@@ -240,7 +240,7 @@
 		var registerDay = moment.unix({{ user.created_at }});
 		var lastSession = moment.unix({{ user.lastLogin }});
         var $user = {
-			id: {{ user.user }},
+			id: {{ user.id }},
             image: '{{ who.image }}',
             user: '{{ who.user }}',
             rank: '{{ whoRank.name }}',
