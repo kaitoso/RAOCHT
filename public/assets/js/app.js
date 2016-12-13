@@ -81,9 +81,9 @@ function linkifyChat(str, permissions) {
 
 function linkifyGlobal(str) {
     var urlRegex = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-    var imageRegex = /\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/;
-    var audioRegex = /\b(https?:\/\/\S+(?:mp3|ogg)\S*)\b/;
-    var videoRegex = /\b(https?:\/\/\S+(?:mp4|webm|ogv)\S*)\b/;
+    var imageRegex = /\b(https?:\/\/\S+\.(?:png|jpe?g|gif)\S*)\b/;
+    var audioRegex = /\b(https?:\/\/\S+\.(?:mp3|ogg)\S*)\b/;
+    var videoRegex = /\b(https?:\/\/\S+\.(?:mp4|webm|ogv)\S*)\b/;
     return str.replace(urlRegex, function (match) {
         if (imageRegex.test(match)) {
             return '<a href="' + match + '" target="_blank"><img src="' + match + '" title="' + match + '" class="img-responsive img-center"></a>';
