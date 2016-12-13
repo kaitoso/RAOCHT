@@ -1,3 +1,6 @@
+/**
+ * Chat RAO - Asner
+ */
 Handlebars.registerHelper("unescape", function (a) {
     return new Handlebars.SafeString(a);
 });
@@ -60,9 +63,9 @@ function smilies(str) {
 
 function linkifyChat(str, permissions) {
     var urlRegex = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-    var imageRegex = /\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/;
-    var audioRegex = /\b(https?:\/\/\S+(?:mp3|ogg)\S*)\b/;
-    var videoRegex = /\b(https?:\/\/\S+(?:mp4|webm|ogv)\S*)\b/;
+    var imageRegex = /\b(https?:\/\/\S+\.(?:png|jpe?g|gif)\S*)\b/;
+    var audioRegex = /\b(https?:\/\/\S+\.(?:mp3|ogg)\S*)\b/;
+    var videoRegex = /\b(https?:\/\/\S+\.(?:mp4|webm|ogv)\S*)\b/;
     var perms = array_flip(permissions);
     return str.replace(urlRegex, function (match) {
         if (imageRegex.test(match) && perms.images != null) {
