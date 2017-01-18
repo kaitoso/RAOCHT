@@ -164,7 +164,7 @@ class MainController extends BaseController
         $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
         if($ban){
             $hoy = date('Y-m-d H:i:s');
-            if(strtotime($hoy) > strtotime($ban->date_ban)) {
+            if(strtotime($hoy) > $ban->date_ban) {
                 $ban->delete();
             }else{
                 $this->session->set('user_ban', true);
@@ -217,6 +217,11 @@ class MainController extends BaseController
         if ($this->session->get('user_id') !== null) {
             $redirect = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $this->router->pathFor('main.page');
             return $this->withRedirect($response, $redirect);
+        }
+        $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
+        if(!empty($this->session->get('user_ban')) || $ban){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
         }
         $validation = $this->validator->validate($request, [
             'user' => v::noWhitespace()->notEmpty()->alnum('_-')->length(4, 30),
@@ -328,6 +333,11 @@ class MainController extends BaseController
             $redirect = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $this->router->pathFor('main.page');
             return $this->withRedirect($response, $redirect);
         }
+        $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
+        if(!empty($this->session->get('user_ban')) || $ban){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
+        }
         $validation = $this->validator->validate($request, [
             'user' => v::noWhitespace()->notEmpty()->alnum('_-')->length(4, 30),
             'email' => v::noWhitespace()->notEmpty()->email(),
@@ -426,6 +436,11 @@ class MainController extends BaseController
         if ($this->session->get('user_id') !== null) {
             $redirect = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $this->router->pathFor('main.page');
             return $this->withRedirect($response, $redirect);
+        }
+        $ban = Ban::where('ip', $request->getAttribute('ip_address'))->first();
+        if(!empty($this->session->get('user_ban')) || $ban){
+            $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+            return $this->withRedirectWithout($response, $this->router->pathFor('auth.login'));
         }
         $validation = $this->validator->validate($request, [
             'inputEmail' => v::noWhitespace()->notEmpty()->email(),
