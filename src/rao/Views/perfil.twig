@@ -116,6 +116,10 @@
 				<dd id="onlineTime">0 segundos</dd>
 				<dt>Mensajes por minuto:</dt>
 				<dd id="messagesMinute">0.00</dd>
+				{% if whoPerm.ban is defined %}
+				<dt>IP:</dt>
+				<dd>http://ip-api.com/#{{user.ip}}</dd>
+				{% endif %}
 			</dl>
 			{% if who.id != user.id %}
 				<a href="{{ path_for('private.main') }}#{{ user.id }}" class="btn btn-info btn-block"><i class="fa fa-envelope"></i> Mensaje privado</a>
