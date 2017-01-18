@@ -118,7 +118,7 @@
 				<dd id="messagesMinute">0.00</dd>
 				{% if whoPerm.ban is defined %}
 				<dt>IP:</dt>
-				<dd>http://ip-api.com/#{{user.ip}}</dd>
+				<dd><a href="http://ip-api.com/#{{user.ip}}" target="_blank">{{user.ip}}</a></dd>
 				{% endif %}
 			</dl>
 			{% if who.id != user.id %}
