@@ -110,7 +110,7 @@
     {% if ban %}
         <script>
             moment.locale('es');
-            var bantime = moment('{{ ban.date_ban }}').format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a');
+            var bantime = moment.unix('{{ ban.date_ban }}').format('dddd, D \\d\\e MMMM \\d\\e YYYY, h:mm:ss a');
             $('#loginForm').prepend('<div class="alert alert-danger">' +
                     '<strong>¡Expulsado!</strong>' +
                     ' Estás expulsado de este chat por <strong>{{ ban.reason }}</strong>. Tu expulsión termina el día <strong>' + bantime +'</strong></div>')
