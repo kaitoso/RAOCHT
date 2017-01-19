@@ -18,4 +18,10 @@ class Middleware
         $this->container->session->set('redirect', $_SERVER['REQUEST_URI']);
         return $response->withStatus(302)->withHeader('Location', $location);
     }
+
+    protected function withRedirectWithout(Response $response, $location = '/')
+    {
+        $this->container->session->set('redirect', null);
+        return $response->withStatus(302)->withHeader('Location', $location);
+    }
 }
