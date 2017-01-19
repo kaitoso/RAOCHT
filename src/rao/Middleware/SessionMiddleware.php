@@ -24,6 +24,13 @@ class SessionMiddleware extends Middleware{
                 }
                 if (hash_equals($auth->token, $token)) {
                     $user = $auth->usuario()->first();
+                    if($user->getBan){
+                        $auth->delete();
+                        $request = RequestCookies::remove($request, 'raoRemember');
+                        $this->logger->info("BAN: {$user} intentó conectarse al chat por cookie.");
+                        $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
+                        return $this->withRedirect($response, $this->router->pathFor('auth.login'));
+                    }
                     $redis = $this->container->redis;
                     $this->container->session->set('user_id', $user->id);
                     $this->container->session->set('user', $user->user);
