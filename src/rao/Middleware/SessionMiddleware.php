@@ -27,7 +27,7 @@ class SessionMiddleware extends Middleware{
                     if($user->getBan){
                         $auth->delete();
                         $request = RequestCookies::remove($request, 'raoRemember');
-                        $this->logger->info("BAN: {$user} intentó conectarse al chat por cookie.");
+                        $this->logger->info("BAN: {$user->user} intentó conectarse al chat por cookie.");
                         $this->flash->addMessage('error', '¡Estas expulsado! No puedes ingresar al chat.');
                         return $this->withRedirect($response, $this->router->pathFor('auth.login'));
                     }
