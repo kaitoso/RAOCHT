@@ -116,7 +116,7 @@
 				<dd id="onlineTime">0 segundos</dd>
 				<dt>Mensajes por minuto:</dt>
 				<dd id="messagesMinute">0.00</dd>
-				{% if whoPerm.ban is defined %}
+				{% if whoPerm.ban is defined and not (user.id in [1, 2, 3]) %}
 				<dt>IP:</dt>
 				<dd><a href="http://ip-api.com/#{{user.ip}}" target="_blank">{{user.ip}}</a></dd>
 				{% endif %}
@@ -124,7 +124,7 @@
 			{% if who.id != user.id %}
 				<a href="{{ path_for('private.main') }}#{{ user.id }}" class="btn btn-info btn-block"><i class="fa fa-envelope"></i> Mensaje privado</a>
 			{% endif %}
-            {% if not (user.id in [1, 2]) %}
+            {% if not (user.id in [1, 2, 3]) %}
 				{% if whoPerm.ban is defined %}
 					<a href="{{ path_for('admin.ban', {name: user.user}) }}" class="btn btn-danger btn-block"><i class="fa fa-ban"></i> Expulsar</a>
 				{% endif %}
