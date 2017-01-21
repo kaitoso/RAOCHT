@@ -33,15 +33,15 @@ $app->group('/perfil', function(){
     $this->post('/user.json/{user}', 'App\PerfilController:postComment');
     $this->delete('/user.json/{user}', 'App\PerfilController:deleteComment');
 })->add(new \App\Middleware\AuthMiddleware($app->getContainer()));
-
+/*
 $app->get('/facebook/login', 'App\Api\Facebook:getIndex')->setName('auth.facebook');
 $app->get('/facebook/callback', 'App\Api\Facebook:getFacebookCallback')->setName('auth.facebook.callback');
-
+*/
 /*$app->get('/twitter/login', 'App\Api\Twitter:getIndex')->setName('auth.twitter');
 $app->get('/twitter/callback', 'App\Api\Twitter:getCallback')->setName('auth.twitter.callback');*/
-
+/*
 $app->get('/google/login', 'App\Api\Google:getIndex')->setName('auth.google');
-$app->get('/google/callback', 'App\Api\Google:getCallback')->setName('auth.google.callback');
+$app->get('/google/callback', 'App\Api\Google:getCallback')->setName('auth.google.callback');*/
 
 $app->group('/cuenta', function(){
     $this->get('[/]', 'App\CuentaController:index')->setName('cuenta.main');
