@@ -29,12 +29,10 @@ class AdminController extends BaseController
             ->groupBy('dia')
             ->get();
         $bans = Ban::where([
-                [$db::raw('DAY(created_at)'), '=', $db::raw('DAY(CURDATE())')],
                 [$db::raw('MONTH(created_at)'), '=', $db::raw('MONTH(CURDATE())')],
                 [$db::raw('YEAR(created_at)'), '=', $db::raw('YEAR(CURDATE())')]
         ])->count();
         $userAch = UserAchievements::where([
-                [$db::raw('DAY(created_at)'), '=', $db::raw('DAY(CURDATE())')],
                 [$db::raw('MONTH(created_at)'), '=', $db::raw('MONTH(CURDATE())')],
                 [$db::raw('YEAR(created_at)'), '=', $db::raw('YEAR(CURDATE())')]
         ])->count();
