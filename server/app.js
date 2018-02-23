@@ -140,7 +140,8 @@ ChatIO.on('connection', (socket) => {
             message: chatConfig.message
         });
         ChatIO.to(socket.id).emit('system', {
-            message: '¡Ahora locuta ' + stream.announcer + '!'
+            message: '¡Ahora locuta ' + stream.announcer + ' :D!'
+            
         });
         currentUser.ready = true;
     });

@@ -1,8 +1,9 @@
 {% extends 'templates/base.twig' %}
-{% block titulo %}Chat - Inicio{% endblock %}
+{% block titulo %}Chat - Radio AnimeObsesión{% endblock %}
 {% block css %}
     <link rel="stylesheet" href="{{ base_url() }}/assets/css/chat.css">
     <link rel="stylesheet" href="{{ base_url() }}/dist/css/sweetalert2.min.css">
+    <meta property="fb:app_id" content="544172022424052"/><link rel="shortcut icon" href="http://animeobsesion.net/wp-content/uploads/2016/02/logo0_1318306169-rao-twit-reasonably-small-1.png" title="Favicon" />
     <style>
         #mainContainer{
             height: 100%;
@@ -20,9 +21,16 @@
             background-size: cover;
             border-color: #e7e7e7;
         }
+        .achicaiframe{
+
+        width: 100% ;
+        }
+
+
     </style>
 {% endblock %}
 {% block contenido %}
+
     <nav id="myNavmenu" class="navmenu navmenu-default navmenu-fixed-left offcanvas-sm" role="navigation">
         <div class="navmenu-brand" id="userPreview">
             <img id="controlImage" src="{{ base_url() }}/avatar/b/{{ user.image }}">
@@ -47,26 +55,35 @@
                 </ul>
             </li>
             <li>
-                <script src="http://content.jwplatform.com/libraries/Coaq3AsN.js" ></script>
-                <script>jwplayer.key="zRBOT5F8V7gY+XXXjNvNf49X84FOyFrKi1vj3g==";</script>
-                <div id="radioAnimeob">Loading the player...</div>
-                <script type="text/javascript">
-                var playerInstance = jwplayer("radioAnimeob");
-                playerInstance.setup({
-                    file: "http://138.128.189.172:8000/;stream.nsv",
-                    width: 282,
-                    height: 40,
-                    type: "mp3",
-                    displaytitle:"true",
-                    title: "en linea",
-                    primary:"hmtl",
-                    autostar:"true",
-                    volume: 40,
-                });
-                </script>
-            </li>
+            <script src="http://animeobsesion.net/Reproductores/Autoplay/jwplayer.js"  ></script>
+          <div id="radioAnimeob">Loading the player...</div>
+          <script type="text/javascript">
+          var playerInstance = jwplayer("radioAnimeob");
+          playerInstance.setup({
+              file: "http://138.128.189.172:8000/;stream.nsv",
+              width: 282,
+              height: 40,
+              type: "mp3",
+              displaytitle:"true",
+              title: "Envivo",
+              primary:"hmtl",
+              autostart:"true",
+
+          });jwplayer().onBeforePlay(function(){ jwplayer().setVolume(50); });
+          </script>
+
+              </li>
+              <li>
+
+          <!--    <iframe  src="http://www.animeobsesion.net/ChatAutoDJ/info2018.php" class="achicaiframe"  height="440" ></iframe>  -->
+          <center><iframe frameborder="0" src="http://www.animeobsesion.net/ChatAutoDJ/info2018.php"  width="280" height="415"></iframe></center>
+
+              </li>
         </ul>
+
+
     </nav>
+
 
     <div class="container-fluid" id="mainContainer">
         <div class="chatbox"></div>

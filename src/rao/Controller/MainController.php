@@ -91,6 +91,15 @@ class MainController extends BaseController
         }
         return $this->withRedirect($response, $this->router->pathFor('main.page'));
     }
+	public function radiinfo(/*Request $request, Response $response, $args*/)
+    {
+        //if($this->flash->getMessage('error')){
+            //return $this->view->render($response, 'error.twig');
+        //}
+       //return $this->withRedirect($response, $this->router->pathFor('main.page'));
+	//return "test";
+    }
+	
 
     public function getLogin(Request $request, Response $response, $args)
     {

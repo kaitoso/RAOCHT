@@ -2,6 +2,8 @@
 var _ = require('lodash');
 var User = require('./user');
 var escape = require('escape-html');
+var stream = require('./stream');
+
 var parse = function(str, lookForQuotes) {
     var args = [];
     var readingPart = false;
@@ -64,6 +66,12 @@ module.exports = function (ChatIO) {
             case "/clean":
                 this.clean(socket, user, comando);
                 break;
+            case "/locutor":
+                this.locu(socket, user, comando);
+                break;
+                case "/cancion":
+                    this.music(socket, user, comando);
+                    break;
             default:
                 let sendMessage = {
                     'user': user.user,
@@ -81,8 +89,8 @@ module.exports = function (ChatIO) {
     comandos.kick = function(socket, user, comando){
         let userRank = User.rankPermissions[user.rank];
         if(userRank.permission.ban === undefined){
-            ChatIO.to(socket.id).emit('system', {
-                message: "No tienes los suficientes permisos para ejecutar este comando."
+            ChatIO.emit('system', {
+                message:  `${user.user} intentó patear a alguien y no tiene permisos, que sad :c`
             });
             return;
         }
@@ -95,7 +103,7 @@ module.exports = function (ChatIO) {
         var dest = comando.shift();
         if(dest.toUpperCase() === user.user.toUpperCase()){
             ChatIO.emit('system', {
-                message: `El usuario ${user.user} se intentó patear a sí mismo. ¡Que tristeza!`
+                message: `En este chat esta prohibido el harakiri ${user.user}, asi que no intentes patearte denuevo porfavor ¬¬`
             });
             return;
         }
@@ -142,7 +150,7 @@ module.exports = function (ChatIO) {
             });
         });
         ChatIO.emit('system', {
-            message: `El usuario ${userKickData.user} ha sido pateado por el usuario ${user.user} por la razón de: ${razon}`
+            message: ` ${userKickData.user} ha sido pateado por el usuario ${user.user} por la razón de: ${razon}, que sad :c`
         });
     };
 
@@ -157,7 +165,7 @@ module.exports = function (ChatIO) {
         let userRank = User.rankPermissions[user.rank];
         if(userRank.permission.global === undefined){
             ChatIO.to(socket.id).emit('system', {
-                message: "No tienes los suficientes permisos para ejecutar este comando."
+                message: "Enserio pensabas que podrias hacerlo? jajaja que sad."
             });
             return;
         }
@@ -178,7 +186,7 @@ module.exports = function (ChatIO) {
         let userRank = User.rankPermissions[user.rank];
         if(userRank.permission.ban === undefined){
             ChatIO.to(socket.id).emit('system', {
-                message: "No tienes los suficientes permisos para ejecutar este comando."
+                message: "Enserio pensabas que podrias hacerlo? jajaja que sad."
             });
             return;
         }
@@ -212,7 +220,7 @@ module.exports = function (ChatIO) {
         let immunityRank = User.getRanksWithImmunity();
         if(_.includes(immunityRank, userKickData.rank)){
             ChatIO.to(socket.id).emit('system', {
-                message: "Este usuario tiene inmunidad para ser reiniciado."
+                message: "Este usuario es inmortal, no puedes patearlo :c"
             });
             return;
         }
@@ -223,8 +231,30 @@ module.exports = function (ChatIO) {
     }
 
     comandos.clean = function(socket, user, comando){
+      ChatIO.to(socket.id).emit('system', {
+          message: "Este comando esta en proceso de construcion ewe --atte kaitoso"
+    });
+}
+comandos.locu = function(socket, user, comando){
 
-    }
+  ChatIO.to(socket.id).emit('system', {
 
+
+
+      message: `${user.user}, ahora esta locutando ` + stream.announcer
+
+});
+}
+comandos.music = function(socket, user, comando){
+
+  ChatIO.to(socket.id).emit('system', {
+
+
+
+      message: `${user.user}, La cancion que suena es: ` + stream.title
+
+});
+}
     return comandos;
+
 };

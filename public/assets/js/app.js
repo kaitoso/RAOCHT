@@ -157,7 +157,9 @@ function getCache() {
             '/reiniciar',
             '/global',
             '/clean',
-            '/stat'
+            '/stat',
+            '/locutor',
+            '/cancion'
         ];
         $.each(data.ranks, function (i, v) {
             $config.autocomplete[0].push(v.name);
@@ -180,8 +182,9 @@ function getCache() {
                     $chat.check.stop();
                     return;
                 }
+                //se setea el tiempo de kick automatico a 40 minutos
                 var currentTime = new Date().getTime();
-                if (currentTime > $chat.last + ($chat.seed * 1000 * 60)) {
+                if (currentTime > $chat.last + (40 * 1000 * 60)) {
                     $chat.check.stop();
                     socket.disconnect();
                     $.getJSON($baseUrl+'/logout', function(data){
@@ -189,7 +192,7 @@ function getCache() {
                     });
                     swal({
                         title: '¡Te han pateado!',
-                        text: "Por la razón de: estuviste más de " + $chat.seed + " minutos sin enviar ningún mensaje",
+                        text: "Por la razón de: estuviste más de  40 minutos  sin enviar ningún mensaje bot del mal >:v",
                         type: 'warning',
                         showCancelButton: false,
                         confirmButtonColor: '#3085d6',
