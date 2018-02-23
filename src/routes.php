@@ -1,5 +1,6 @@
 <?php
 
+//comentatio para ver realmente funciona el commit y push
 $app->get('/', 'App\MainController:index')->setName('main.page');
 $app->get('/error', 'App\MainController:error')->setName('main.error');
 $app->get('/radioinfo', 'App\MainController:radioinfo')->setName('main.radioinfo');
